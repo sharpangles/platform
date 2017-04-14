@@ -2,6 +2,10 @@
 
 ## Dynamic Component Loading for Angular.
 
+#
+### NOTE: This is just getting started and is not quite enough to take you to the ultimate dynamic dashboard without alot of work on your own.  Several more pieces are on their way to being open sourced, including global bootstrapping of dependencies and packages (including global and module based), a layout mechanism that supports declarative and imperative manipulation through dynamic layout hierarchies, some love for ngrx (effects bootstrapping), a full sample, docs, etc...
+#
+
 While @angular/router works great for explicitly coded transitions, sometimes component hierarchies are determined from external state.
 The router does provide some mechanisms to dynamically create routes, lazy load modules, and map state, however sometimes you don't want to bring along history, urls, and knowledge on the child-side of its involvement in routing.
 Additionally, without lifecycle hooks during the loading process it is difficult to separate concerns across other hierarchical structures, such as forms.
