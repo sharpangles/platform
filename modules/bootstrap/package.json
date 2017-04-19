@@ -1,0 +1,46 @@
+{
+  "version": "1.0.0-beta.0",
+  "name": "@sharpangles/bootstrap",
+  "description": "Global build bootstraps",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sharpangles/platform.git"
+  },
+  "keywords": [
+    "Angular",
+    "Enterprise",
+    "Bootstrap"
+  ],
+  "author": "Eric Nilsen",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sharpangles/platform/issues"
+  },
+  "homepage": "https://github.com/sharpangles/platform/tree/master/modules/bootstrap#readme",
+  "scripts": {
+    "build:karma": "tsc -p ./src/Karma/tsconfig.json",
+    "build:bootstrap": "tsc -p tsconfig.dist.json",
+    "build": "npm run build:karma && rimraf \"./__artifacts/release/*.*\" && npm run build:bootstrap",
+    "copy": "cpy package.json README.md __artifacts/release",
+    "postbuild": "npm run copy",
+    "test": "node ../../tests-typescript.js",
+    "clean": "rimraf -rf \"__artifacts\"",
+    "watch": "tsc -w"
+  },
+  "devDependencies": {
+    "karma": "^1.3.0",
+    "karma-chrome-launcher": "^2.0.0",
+    "karma-cli": "^1.0.1",
+    "karma-jasmine": "^1.0.2",
+    "karma-jasmine-html-reporter": "^0.2.2",
+    "cpy-cli": "^1.0.1",
+    "jasmine": "^2.5.3",
+    "nyc": "^10.1.2",
+    "rimraf": "^2.5.4",
+    "rollup": "^0.41.4",
+    "uglifyjs": "^2.4.10",
+    "concurrently": "^3.4.0",
+    "node-sass": "^4.5.2",
+    "systemjs": "0.19.40"
+  }
+}

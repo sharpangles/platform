@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "declaration": true,
+    "stripInternal": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "moduleResolution": "node",
+    "noEmitOnError": false,
+    "outFile": "./__artifacts/release/environment-bootstrap.es2015.js",
+    "rootDir": ".",
+    "lib": ["es2015", "dom"],
+    "target": "es2015",
+    "skipLibCheck": true,
+    "strictNullChecks": true,
+    "types": [
+      "node",
+      "jasmine",
+      "systemjs"
+    ]
+  },
+  "include": [
+    "./src/*.ts",
+    "./src/*/*.ts",
+    "./spec/**/*.ts"
+  ]
+}
