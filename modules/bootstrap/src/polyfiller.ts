@@ -1,13 +1,19 @@
-﻿/// <reference path="./ScriptTagLoader.ts" />
+﻿/// <reference path="./module_loader.ts" />
 
 namespace __sharpangles {
-    interface _polyfillTest {
-        src: string;
+    interface _polyfill {
+        dependsOn?: string[];
+
+        /** A test to determine if the polyfill is needed or already loaded. */
         test(): boolean;
     }
 
     export class Polyfiller {
-        constructor(public baseUrl: string) {
+        constructor(private _moduleLoader: ModuleLoader<any>, public baseUrl: string) {
+        }
+
+        ensureAllAsync() {
+            return this._taskMap.ensureAllAsync();
         }
 
         fromES5(): Polyfiller {
@@ -15,24 +21,19 @@ namespace __sharpangles {
             return this;
         }
 
-        withSystemJS(): Polyfiller {
-            this.registerPolyfill("node_modules/systemjs/dist/system.src.js", () => typeof System == "undefined");
-            return this;
-        }
+        private _taskMap = new TaskMap<string, _polyfill, any>((key: string, source: _polyfill) => new Task<any>(() => this._loadPolyfillAsync(key, source)));
 
-        registerPolyfill(src: string, test: () => boolean) {
-            this._tests.push({ src: src, test: test });
-        }
-
-        private _tests: _polyfillTest[] = [];
-
-        async ensurePolyfillsAsync() {
-            for (var test of this._tests) {
-                if (test.test())
-                    scriptTagLoader.loadAsync(test.src, this.baseUrl);
+        private async _loadPolyfillAsync(key: string, source: _polyfill) {
+            if (source.dependsOn) {
+                await Promise.all(source.dependsOn.map(d => this._taskMap.ensureAsync(d)));
             }
-            this._tests = [];
-            await scriptTagLoader.ensureLoadedAsync();
+            if (!source.test())
+                return;
+            return await this._moduleLoader.loadModuleAsync(key);
+        }
+
+        registerPolyfill(src: string, test?: () => boolean, dependsOn?: string[]) {
+            this._taskMap.ensureOrCreateAsync(src, { test: test ? test : () => true, dependsOn: dependsOn });
         }
     }
 }

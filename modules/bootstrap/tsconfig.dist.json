@@ -1,27 +1,25 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
-    "declaration": true,
-    "stripInternal": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noEmitOnError": false,
+    "removeComments": true,
+    "target": "es2015",
+    "inlineSourceMap": true,
+    "inlineSources": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "moduleResolution": "node",
-    "noEmitOnError": false,
-    "outFile": "./__artifacts/release/environment-bootstrap.es2015.js",
-    "rootDir": ".",
+    "module": "none",
+    "declaration": true,
+    "stripInternal": true,
+    "noEmitHelpers": true,
+    "importHelpers": true,
     "lib": ["es2015", "dom"],
-    "target": "es2015",
-    "skipLibCheck": true,
-    "strictNullChecks": true,
-    "types": [
-      "node",
-      "jasmine",
-      "systemjs"
-    ]
-  },
-  "include": [
-    "./src/*.ts",
-    "./src/*/*.ts",
-    "./spec/**/*.ts"
-  ]
+    "types": [ "node", "systemjs" ],
+    "skipLibCheck": true
+  }
 }

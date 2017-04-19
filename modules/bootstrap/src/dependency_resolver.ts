@@ -1,32 +1,21 @@
 ﻿/// <reference path="./dependency.ts" />
+/// <reference path="./dependency_policy.ts" />
 
 namespace __sharpangles {
     /** @internal */
-    export class DependencyResolver {
-        constructor(
-            private _moduleLoader: DependencyModuleLoader,
-            rootName: string,
-            private _environment: string,
-            private _dependencyModuleLocation: string,
-            private _dependencyModuleExport?: string) {
-            this._rootScope = this._getScope(rootName);
+    export class DependencyResolver<TModuleLoaderConfig> {
+        constructor(private _moduleLoader: ModuleLoader<TModuleLoaderConfig>, private _dependencyPolicy: DependencyPolicy<TModuleLoaderConfig>) {
         }
 
-        private _rootScope?: string;
-
-        protected canDependencyHaveDependencies(dependency: Dependency) {
-            this._getScope(dependency.name) != this._rootScope;
+        protected getMetadataForEnvironmentFromModule(depsModule: any): { [key: string]: Dependency<TModuleLoaderConfig> } {
+            return this._dependencyPolicy.dependencyModuleExport ? depsModule[this._dependencyPolicy.dependencyModuleExport] : depsModule;
         }
 
-        protected getMetadataForEnvironmentFromModule(depsModule: any): { [key: string]: Dependency } {
-            return this._dependencyModuleExport ? depsModule[this._dependencyModuleExport] : depsModule;
-        }
-
-        async resolveChildDependenciesAsync(dependency: Dependency, isLocal: boolean): Promise<{ [key: string]: Dependency }> {
-            if (dependency.knownDependencies || !this.canDependencyHaveDependencies(dependency)) {
+        async resolveChildDependenciesAsync(dependency: Dependency<TModuleLoaderConfig>): Promise<{ [key: string]: Dependency<TModuleLoaderConfig> }> {
+            if (dependency.knownDependencies || !this._dependencyPolicy.isDependencyParticipant(dependency.name)) {
                 return this._getAllDependencies({}, dependency.knownDependencies ? dependency.knownDependencies : {});
             }
-            var depsModule = await this._moduleLoader.loadModuleAsync(isLocal ? this._dependencyModuleLocation : `${dependency.name}/${this._dependencyModuleLocation}`);
+            var depsModule = await this._moduleLoader.loadModuleAsync(this._dependencyPolicy.resolveDependencyModuleName(dependency.name));
             if (!depsModule)
                 return {};
             let metadata = this.getMetadataForEnvironmentFromModule(depsModule);
@@ -42,11 +31,7 @@ namespace __sharpangles {
             return metadata;
         }
 
-        private _getScope(name: string): string | undefined {
-            return name && name.charAt(0) == '@' ? name.indexOf('/') > 0 ? name.substr(0, name.indexOf('/')) : name : undefined;
-        }
-
-        private _getAllDependencies(deps: { [key: string]: Dependency }, childDeps: { [key: string]: Dependency }): { [key: string]: Dependency } {
+        private _getAllDependencies(deps: { [key: string]: Dependency<TModuleLoaderConfig> }, childDeps: { [key: string]: Dependency<TModuleLoaderConfig> }): { [key: string]: Dependency<TModuleLoaderConfig> } {
             if (!childDeps)
                 return {};
             for (var name of Object.keys(childDeps)) {

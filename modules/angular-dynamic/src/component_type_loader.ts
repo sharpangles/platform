@@ -1,15 +1,6 @@
 import { Injectable, Injector, NgModuleFactory, resolveForwardRef, NgModuleFactoryLoader, NgModule, Type, InjectionToken, Optional, Inject } from '@angular/core';
 import { TypeReference } from './interfaces';
-
-/**
- * Implementations asyncrhonously resolve the type reference to a url.
- * This gives an opportunity to involve global bootstrappers, configure a module loader, or handle internal references with moduleId (similar to UrlTree from the router or UrlResolver from the compiler),
- */
-export interface TypeReferenceUrlResolver {
-    getUrl(typeReference: TypeReference): Promise<string>;
-}
-
-export let TYPE_REFERENCE_URL_RESOLVER: InjectionToken<TypeReferenceUrlResolver> = new InjectionToken<TypeReferenceUrlResolver>('TypeReferenceUrlResolver');
+import { TYPE_REFERENCE_URL_RESOLVER, TypeReferenceUrlResolver } from './type_reference_url_resolver';
 
 /**
  * Creates a ComponentFactory from an ITypeMetadata.

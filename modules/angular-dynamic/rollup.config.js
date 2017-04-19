@@ -17,5 +17,6 @@ export default {
     'rxjs/operator/observeOn': 'Rx.Observable.prototype',
     'rxjs/operator/scan': 'Rx.Observable.prototype',
     'rxjs/operator/withLatestFrom': 'Rx.Observable'
-  }
+  },
+  onwarn: function (warning) { if (warning.code !== 'THIS_IS_UNDEFINED') console.error(warning.message); }
 }

@@ -1,48 +1,45 @@
 ﻿/// <reference path="./dependency.ts" />
+/// <reference path="./module_loader.ts" />
+/// <reference path="./task_map.ts" />
 
 namespace __sharpangles {
     /** @internal */
-    export class DependencyLoader {
+    export class DependencyLoader<TModuleLoaderConfig> {
         constructor(
-            private _moduleLoader: DependencyModuleLoader,
+            private _moduleLoader: ModuleLoader<TModuleLoaderConfig>,
             public name: string,
-            public environment: string,
-            public baseUrl: string = '/',
-            public dependencyResolver: DependencyResolver) {
+            dependencyPolicy: DependencyPolicy<TModuleLoaderConfig>) {
+                this.dependencyResolver = new DependencyResolver<TModuleLoaderConfig>(this._moduleLoader, dependencyPolicy);
         }
 
-        async runAsync(useDefaultOnBasePaths = true): Promise<any> {
-            await this._loadAsync(this);
-            await scriptTagLoader.ensureLoadedAsync();
+        dependencyResolver: DependencyResolver<TModuleLoaderConfig>;
+
+        async loadStaticDependenciesAsync(): Promise<void> {
+            await this._taskMap.ensureOrCreateAsync(this.name, <Dependency<TModuleLoaderConfig>>{ name: this.name });
+            await this._moduleLoader.ensureAllLoadedAsync();
         }
 
-        async ensureDependencyLoadedAsync(dependency: Dependency): Promise<void> {
-            if (this._loads.get(dependency.name))
+        async addDependencyAsync(dependency: Dependency<TModuleLoaderConfig>): Promise<void> {
+            await this._taskMap.ensureOrCreateAsync(dependency.name, dependency);
+            if (this._taskMap.tryGetSource(dependency.name)) {
+                await this._taskMap.ensureAsync(dependency.name);
                 return;
+            }
             var batch: any = {};
             batch[dependency.name] = dependency;
             await this._loadBatchAsync(batch);
-            await scriptTagLoader.ensureLoadedAsync();
+            await this._moduleLoader.ensureAllLoadedAsync();
         }
 
-        private _loads = new Map<string, Promise<{ [key: string]: Dependency }>>();
+        private _taskMap = new TaskMap<string, Dependency<TModuleLoaderConfig>, { [key: string]: Dependency<TModuleLoaderConfig> }>((key: string, source: Dependency<TModuleLoaderConfig>) => new Task<any>(() => this._loadChildDependenciesAsync(source)));
 
-        private async _loadBatchAsync(dependencies: { [key: string]: Dependency }) {
+        private async _loadBatchAsync(dependencies: { [key: string]: Dependency<TModuleLoaderConfig> }) {
             this._moduleLoader.registerDependencies(dependencies);
-            await Promise.all(Object.keys(dependencies).map(k => this._loadAsync(dependencies[k])));
+            await Promise.all(Object.keys(dependencies).map(k => this._taskMap.ensureOrCreateAsync(k, dependencies[k])));
         }
 
-        private _loadAsync(dependency: Dependency) {
-            let load = this._loads.get(dependency.name);
-            if (load)
-                return load;
-            load = this._loadChildDependenciesAsync(dependency);
-            this._loads.set(dependency.name, load);
-            return load;
-        }
-
-        private async _loadChildDependenciesAsync(dependency: Dependency) {
-            var dependents = await this.dependencyResolver.resolveChildDependenciesAsync(dependency, dependency.name == this.name);
+        private async _loadChildDependenciesAsync(dependency: Dependency<TModuleLoaderConfig>) {
+            var dependents = await this.dependencyResolver.resolveChildDependenciesAsync(dependency);
             if (dependents && Object.keys(dependents).length > 0) {
                 await this._loadBatchAsync(dependents);
             }
