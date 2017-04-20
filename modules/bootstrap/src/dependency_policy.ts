@@ -6,8 +6,8 @@ namespace __sharpangles {
          *
          * @param rootName The name used for the application root.
          */
-        constructor(public rootName: string, public environmentExtension?: string, public dependencyModuleLocation: string = 'dependencies', public dependencyModuleExport?: string) {
-            this.scope = this._getScope(rootName);
+        constructor(public rootDependency: Dependency<TModuleLoaderConfig>, public environmentExtension?: string, public dependencyModuleLocation: string = 'dependencies', public dependencyModuleExport?: string) {
+            this.scope = this._getScope(rootDependency.name);
         }
 
         scope?: string;
@@ -17,7 +17,7 @@ namespace __sharpangles {
          * The base implementation determines this by a matching scope on the package.
          */
         isDependencyParticipant(moduleName: string): boolean {
-            return this.scope == this._getScope(moduleName);
+            return this.scope === this._getScope(moduleName);
         }
 
         /**
@@ -34,11 +34,11 @@ namespace __sharpangles {
             let loc = this.dependencyModuleLocation;
             if (this.environmentExtension)
                 loc += '.' +  + this.environmentExtension;
-            return this.rootName == moduleName ? loc : `${moduleName}/${loc}`;
+            return this.rootDependency.name === moduleName ? loc : `${moduleName}/${loc}`;
         }
 
         private _getScope(name: string): string | undefined {
-            return name && name.charAt(0) == '@' ? name.indexOf('/') > 0 ? name.substr(0, name.indexOf('/')) : name : undefined;
+            return name && name.charAt(0) === '@' ? name.indexOf('/') > 0 ? name.substr(0, name.indexOf('/')) : name : undefined;
         }
     }
 }

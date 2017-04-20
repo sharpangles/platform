@@ -62,3 +62,4 @@ lerna-debug.log
 /lib/
 ngfactory
 output
+__artifacts

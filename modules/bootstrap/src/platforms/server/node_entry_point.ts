@@ -3,8 +3,8 @@
 
 namespace __sharpangles {
     export class NodeEntryPoint extends EntryPoint<any> {
-        constructor(public name: string, public dependencyPolicy: DependencyPolicy<any>) {
-            super(name, dependencyPolicy);
+        constructor(public dependencyPolicy: DependencyPolicy<any>) {
+            super(dependencyPolicy);
         }
 
         protected createModuleLoader() {

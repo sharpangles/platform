@@ -38,5 +38,8 @@ namespace __sharpangles {
         ensureAllLoadedAsync(): Promise<any> {
             return Promise.resolve();
         }
+
+        registerDependencies(dependencies: { [key: string]: Dependency<any> }): void {
+        }
     }
 }

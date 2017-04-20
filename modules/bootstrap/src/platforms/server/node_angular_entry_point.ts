@@ -2,12 +2,12 @@
 
 namespace __sharpangles {
     export class NodeAngularEntryPoint extends NodeEntryPoint {
-        constructor(public name: string, public dependencyPolicy: DependencyPolicy<any>) {
-            super(name, dependencyPolicy);
+        constructor(public dependencyPolicy: DependencyPolicy<any>) {
+            super(dependencyPolicy);
         }
 
         protected async initEnvironmentAsync() {
-            //__sharpangles.hackXHRForDynamicAngular();
+            // __sharpangles.hackXHRForDynamicAngular();
             await this.moduleLoader.ensureAllLoadedAsync();
             const Jasmine = await this.moduleLoader.loadModuleAsync('jasmine');
             const runner = new Jasmine();
@@ -25,13 +25,13 @@ namespace __sharpangles {
         }
 
         protected createPolyfiller() {
-            var polyfiller = super.createPolyfiller();
-            polyfiller.registerPolyfill("/base/node_modules/zone.js/dist/zone-node.js");
-            polyfiller.registerPolyfill("/base/node_modules/zone.js/dist/long-stack-trace-zone.js");
-            polyfiller.registerPolyfill("/base/node_modules/zone.js/dist/proxy.js");
-            polyfiller.registerPolyfill("/base/node_modules/zone.js/dist/sync-test.js");
-            polyfiller.registerPolyfill("/base/node_modules/zone.js/dist/async-test.js");
-            polyfiller.registerPolyfill("/base/node_modules/zone.js/dist/fake-async-test.js");
+            let polyfiller = super.createPolyfiller();
+            polyfiller.registerPolyfill('/base/node_modules/zone.js/dist/zone-node.js');
+            polyfiller.registerPolyfill('/base/node_modules/zone.js/dist/long-stack-trace-zone.js');
+            polyfiller.registerPolyfill('/base/node_modules/zone.js/dist/proxy.js');
+            polyfiller.registerPolyfill('/base/node_modules/zone.js/dist/sync-test.js');
+            polyfiller.registerPolyfill('/base/node_modules/zone.js/dist/async-test.js');
+            polyfiller.registerPolyfill('/base/node_modules/zone.js/dist/fake-async-test.js');
             return polyfiller;
         }
     }

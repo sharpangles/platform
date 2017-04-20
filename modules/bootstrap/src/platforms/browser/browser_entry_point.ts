@@ -5,8 +5,8 @@
 
 namespace __sharpangles {
     export class BrowserEntryPoint extends EntryPoint<any> {
-        constructor(public name: string, public dependencyPolicy: DependencyPolicy<any>, public baseUrl: string = '/') {
-            super(name, dependencyPolicy, baseUrl)
+        constructor(public dependencyPolicy: DependencyPolicy<any>, public baseUrl: string = '/') {
+            super(dependencyPolicy, baseUrl);
         }
 
         protected createModuleLoader() {

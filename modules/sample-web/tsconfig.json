@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "stripInternal": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "moduleResolution": "node",
+    "noEmitOnError": false,
+    "lib": ["es2015", "dom"],
+    "outDir": "./__artifacts/local",
+    "target": "es5",
+    "skipLibCheck": true,
+    "strictNullChecks": true
+  },
+  "include": [
+    "./index.ts",
+    "./dependencies.ts",
+    "./src/**/*.ts"
+  ]
+}

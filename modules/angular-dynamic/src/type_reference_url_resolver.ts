@@ -11,9 +11,12 @@ export interface TypeReferenceUrlResolver {
 
 export let TYPE_REFERENCE_URL_RESOLVER: InjectionToken<TypeReferenceUrlResolver> = new InjectionToken<TypeReferenceUrlResolver>('TypeReferenceUrlResolver');
 
+declare var __sharpangles: any;
+
 export class BootstrapTypeReferenceResolver {
-    getUrl(typeReference: TypeReference): Promise<string> {
-        if (url && url.startsWith('@abcoa/'))
-    await __AbcLoader.ensureModuleAsync(url.substr(0, url.indexOf('/', 7)));
+    async getUrl(typeReference: TypeReference): Promise<string> {
+        let url = <string>typeReference.moduleName; // @todo urlresolver or router stuff to resolve module.id?
+        let dep = await __sharpangles.entryPoint.moduleLoader.addDependencyAsync(url); // Ensures the module is loaded.
+        return url;
     }
 }

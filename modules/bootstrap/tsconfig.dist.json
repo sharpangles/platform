@@ -2,6 +2,9 @@
   "compilerOptions": {
     "noImplicitAny": true,
     "strictNullChecks": true,
+    "declaration": true,
+    "declarationDir": "./__artifacts/release",
+    "outDir": "./__artifacts/release",
     "noImplicitReturns": true,
     "noImplicitThis": true,
     "noUnusedLocals": true,
@@ -14,12 +17,14 @@
     "experimentalDecorators": true,
     "moduleResolution": "node",
     "module": "none",
-    "declaration": true,
     "stripInternal": true,
     "noEmitHelpers": true,
     "importHelpers": true,
     "lib": ["es2015", "dom"],
     "types": [ "node", "systemjs" ],
     "skipLibCheck": true
-  }
+  },
+  "include": [
+    "./src/**/*.ts"
+  ]
 }

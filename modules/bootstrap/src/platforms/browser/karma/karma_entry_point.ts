@@ -4,8 +4,8 @@ namespace __sharpangles {
     declare var __karma__: any;
 
     export class KarmaEntryPoint extends SystemJSBrowserEntryPoint {
-        constructor(public name: string, public dependencyPolicy: DependencyPolicy<SystemJSModuleLoaderConfig>) {
-            super(name, dependencyPolicy, '/base');
+        constructor(public dependencyPolicy: DependencyPolicy<SystemJSModuleLoaderConfig>) {
+            super(dependencyPolicy, '/base');
             __karma__.loaded = function () { };
         }
 
@@ -25,7 +25,7 @@ namespace __sharpangles {
         }
 
         getKarmaTestFiles(): string[] {
-            return Object.keys((<any>window).__karma__.files).filter(path => !path.startsWith("/base/node_modules/") && /.spec\.js$/.test(path));
+            return Object.keys((<any>window).__karma__.files).filter(path => !path.startsWith('/base/node_modules/') && /.spec\.js$/.test(path));
         }
 
         async loadTestsAsync(fileName: string) {

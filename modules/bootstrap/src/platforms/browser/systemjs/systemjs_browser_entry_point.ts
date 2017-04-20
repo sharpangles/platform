@@ -4,18 +4,20 @@
 
 namespace __sharpangles {
     export class SystemJSBrowserEntryPoint extends EntryPoint<SystemJSModuleLoaderConfig> {
-        constructor(public name: string, public dependencyPolicy: DependencyPolicy<SystemJSModuleLoaderConfig>, public baseUrl: string = '/') {
-            super(name, dependencyPolicy, baseUrl)
+        constructor(public dependencyPolicy: DependencyPolicy<SystemJSModuleLoaderConfig>, public baseUrl: string = '/') {
+            super(dependencyPolicy, baseUrl);
         }
 
+        private _browserModuleLoader = new BrowserModuleLoader(this.baseUrl);
+
         protected createPolyfiller() {
-            var polyfiller = super.createPolyfiller();
-            polyfiller.registerPolyfill("node_modules/systemjs/dist/system.src.js", () => typeof System == "undefined");
-            return polyfiller;
+            let polyfiller = new Polyfiller(this._browserModuleLoader, this.baseUrl);
+            polyfiller.registerPolyfill('node_modules/systemjs/dist/system.src.js', () => typeof System === 'undefined', undefined, true);
+            return polyfiller.fromES5();
         }
 
         protected createModuleLoader() {
-            return new SystemJSModuleLoader(new BrowserModuleLoader(this.baseUrl), <SystemJSBundleDependencyPolicy>this.dependencyPolicy, this.baseUrl);
+            return new SystemJSModuleLoader(this._browserModuleLoader, <SystemJSBundleDependencyPolicy>this.dependencyPolicy, this.baseUrl);
         }
     }
 }

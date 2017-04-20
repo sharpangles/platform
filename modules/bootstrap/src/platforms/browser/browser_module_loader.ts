@@ -1,28 +1,35 @@
 /// <reference path="../../module_loader.ts" />
 /// <reference path="../../task_map.ts" />
-/// <reference path="../../__sharpangles.ts" />
+/// <reference path="./browser_module_loader_config.ts" />
 
 namespace __sharpangles {
     /**
      * Loads scripts via script tags.
      * For now, this means es5 global scripts.
      */
-    export class BrowserModuleLoader extends ModuleLoader<any> {
+    export class BrowserModuleLoader extends ModuleLoader<BrowserModuleLoaderConfig> {
         constructor(private _baseUrl: string) {
             super();
         }
 
-        private _taskMap = new TaskMap<string, string, boolean>((key: string, source: string) => this._createTagTask(key));
+        private _taskMap = new TaskMap<string, void, void>((key: string) => new Task<void>(() => this._createTagAsync(key)));
+        private _knownDependencies = new Map<string, Dependency<BrowserModuleLoaderConfig>>();
+
+        registerDependencies(dependencies: { [key: string]: Dependency<BrowserModuleLoaderConfig> }): void {
+            for (let key in dependencies) {
+                this._knownDependencies.set(key, dependencies[key]);
+            }
+        }
 
         async loadModuleAsync(moduleName: string): Promise<any> {
             moduleName = this.combinePath(moduleName, this._baseUrl);
-            await this._taskMap.ensureOrCreateAsync(moduleName, moduleName);
+            await this._taskMap.ensureOrCreateAsync(moduleName, undefined);
         }
 
         combinePath(src: string, baseUrl: string = '') {
             if (baseUrl.endsWith('/'))
                 baseUrl = baseUrl.substr(0, baseUrl.length - 1);
-            var result = baseUrl + "/" + (src.startsWith('/') ? src.substr(1) : src);
+            let result = baseUrl + '/' + (src.startsWith('/') ? src.substr(1) : src);
             return result.startsWith('/') ? result.substr(1) : result;
         }
 
@@ -33,28 +40,25 @@ namespace __sharpangles {
             return this._taskMap.ensureAllAsync();
         }
 
-        private _createTagTask(moduleName: string) {
-            return new Task<boolean>(() => new Promise<boolean>(resolve => {
-                let el = document.createElement("script");
-                el.setAttribute("src", moduleName);
-                el.setAttribute("type", "text/javascript"); // @todo application/javascript, module?
-                el.setAttribute("async", "false");
-                var resolved = false;
+        private _createTagAsync(moduleName: string) {
+            let dep = this._knownDependencies.get(moduleName);
+            let config = dep && dep.moduleLoaderConfig || { src: moduleName };
+            return new Promise<void>((resolve, reject) => {
+                let el = document.createElement('script');
+                el.setAttribute('src', config.src);
+                el.setAttribute('type', config.isModule ? 'module' : 'application/javascript');
+                if (config.isAsync)
+                    el.setAttribute('async', 'true');
+                if (config.isDeferred)
+                    el.setAttribute('defer', 'true');
                 el.onerror = (event) => {
-                    console.log(`failed to load ${moduleName}.`);
-                    if (!resolved) {
-                        resolved = true;
-                        resolve(false);
-                    }
-                }
+                    reject(event.error);
+                };
                 el.onload = (event) => {
-                    if (!resolved) {
-                        resolved = true;
-                        resolve(true);
-                    }
-                }
+                    resolve();
+                };
                 document.head.appendChild(el);
-            }));
+            });
         }
     }
 }

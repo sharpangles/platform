@@ -1,5 +1,5 @@
-describe("bootstrapper", () => {
-  it("should work", () => {
+describe('bootstrapper', () => {
+  it('should work', () => {
     expect(1).toBe(1);
   });
-})
+});

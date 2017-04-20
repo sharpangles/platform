@@ -18,15 +18,15 @@ namespace __sharpangles {
 
         /** Ensures a task nown to exist is completed. */
         async ensureAsync(key: TKey) {
-            var item = this._map.get(key);
+            let item = this._map.get(key);
             if (!item)
                 throw new Error(`${key} represents a task that does not exist.`);
             return item.task.isCompleted ? item.task.result : await item.task;
         }
 
-        async ensureAllAsync() {
-            var promises = Array.from(this._map.values()).filter(v => !v.task.isCompleted).map(v => v.task);
-            if (promises.length == 0)
+        async ensureAllAsync(filter?: (source: TSource) => boolean) {
+            let promises = Array.from(this._map.values()).filter(v => !v.task.isCompleted && (!filter || filter(v.source))).map(v => v.task);
+            if (promises.length === 0)
                 return;
             await Promise.all(promises);
         }

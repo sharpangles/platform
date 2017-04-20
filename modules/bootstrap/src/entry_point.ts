@@ -3,10 +3,17 @@
 /// <reference path="./polyfiller.ts" />
 
 namespace __sharpangles {
-    let _entryPoint: EntryPoint<any>;
+    let entryPoint: EntryPoint<any>;
+
+    /**
+     * @export
+     */
+    export function loadDynamicDependencyAsync(url: string) {
+        return entryPoint.dependencyLoader.addDependencyAsync(url);
+    }
 
     export abstract class EntryPoint<TModuleLoaderConfig> {
-        constructor(public name: string, public dependencyPolicy: DependencyPolicy<TModuleLoaderConfig>, public baseUrl: string = '/') {
+        constructor(public dependencyPolicy: DependencyPolicy<TModuleLoaderConfig>, public baseUrl: string = '/') {
         }
 
         dependencyLoader: DependencyLoader<TModuleLoaderConfig>;
@@ -14,16 +21,16 @@ namespace __sharpangles {
         polyfiller: Polyfiller;
 
         async startAsync(): Promise<void> {
-            if (_entryPoint) {
-                throw new Error("Already started");
+            if (entryPoint) {
+                throw new Error('Already started');
             }
             await this.initEnvironmentAsync();
-            this.dependencyLoader = new DependencyLoader<TModuleLoaderConfig>(this.moduleLoader, this.name, this.dependencyPolicy);
+            this.dependencyLoader = new DependencyLoader<TModuleLoaderConfig>(this.moduleLoader, this.dependencyPolicy);
             await this.dependencyLoader.loadStaticDependenciesAsync();
         }
 
         protected async initEnvironmentAsync() {
-            _entryPoint = this;
+            entryPoint = this;
             this.moduleLoader = this.createModuleLoader();
             this.polyfiller = this.createPolyfiller();
             await this.polyfiller.ensureAllAsync();
