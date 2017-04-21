@@ -4,16 +4,24 @@
 
 namespace __sharpangles {
     export class SystemJSBrowserEntryPoint extends EntryPoint<SystemJSModuleLoaderConfig> {
-        constructor(public dependencyPolicy: DependencyPolicy<SystemJSModuleLoaderConfig>, public baseUrl: string = '/') {
-            super(dependencyPolicy, baseUrl);
+        constructor(private systemJsPath: string, public dependencyPolicy: DependencyPolicy<SystemJSModuleLoaderConfig>, public features: Feature[] = [], public baseUrl: string = '/') {
+            super(dependencyPolicy, features, baseUrl);
         }
 
         private _browserModuleLoader = new BrowserModuleLoader(this.baseUrl);
 
+        protected async bootstrapAsync() {
+            // Create a browser-level (i.e. script tag) polyfiller to handle the presence of systemjs itself, prior to any other module work.
+            let browserPolyfiller = new Polyfiller(this._browserModuleLoader, this.baseUrl);
+            browserPolyfiller.registerPolyfill(this.systemJsPath, () => typeof System === 'undefined', undefined, true);
+            await browserPolyfiller.ensureAllAsync();
+            await super.bootstrapAsync();
+        }
+
         protected createPolyfiller() {
-            let polyfiller = new Polyfiller(this._browserModuleLoader, this.baseUrl);
-            polyfiller.registerPolyfill('node_modules/systemjs/dist/system.src.js', () => typeof System === 'undefined', undefined, true);
-            return polyfiller.fromES5();
+            let polyfiller = super.createPolyfiller();
+            polyfiller.registerPolyfill(this.systemJsPath, () => typeof System === 'undefined', undefined, true);
+            return polyfiller;
         }
 
         protected createModuleLoader() {

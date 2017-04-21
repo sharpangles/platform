@@ -5,7 +5,7 @@ namespace __sharpangles {
      * Implements a mechanism to track the loading of dependencies.
      */
     export abstract class ModuleLoader<TModuleLoaderConfig> {
-        abstract registerDependencies(dependencies: { [key: string]: Dependency<TModuleLoaderConfig> }): void;
+        abstract registerDependency(dependency: Dependency<TModuleLoaderConfig>): void;
         abstract loadModuleAsync(moduleName: string): Promise<any>;
 
         /**

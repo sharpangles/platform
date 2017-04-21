@@ -39,7 +39,7 @@ namespace __sharpangles {
             return Promise.resolve();
         }
 
-        registerDependencies(dependencies: { [key: string]: Dependency<any> }): void {
+        registerDependency(dependency: Dependency<any>): void {
         }
     }
 }

@@ -11,8 +11,8 @@ namespace __sharpangles {
             if (this._baseUrl !== '/')
                 dependencyPolicy.localCodePaths.push(this._baseUrl.startsWith('/') ? this._baseUrl.substr(1) : this._baseUrl);
 
-            this.initialConfig = {
-                transpiler: false,
+            let initialConfig = {
+                transpiler: <any>false,
                 packages: <any>{},
                 baseURL: this._baseUrl,
                 paths: {
@@ -21,20 +21,16 @@ namespace __sharpangles {
             };
             if (useDefaultOnBasePaths) {
                 for (let codePath of dependencyPolicy.localCodePaths)
-                    this.initialConfig.packages['/' + codePath] = { defaultExtension: 'js' };
+                    initialConfig.packages['/' + codePath] = { defaultExtension: 'js' };
             }
+            // @todo chicken-or-egg?  Polyfills can use the module loader, but we didnt load the inital app dependencies which could register polyfills... do we treat root app as special, or restructure some stuff?
+            // dependencyPolicy.rootDependency.
+            System.config(initialConfig);
         }
-
-        initialConfig: any;
 
         private _taskMap = new TaskMap<string, void, void>((key: string) => new Task<void>(() => System.import(key)));
 
         loadModuleAsync(moduleName: string): Promise<any> {
-            if (this.initialConfig) {
-                // Lazy config for system since the module loader is constructed before the polyfiller.
-                System.config(this.initialConfig);
-                delete this.initialConfig;
-            }
             return this._taskMap.ensureOrCreateAsync(moduleName, undefined);
         }
 
@@ -42,14 +38,13 @@ namespace __sharpangles {
             await Promise.all([this._browserModuleLoader.ensureAllLoadedAsync(), this._taskMap.ensureAllAsync()]);
         }
 
-        registerDependencies(dependencies: { [key: string]: Dependency<SystemJSModuleLoaderConfig> }) {
+        registerDependency(dependency: Dependency<SystemJSModuleLoaderConfig>) {
             let config = {
                 map: <{ [key: string]: string }>{},
                 packages: <{ [key: string]: { defaultExtension: string | boolean, main: string } }>{},
                 paths: {}
             };
-            for (let dep of Object.keys(dependencies).map(k => dependencies[k]))
-                this._registerDependencyOnConfig(dep, config);
+            this._registerDependencyOnConfig(dependency, config);
             System.config(config);
         }
 
@@ -57,14 +52,13 @@ namespace __sharpangles {
             if (!dependency.moduleLoaderConfig)
                 return;
             if (dependency.moduleLoaderConfig.browserLoaderConfig) {
-                let deps: { [key: string ]: Dependency<BrowserModuleLoaderConfig> } = {};
-                deps[dependency.name] = <Dependency<BrowserModuleLoaderConfig>>{
+                let dep = <Dependency<BrowserModuleLoaderConfig>>{
                     name: dependency.name,
                     knownDependencies: dependency.knownDependencies,
                     dependencies: dependency.dependencies,
                     moduleLoaderConfig: dependency.moduleLoaderConfig.browserLoaderConfig
                 };
-                this._browserModuleLoader.registerDependencies(deps);
+                this._browserModuleLoader.registerDependency(dep);
                 this._browserModuleLoader.loadModuleAsync(this._browserModuleLoader.combinePath(dependency.moduleLoaderConfig.browserLoaderConfig.src, this._baseUrl));
             }
             if (dependency.moduleLoaderConfig.systemConfig)

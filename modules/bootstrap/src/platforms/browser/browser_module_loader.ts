@@ -15,10 +15,8 @@ namespace __sharpangles {
         private _taskMap = new TaskMap<string, void, void>((key: string) => new Task<void>(() => this._createTagAsync(key)));
         private _knownDependencies = new Map<string, Dependency<BrowserModuleLoaderConfig>>();
 
-        registerDependencies(dependencies: { [key: string]: Dependency<BrowserModuleLoaderConfig> }): void {
-            for (let key in dependencies) {
-                this._knownDependencies.set(key, dependencies[key]);
-            }
+        registerDependency(dependency: Dependency<BrowserModuleLoaderConfig>): void {
+            this._knownDependencies.set(dependency.name, dependency);
         }
 
         async loadModuleAsync(moduleName: string): Promise<any> {

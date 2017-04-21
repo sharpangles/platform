@@ -1,12 +1,12 @@
 /// <reference path="../bootstrap/src/dependency.ts" />
 /// <reference path="../bootstrap/src/dependency_policy.ts" />
 /// <reference path="../bootstrap/src/platforms/browser/systemjs/systemjs_bundle_dependency_policy.ts" />
-/// <reference path="../bootstrap/src/platforms/browser/systemjs/systemjs_angular_browser_entry_point.ts" />
+/// <reference path="../bootstrap/src/platforms/browser/systemjs/systemjs_browser_entry_point.ts" />
 
 // tslint:disable-next-line:class-name
-class __CustomEntryPoint extends __sharpangles.SystemJSAngularBrowserEntryPoint {
+class __EntryPoint_Test_Karma extends __sharpangles.SystemJSBrowserEntryPoint {
     constructor() {
-        super(<any>new __sharpangles.SystemJSBundleDependencyPolicy(<__sharpangles.Dependency<__sharpangles.SystemJSAngularModuleLoaderConfig>>{
+        super(new __sharpangles.SystemJSBundleDependencyPolicy({
             name: '@sharpangles/sample-web',
             moduleLoaderConfig: {
                 systemConfig: {
@@ -21,11 +21,10 @@ class __CustomEntryPoint extends __sharpangles.SystemJSAngularBrowserEntryPoint 
                     main: 'src/index',
                     defaultExtension: false,
                     format: 'system'
-                },
-                entry: ''
+                }
             }
         }));
     }
 }
 
-new __CustomEntryPoint().startAsync();
+new __EntryPoint_Test_Karma().startAsync();

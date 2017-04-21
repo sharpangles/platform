@@ -19,11 +19,6 @@ namespace __sharpangles {
             return this._taskMap.ensureAllAsync();
         }
 
-        fromES5(): Polyfiller {
-            this.registerPolyfill('node_modules/core-js/client/shim.min.js', () => typeof Reflect === 'undefined' || !(<any>Reflect).getMetadata);
-            return this;
-        }
-
         private _taskMap = new TaskMap<string, Polyfill, any>((key: string, source: Polyfill) => new Task<any>(() => this._loadPolyfillAsync(key, source)));
 
         private async _loadPolyfillAsync(key: string, source: Polyfill) {

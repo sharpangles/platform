@@ -1,6 +1,9 @@
 /// <reference path="./dependency.ts" />
 
 namespace __sharpangles {
+    /**
+     * An opinionated mechanism for working with dependencies in an enterprise culture.
+     */
     export class DependencyPolicy<TModuleLoaderConfig> {
         /**
          *

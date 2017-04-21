@@ -12,9 +12,12 @@ namespace __sharpangles {
 
         dependencyResolver: DependencyResolver<TModuleLoaderConfig>;
 
+        /**
+         * Loads all dependencies that can be discovered from the root.
+         * The dependency policy and module loader will be responsible for when and how web requests are made to fully load the tree.
+         */
         async loadStaticDependenciesAsync(): Promise<void> {
-            await this._taskMap.ensureOrCreateAsync(this._dependencyPolicy.rootDependency.name, this._dependencyPolicy.rootDependency);
-            await this._moduleLoader.ensureAllLoadedAsync();
+            await this.addDependencyAsync(this._dependencyPolicy.rootDependency);
         }
 
         /**
@@ -40,11 +43,11 @@ namespace __sharpangles {
         private _taskMap = new TaskMap<string, Dependency<TModuleLoaderConfig>, { [key: string]: Dependency<TModuleLoaderConfig> }>((key: string, source: Dependency<TModuleLoaderConfig>) => new Task<any>(() => this._loadChildDependenciesAsync(source)));
 
         private async _loadBatchAsync(dependencies: { [key: string]: Dependency<TModuleLoaderConfig> }) {
-            this._moduleLoader.registerDependencies(dependencies);
             await Promise.all(Object.keys(dependencies).map(k => this._taskMap.ensureOrCreateAsync(k, dependencies[k])));
         }
 
         private async _loadChildDependenciesAsync(dependency: Dependency<TModuleLoaderConfig>) {
+            this._moduleLoader.registerDependency(dependency);
             let dependents = await this.dependencyResolver.resolveChildDependenciesAsync(dependency);
             if (dependents && Object.keys(dependents).length > 0) {
                 await this._loadBatchAsync(dependents);

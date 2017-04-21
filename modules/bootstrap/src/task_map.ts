@@ -69,8 +69,13 @@ namespace __sharpangles {
                 this.onCancelled();
         }
 
-        then<TResult>(onfulfilled: (value: T) => TResult | PromiseLike<TResult>, onrejected?: (reason: any) => TResult | PromiseLike<TResult>): Promise<TResult> { return onrejected ? this.trigger().then(onfulfilled, onrejected) : this.trigger().then(onfulfilled); }
-        catch(onrejected: (reason: any) => T | PromiseLike<T>): Promise<T> { return this.trigger().catch(onrejected); }
+        then<TResult>(onfulfilled: (value: T) => TResult | PromiseLike<TResult>, onrejected?: (reason: any) => TResult | PromiseLike<TResult>): Promise<TResult> {
+            return onrejected ? this.trigger().then(onfulfilled, onrejected) : this.trigger().then(onfulfilled);
+        }
+
+        catch(onrejected: (reason: any) => T | PromiseLike<T>): Promise<T> {
+            return this.trigger().catch(onrejected);
+        }
     }
 
 

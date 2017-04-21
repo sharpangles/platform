@@ -21,9 +21,9 @@
   "scripts": {
     "build:entrypoint": "tsc -p tsconfig.entrypoint.json",
     "build:dist": "tsc -p tsconfig.app.json && rollup -c rollup.config.js",
-    "build": "npm run build:entrypoint && npm run build:dist && npm run minify:entrypoint && npm run copy",
-    "minify:entrypoint": "closure-compiler --compilation_level ADVANCED_OPTIMIZATIONS --create_source_map ./__artifacts/build/entrypoint/customEntryPoint.min.js.map --js node_modules/google-closure-library/closure/goog/base.js --js ./__artifacts/build/entrypoint/customEntryPoint.js --js node_modules/systemjs/dist/system.src.js --language_out ES5 > ./__artifacts/build/entrypoint/customEntryPoint.min.js",
-    "copy": "cpy index.html __artifacts/serve && cpy __artifacts/build/entrypoint/* __artifacts/serve/entrypoint"
+    "build": "npm run build:entrypoint && npm run build:dist && npm run copy",
+    "minify:entrypoint": "closure-compiler --compilation_level ADVANCED_OPTIMIZATIONS --create_source_map ./__artifacts/build/entrypoint/customEntryPoint.min.js.map --js node_modules/google-closure-library/closure/goog/base.js --js ./__artifacts/build/entrypoint/customEntryPoint.js --js node_modules/systemjs/dist/system.src.js --language_in ECMASCRIPT6 --language_out ES5_STRICT > ./__artifacts/build/entrypoint/customEntryPoint.min.js",
+    "copy": "cpy index.html __artifacts/serve && cpy ../../node_modules/systemjs/dist/system.src.js __artifacts/serve/node_modules/systemjs/dist && cpy ../../node_modules/core-js/es7/reflect.js __artifacts/serve/polyfills && cpy __artifacts/build/entrypoint/* __artifacts/serve/entrypoint"
   },
   "peerDependencies": {
     "@angular/animations": "^4.0.0",

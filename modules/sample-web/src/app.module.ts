@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common/common';
+import { CommonModule } from '@angular/common';
 import { NgModule, NgModuleFactoryLoader, SystemJsNgModuleLoader, ModuleWithProviders } from '@angular/core';
 import { SomethingComponent } from './something.component';
 
