@@ -12,7 +12,7 @@ namespace __sharpangles {
     }
 
     export class Polyfiller {
-        constructor(private _moduleLoader: ModuleLoader<any>, public baseUrl: string) {
+        constructor(private _moduleLoader: ModuleLoader<any>) {
         }
 
         ensureAllAsync() {

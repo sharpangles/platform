@@ -11,9 +11,6 @@ namespace __sharpangles {
         }
 
         protected async onStartedAsync(entryPoint: EntryPoint<any>) {
-            let config = entryPoint.dependencyPolicy.rootDependency.moduleLoaderConfig;
-            if (!config)
-                return;
             let platformModule = await entryPoint.moduleLoader.loadModuleAsync(this.platformModuleName);
             let entryModule = await entryPoint.moduleLoader.loadModuleAsync(this.entryModuleName);
             this.bootstrap(platformModule, entryModule);

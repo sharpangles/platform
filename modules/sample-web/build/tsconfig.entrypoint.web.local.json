@@ -4,26 +4,25 @@
     "stripInternal": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "module": "es2015",
     "moduleResolution": "node",
+    "module": "none",
     "noEmitOnError": false,
-    "outDir": "./__artifacts/build/app",
+    "outFile": "../__artifacts/build/entrypoint/entrypoint.web.local.js",
     "lib": ["es2015", "dom"],
     "target": "es2015",
     "skipLibCheck": true,
     "strictNullChecks": true,
     "inlineSources": true,
     "inlineSourceMap": true,
+    "importHelpers": true,
     "types": [
       "node",
-      "jasmine"
+      "jasmine",
+      "systemjs"
     ]
   },
   "files": [
-    "../../node_modules/tslib/tslib.d.ts"
-  ],
-  "include": [
-    "index.ts"
+    "./entrypoint.web.local.ts"
   ],
   "angularCompilerOptions": {
     "strictMetadataEmit": true

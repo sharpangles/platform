@@ -1,23 +1,22 @@
 ﻿/// <reference path="./dependency.ts" />
-/// <reference path="./dependency_policy.ts" />
+/// <reference path="./dependency_module_policy.ts" />
 
 namespace __sharpangles {
-    export class DependencyResolver<TModuleLoaderConfig> {
-        constructor(private _moduleLoader: ModuleLoader<TModuleLoaderConfig>, private _dependencyPolicy: DependencyPolicy<TModuleLoaderConfig>) {
+    /**
+     * Loads the dependency tree from a dependency.
+     */
+    export class DependencyResolver {
+        constructor(private _moduleLoader: ModuleLoader, private _dependencyModulePolicy: DependencyModulePolicy) {
         }
 
-        protected getMetadataForEnvironmentFromModule(depsModule: any): { [key: string]: Dependency<TModuleLoaderConfig> } {
-            return this._dependencyPolicy.dependencyModuleExport ? depsModule[this._dependencyPolicy.dependencyModuleExport] : depsModule.default;
-        }
-
-        async resolveChildDependenciesAsync(dependency: Dependency<TModuleLoaderConfig>): Promise<{ [key: string]: Dependency<TModuleLoaderConfig> }> {
-            if (dependency.knownDependencies || !this._dependencyPolicy.isDependencyParticipant(dependency.name)) {
+        async resolveChildDependenciesAsync(dependency: Dependency): Promise<{ [key: string]: Dependency }> {
+            if (dependency.knownDependencies || !this._dependencyModulePolicy.isDependencyParticipant(dependency.name)) {
                 return this._getAllDependencies({}, dependency.knownDependencies ? dependency.knownDependencies : {});
             }
-            let depsModule = await this._moduleLoader.loadModuleAsync(this._dependencyPolicy.resolveDependencyModuleName(dependency.name));
+            let depsModule = await this._moduleLoader.loadModuleAsync(this._dependencyModulePolicy.resolveDependencyModuleName(dependency.name));
             if (!depsModule)
                 return {};
-            let metadata = this.getMetadataForEnvironmentFromModule(depsModule);
+            let metadata = this._dependencyModulePolicy.getDependenciesFromModule(depsModule);
             if (!metadata)
                 return {};
 
@@ -30,7 +29,7 @@ namespace __sharpangles {
             return metadata;
         }
 
-        private _getAllDependencies(deps: { [key: string]: Dependency<TModuleLoaderConfig> }, childDeps: { [key: string]: Dependency<TModuleLoaderConfig> }): { [key: string]: Dependency<TModuleLoaderConfig> } {
+        private _getAllDependencies(deps: { [key: string]: Dependency }, childDeps: { [key: string]: Dependency }): { [key: string]: Dependency } {
             if (!childDeps)
                 return {};
             for (let name of Object.keys(childDeps)) {

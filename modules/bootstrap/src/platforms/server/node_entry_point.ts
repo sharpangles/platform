@@ -2,9 +2,9 @@
 /// <reference path="./commonjs_module_loader.ts" />
 
 namespace __sharpangles {
-    export class NodeEntryPoint extends EntryPoint<any> {
-        constructor(public dependencyPolicy: DependencyPolicy<any>, public features: Feature[] = []) {
-            super(dependencyPolicy, features);
+    export class NodeEntryPoint extends EntryPoint {
+        constructor(dependencyModulePolicy: DependencyModulePolicy, libraryPolicy: LibraryPolicy, features?: Feature | Feature[]) {
+            super(dependencyModulePolicy, libraryPolicy, features);
         }
 
         protected createModuleLoader() {

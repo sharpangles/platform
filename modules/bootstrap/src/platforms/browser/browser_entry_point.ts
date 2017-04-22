@@ -4,13 +4,16 @@
 /// <reference path="../../entry_point.ts" />
 
 namespace __sharpangles {
-    export class BrowserEntryPoint extends EntryPoint<any> {
-        constructor(public dependencyPolicy: DependencyPolicy<any>, public features: Feature[] = [], public baseUrl: string = '/') {
-            super(dependencyPolicy, features, baseUrl);
+    export class BrowserEntryPoint extends EntryPoint<BrowserModuleLoaderConfig> {
+        constructor(dependencyModulePolicy: DependencyModulePolicy<BrowserModuleLoaderConfig>,
+            libraryPolicy: LibraryPolicy<BrowserModuleLoaderConfig>,
+            features?: Feature | Feature[],
+            public baseUrl?: string) {
+            super(dependencyModulePolicy, libraryPolicy, features);
         }
 
         protected createModuleLoader() {
-            return new BrowserModuleLoader(this.baseUrl);
+            return new BrowserModuleLoader(this.libraryPolicy, this.baseUrl);
         }
     }
 }

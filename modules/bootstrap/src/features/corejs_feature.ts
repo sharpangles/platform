@@ -7,7 +7,7 @@ namespace __sharpangles {
         }
 
         protected async onPolyfillerCreatedAsync(entryPoint: EntryPoint<any>) {
-            entryPoint.polyfiller.registerPolyfill('core-js/es7/reflect.js', () => typeof Reflect === 'undefined' || !(<any>Reflect).getMetadata);
+            entryPoint.polyfiller.registerPolyfill(`core-js/es7/reflect`, () => typeof Reflect === 'undefined' || !(<any>Reflect).getMetadata);
         }
     }
 }

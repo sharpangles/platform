@@ -13,6 +13,10 @@ export let TYPE_REFERENCE_URL_RESOLVER: InjectionToken<TypeReferenceUrlResolver>
 
 declare var __sharpangles: any;
 
+/**
+ * Connects dynamic loading to dependency tracking in the bootstrapper.
+ * The enables the module to participate in additional module loading configuration.
+ */
 export class BootstrapTypeReferenceResolver {
     async getUrl(typeReference: TypeReference): Promise<string> {
         let url = <string>typeReference.moduleName; // @todo urlresolver or router stuff to resolve module.id?

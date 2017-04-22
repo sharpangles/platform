@@ -24,7 +24,8 @@
     "build:ep:ngkarma": "tsc -t es2015 -lib es2015,dom -d --inlineSourceMap --outFile \"./__artifacts/release/bundles/entrypoints/karmaAngularEntryPoint.js\" \"./src/platforms/browser/karma/karma_angular_entry_point.ts\"",
     "build:ep:node": "tsc -t es2015 -lib es2015,dom -d --inlineSourceMap --outFile \"./__artifacts/release/bundles/entrypoints/nodeEntryPoint.js\" \"./src/platforms/server/node_entry_point.ts\"",
     "build:ep:ngnode": "tsc -t es2015 -lib es2015,dom -d --inlineSourceMap --outFile \"./__artifacts/release/bundles/entrypoints/nodeAngularEntryPoint.js\" \"./src/platforms/server/node_angular_entry_point.ts\"",
-    "build": "tsc -p tsconfig.dist.json && npm run build:ep:systemjs && npm run build:ep:ngsystemjs && npm run build:ep:karma && npm run build:ep:ngkarma && npm run build:ep:node && npm run build:ep:ngnode",
+    "build:dist": "tsc -p tsconfig.dist.json",
+    "build": "npm run build:dist && npm run build:ep:systemjs && npm run build:ep:ngsystemjs && npm run build:ep:karma && npm run build:ep:ngkarma && npm run build:ep:node && npm run build:ep:ngnode",
     "minify:ep:systemjs": "closure-compiler --compilation_level ADVANCED_OPTIMIZATIONS --create_source_map ./__artifacts/release/bundles/entrypoints/systemjsBrowserEntryPoint.min.js.map --js node_modules/google-closure-library/closure/goog/base.js --js ./__artifacts/release/bundles/entrypoints/systemjsBrowserEntryPoint.js --js node_modules/systemjs/dist/system.src.js --language_out ES5 > ./__artifacts/release/bundles/entrypoints/systemjsBrowserEntryPoint.min.js",
     "copy": "cpy package.json README.md __artifacts/release",
     "postbuild": "npm run copy",
@@ -46,7 +47,6 @@
     "nyc": "^10.1.2",
     "rimraf": "^2.5.4",
     "concurrently": "^3.4.0",
-    "systemjs": "0.19.40",
     "closure-compiler-cli": "1.0.2",
     "google-closure-compiler": "20170409.0.0",
     "google-closure-library": "^20170409.0.0"

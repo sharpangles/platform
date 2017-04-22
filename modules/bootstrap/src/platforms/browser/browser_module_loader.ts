@@ -8,7 +8,7 @@ namespace __sharpangles {
      * For now, this means es5 global scripts.
      */
     export class BrowserModuleLoader extends ModuleLoader<BrowserModuleLoaderConfig> {
-        constructor(private _baseUrl: string) {
+        constructor(private _baseUrl?: string) {
             super();
         }
 
@@ -16,19 +16,12 @@ namespace __sharpangles {
         private _knownDependencies = new Map<string, Dependency<BrowserModuleLoaderConfig>>();
 
         registerDependency(dependency: Dependency<BrowserModuleLoaderConfig>): void {
-            this._knownDependencies.set(dependency.name, dependency);
+            this._knownDependencies.set(dependency.name || '', dependency);
         }
 
         async loadModuleAsync(moduleName: string): Promise<any> {
-            moduleName = this.combinePath(moduleName, this._baseUrl);
+            moduleName = ModuleLoader.combinePath(moduleName, this._baseUrl);
             await this._taskMap.ensureOrCreateAsync(moduleName, undefined);
-        }
-
-        combinePath(src: string, baseUrl: string = '') {
-            if (baseUrl.endsWith('/'))
-                baseUrl = baseUrl.substr(0, baseUrl.length - 1);
-            let result = baseUrl + '/' + (src.startsWith('/') ? src.substr(1) : src);
-            return result.startsWith('/') ? result.substr(1) : result;
         }
 
         /**
