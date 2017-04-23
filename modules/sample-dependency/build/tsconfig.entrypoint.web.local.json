@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "stripInternal": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "moduleResolution": "node",
+    "module": "none",
+    "noEmitOnError": false,
+    "outFile": "../__artifacts/build/entrypoint/entrypoint.web.local.js",
+    "lib": ["es2015", "dom"],
+    "target": "es2015",
+    "skipLibCheck": true,
+    "strictNullChecks": true,
+    "inlineSources": true,
+    "inlineSourceMap": true,
+    "importHelpers": true,
+    "types": [
+      "node",
+      "jasmine",
+      "systemjs"
+    ]
+  },
+  "files": [
+    "./entrypoint.web.local.ts"
+  ],
+  "angularCompilerOptions": {
+    "strictMetadataEmit": true
+  }
+}

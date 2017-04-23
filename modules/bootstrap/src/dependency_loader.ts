@@ -21,8 +21,8 @@ namespace __sharpangles {
         /**
          * Infer a new dependency on the fly from a module name.
          * Called as runtime for dynamic loading.
-         * @export
          * @param dependency Either a dependency or the string name from which to infer the dependency based on the provided policy.
+         * @export
          */
         async addDependencyAsync(dependency?: string | Dependency): Promise<void> {
             if (!dependency || typeof dependency === 'string')
@@ -46,6 +46,9 @@ namespace __sharpangles {
         }
 
         private async _loadChildDependenciesAsync(dependency: Dependency) {
+            // @todo Abstract out these parent-child 'platform-level' capabilities better.  The module loader should be able to loop through them.
+            // The traversal of dependencies to wire up systemjs for example should just be one of these capabilities.
+            // Right now its living across the next two method calls.
             this._moduleLoader.registerDependency(dependency);
             let dependents = await this._dependencyResolver.resolveChildDependenciesAsync(dependency);
             if (dependents && Object.keys(dependents).length > 0) {

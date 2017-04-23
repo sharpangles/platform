@@ -12,16 +12,17 @@ export default {
         moduleLoaderConfig: {
             systemConfig: {
                 bundles: {
-                    'npm:@sharpangles/sample-dependency/bundles/sharpangles-sample-dependency.umd.js': [
+                    'npm:@sharpangles/sample-dependency/__artifacts/release/bundles/sample-dependency.system.js': [
                         '@sharpangles/sample-dependency',
                         '@sharpangles/sample-dependency/*',
+                        '@sharpangles/sample-dependency/build/*'
                     ]
                 }
             },
             systemPackageConfig: {
                 main: 'index',
                 defaultExtension: false,
-                format: 'umd'
+                format: 'system'
             }
         }
     }

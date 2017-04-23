@@ -7,10 +7,14 @@ namespace __sharpangles {
      * A policy that uses a scoped package name and assumes each module has a single bundle.
      */
     export class SystemJSLibraryPolicy implements LibraryPolicy<SystemJSModuleLoaderConfig> {
-        constructor(public baseUrl = '/') {
+        /**
+         * @param appModuleName Settings this can simplify configuration scenarios for local builds (i.e. configuring systemjs to load ./src, ./spec, etc...).
+         */
+        constructor(public appModuleName?: string, public baseUrl = '/') {
         }
 
         inferDependency(moduleName?: string): Dependency<SystemJSModuleLoaderConfig> {
+            moduleName = moduleName || this.appModuleName;
             let moduleLoaderConfig = <SystemJSModuleLoaderConfig>{
                 systemConfig: this.createConfig(moduleName),
                 systemPackageConfig: this.createPackageConfig(moduleName)
@@ -31,13 +35,14 @@ namespace __sharpangles {
         }
 
         protected createPackageConfig(moduleName?: string): SystemJSLoader.Config | undefined {
-            if (!moduleName)
-                return;
-            return {
-                main: 'index',
-                defaultExtension: false,
-                format: 'umd'
-            };
+            return;
+            // if (!moduleName)
+            //     return;
+            // return {
+            //     main: 'index',
+            //     defaultExtension: false,
+            //     format: 'umd'
+            // };
         }
     }
 }

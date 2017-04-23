@@ -7,8 +7,8 @@ namespace __sharpangles {
      * A policy that uses a scoped package name and assumes each module has a single bundle.
      */
     export class SystemJSBundleLibraryPolicy extends SystemJSLibraryPolicy {
-        constructor(public baseUrl = '/', public bundleRoot: string = '', public bundleExtension: string = '') {
-            super(baseUrl);
+        constructor(public appModuleName?: string, public baseUrl = '/', public bundleRoot: string = '', public bundleExtension: string = '') {
+            super(appModuleName, baseUrl);
         }
 
         getBundleName(moduleName: string) {
