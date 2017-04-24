@@ -446,7 +446,7 @@ cloneable-readable@^1.0.0:
     process-nextick-args "^1.0.6"
     through2 "^2.0.1"
 
-closure-compiler-cli@1.0.2:
+closure-compiler-cli@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/closure-compiler-cli/-/closure-compiler-cli-1.0.2.tgz#d8f03332d3850761c910e4c728191a2192dfd169"
   dependencies:
@@ -994,7 +994,7 @@ globby@^4.0.0:
     pify "^2.0.0"
     pinkie-promise "^2.0.0"
 
-google-closure-compiler@20170409.0.0, google-closure-compiler@>=20170218.0.0:
+google-closure-compiler@>=20170218.0.0, google-closure-compiler@^20170409.0.0:
   version "20170409.0.0"
   resolved "https://registry.yarnpkg.com/google-closure-compiler/-/google-closure-compiler-20170409.0.0.tgz#dc1be29a9f7eef8611364533b271b9fac757c970"
   dependencies:
@@ -2298,12 +2298,6 @@ supports-color@^3.1.2, supports-color@^3.2.3:
   dependencies:
     has-flag "^1.0.0"
 
-systemjs@0.19.40:
-  version "0.19.40"
-  resolved "https://registry.yarnpkg.com/systemjs/-/systemjs-0.19.40.tgz#158f64a9f4ef541a7fda6b40e527ee46b6c54cd0"
-  dependencies:
-    when "^3.7.5"
-
 tar-pack@^3.4.0:
   version "3.4.0"
   resolved "https://registry.yarnpkg.com/tar-pack/-/tar-pack-3.4.0.tgz#23be2d7f671a8339376cbdb0b8fe3fdebf317984"
@@ -2473,10 +2467,6 @@ vlq@^0.2.1:
 void-elements@^2.0.0:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/void-elements/-/void-elements-2.0.1.tgz#c066afb582bb1cb4128d60ea92392e94d5e9dbec"
-
-when@^3.7.5:
-  version "3.7.8"
-  resolved "https://registry.yarnpkg.com/when/-/when-3.7.8.tgz#c7130b6a7ea04693e842cdc9e7a1f2aa39a39f82"
 
 which-module@^1.0.0:
   version "1.0.0"

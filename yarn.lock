@@ -671,6 +671,10 @@ error-ex@^1.2.0:
   dependencies:
     is-arrayish "^0.2.1"
 
+es-module-loader@2.1.5:
+  version "2.1.5"
+  resolved "https://registry.yarnpkg.com/es-module-loader/-/es-module-loader-2.1.5.tgz#3fe33c5dbc2a9fce6f412f0f65f32427d39c852a"
+
 escape-string-regexp@^1.0.2, escape-string-regexp@^1.0.5:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/escape-string-regexp/-/escape-string-regexp-1.0.5.tgz#1b61c0562190a8dff6ae3bb2cf0200ca130b86d4"

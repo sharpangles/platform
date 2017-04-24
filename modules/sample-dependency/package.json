@@ -19,7 +19,7 @@
   },
   "homepage": "https://github.com/sharpangles/platform/tree/master/modules/bootstrap#readme",
   "scripts": {
-    "build:app": "tsc -p build/tsconfig.app.local.1.json",
+    "build:app": "tsc -p build/tsconfig.app.local.json",
     "build": "npm run build:app",
     "rollup": "rollup -c build/rollup.config.js",
     "copy": "cpy LICENSE package.json README.md __artifacts/release",

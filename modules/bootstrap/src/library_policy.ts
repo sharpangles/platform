@@ -2,8 +2,11 @@
 
 namespace __sharpangles {
     export interface LibraryPolicy<TModuleLoaderConfig = any> {
-        /** Infer a new dependency on the fly from a module name. If not provided, the dependency is for the root application. */
-        inferDependency(moduleName?: string): Dependency<TModuleLoaderConfig>;
+        /**
+         * Given a dependency name, this method discovers if the dependency participates in this library feature.
+         * If it does, it infers or resolves the library, otherwise undefined is returned.
+         */
+        getLibraryModuleAsync(dependencyName?: string): Promise<Library | undefined>;
     }
 
     /**
@@ -14,10 +17,14 @@ namespace __sharpangles {
         }
 
         /**
+         * Determines if the module name participates in the library mechanism.
+         * The base implementation determines this by a matching scope on the package.
+         */
+        /**
          * Infer a new dependency on the fly from a module name.
          * This is used to wire up something without known dependencies.
          */
-        inferDependency(moduleName?: string): Dependency<TModuleLoaderConfig> {
+        inferLibrary(moduleName?: string): Dependency<TModuleLoaderConfig> {
             return <Dependency<TModuleLoaderConfig>>{ name: moduleName };
         }
     }
@@ -33,7 +40,7 @@ namespace __sharpangles {
          * Infer a new dependency on the fly from a module name.
          * This is used to wire up something without known dependencies.
          */
-        inferDependency(moduleName?: string): Dependency<TModuleLoaderConfig> {
+        inferLibrary(moduleName?: string): Library {
             return moduleName ? this.dependenciesPolicy.inferDependency(moduleName) : this.rootPolicy.inferDependency(moduleName);
         }
     }

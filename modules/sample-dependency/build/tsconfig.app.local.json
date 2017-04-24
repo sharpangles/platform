@@ -23,8 +23,7 @@
     "../../../node_modules/tslib/tslib.d.ts"
   ],
   "include": [
-    "../index.ts",
-    "./dependencies.local.ts"
+    "../index.ts"
   ],
   "angularCompilerOptions": {
     "strictMetadataEmit": true

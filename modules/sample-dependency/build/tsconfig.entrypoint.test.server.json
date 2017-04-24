@@ -17,12 +17,11 @@
     "importHelpers": true,
     "types": [
       "node",
-      "jasmine",
-      "systemjs"
+      "jasmine"
     ]
   },
   "files": [
-    "./entrypoint.web.dev.ts"
+    "./entrypoint.test.server.ts"
   ],
   "angularCompilerOptions": {
     "strictMetadataEmit": true

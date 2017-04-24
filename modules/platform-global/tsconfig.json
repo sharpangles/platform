@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noEmitOnError": false,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "baseUrl": ".",
+    "module": "es2015",
+    "outDir": "./__artifacts/local",
+    "declaration": true,
+    "stripInternal": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "moduleResolution": "node",
+    "rootDir": ".",
+    "lib": ["es2015", "dom"],
+    "target": "es2015",
+    "skipLibCheck": true,
+    "types": [
+      "node",
+      "jasmine",
+      "systemjs"
+    ]
+  },
+  "include": [
+    "./src/**/*.ts",
+    "./spec/**/*.ts"
+    ]
+}

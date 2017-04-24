@@ -32,6 +32,7 @@
       "@types/systemjs": "0.20.2",
       "core-js": "^2.4.1",
       "cpy-cli": "^1.0.1",
+      "es-module-loader": "2.1.5",
       "jasmine": "^2.5.3",
       "lerna": "^2.0.0-rc.3",
       "nyc": "^10.2.0",

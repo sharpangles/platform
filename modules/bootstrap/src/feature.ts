@@ -3,7 +3,13 @@
 /// <reference path="./polyfiller.ts" />
 
 namespace __sharpangles {
+    /**
+     * Base class for pluggable entry point features.
+     */
     export class Feature {
+        /**
+         * @param dependencies Compile-time dependencies.
+         */
         constructor(public dependencies?: Feature[]) {
         }
 
