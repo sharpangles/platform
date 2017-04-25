@@ -1,11 +1,6 @@
-/// <reference path="../../bootstrap/src/dependency.ts" />
-/// <reference path="../../bootstrap/src/dependency_policy.ts" />
-/// <reference path="../../bootstrap/src/platforms/browser/systemjs/systemjs_bundle_library_policy.ts" />
-/// <reference path="../../bootstrap/src/platforms/browser/systemjs/systemjs_browser_entry_point.ts" />
-/// <reference path="../../bootstrap/src/features/angular_platform_browser_dynamic_feature.ts" />
-/// <reference path="../../bootstrap/src/features/corejs_feature.ts" />
-/// <reference path="../../bootstrap/src/features/systemjs_config_feature.ts" />
-/// <reference path="../../bootstrap/src/feature.ts" />
+import { EntryPoint } from '@sharpangles/platform-global';
+
+E
 
 /**
  * An entrypoint useful for a development deployment that includes source maps.

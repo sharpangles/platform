@@ -1,4 +1,4 @@
-import { Feature } from '../Feature';
+import { Feature } from '../feature';
 
 export interface ModuleResolutionContext {
     key: string;
@@ -13,11 +13,10 @@ export interface ModuleResolutionContext {
 export abstract class ModuleLoader<TContext extends ModuleResolutionContext = ModuleResolutionContext> extends Feature {
     constructor() {
         super();
-        this.resolver = this.onLoadModuleAsync.bind(this);
     }
 
     async loadModuleAsync(context: TContext): Promise<any> {
-        return await this.resolver(context);
+        return await (this.resolver || this.onLoadModuleAsync.bind(this))(context);
     }
 
     abstract onLoadModuleAsync(context: TContext): Promise<any>;
@@ -27,8 +26,8 @@ export abstract class ModuleLoader<TContext extends ModuleResolutionContext = Mo
     /**
      * Allows registering a new resolver in front of the current.  The current will be the 'next' during resolution.
      */
-    registerResolver(resolver: (moduleLoader: ModuleLoader<TContext>, context: TContext, next: (context: TContext) => Promise<any>) => Promise<any>) {
-        let oldResolver = this.resolver;
-        this.resolver = (context: TContext) => resolver(this, context, context => oldResolver(context));
+    registerResolver(resolver: (context: TContext, next: (context: TContext) => Promise<any>) => Promise<any>) {
+        let oldResolver = this.resolver || this.onLoadModuleAsync.bind(this);
+        this.resolver = (context: TContext) => resolver(context, context => oldResolver(context));
     }
 }

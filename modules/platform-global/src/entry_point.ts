@@ -2,9 +2,9 @@ import { FeatureReference, Feature } from './features/feature';
 
 export let rootFeature: Feature;
 
-export abstract class EntryPoint extends FeatureReference {
+export class EntryPoint extends FeatureReference {
     constructor() {
-        super(FeatureReference);
+        super(Feature);
     }
 
     /**
@@ -16,8 +16,10 @@ export abstract class EntryPoint extends FeatureReference {
         }
         rootFeature = this.getFeature();
         if (rootFeature) {
+            // Flatten and check for cyclical
             let features: Feature[] = [];
-            this._flatten(rootFeature, features);
+            this._traverse(rootFeature, f => f.dependencies, f => features.push(f), new Set<Feature>());
+
             let ind = features.length - 1;
             // We only order the list to wire up dependencies and perform a cyclical check.  Once wired, awaiting tasks from the root is the most optimal async pattern.
             while (ind > 0) {
@@ -32,7 +34,7 @@ export abstract class EntryPoint extends FeatureReference {
                             features.splice(pos--, 0, features.splice(ind, 1)[0]);
                         tries++;
                         if (tries > features.length * 2)
-                            throw new Error('Cyclical dependencies in features.');
+                            throw new Error('Cyclical runtime dependencies in features.');
                     }
                 }
                 ind--;
@@ -44,11 +46,22 @@ export abstract class EntryPoint extends FeatureReference {
         }
     }
 
-    private _flatten(feature: Feature, features: Feature[]) {
-        features.push(feature);
-        if (feature.dependencies) {
-            for (let child of feature.dependencies)
-                this._flatten(child, features);
+    private _dostuff(featureReference: FeatureReference) {
+    }
+
+    private _traverse<T>(node: T, childrenSelector: (node: T) => T[], func: (node: T) => void, visitedStack?: Set<T>) {
+        if (visitedStack) {
+            if (visitedStack.has(node))
+                throw new Error('Cyclical features.');
+            visitedStack.add(node);
         }
+        func(node);
+        let children = childrenSelector(node);
+        if (children && children.length !== 0) {
+            for (let child of children)
+                this._traverse(child, childrenSelector, func, visitedStack);
+        }
+        if (visitedStack)
+            visitedStack.delete(node);
     }
 }

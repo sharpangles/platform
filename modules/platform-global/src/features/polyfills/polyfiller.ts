@@ -1,8 +1,10 @@
 ﻿import { TaskMap, Task } from '../../task_map';
 import { Feature, FeatureReference } from '../feature';
-import { ModuleLoader } from '../module_loaders/module_loader';
+import { ModuleLoader, ModuleResolutionContext } from '../module_loaders/module_loader';
 
-interface Polyfill {
+export interface Polyfill {
+    src: string;
+
     /** Allows per-polyfill specification of the module loader. */
     moduleLoader?: ModuleLoader;
 
@@ -29,10 +31,10 @@ export class Polyfiller extends Feature {
         }
         if (!source.test())
             return;
-        return await (source.moduleLoader || <ModuleLoader>FeatureReference.getFeature(ModuleLoader)).loadModuleAsync(key);
+        return await (source.moduleLoader || <ModuleLoader>FeatureReference.getFeature(ModuleLoader)).loadModuleAsync(<ModuleResolutionContext>{ key: key });
     }
 
-    registerPolyfill(src: string, test?: () => boolean, dependsOn?: string[], waitFor?: boolean, moduleLoader?: ModuleLoader) {
-        this._taskMap.ensureOrCreateAsync(src, { moduleLoader: moduleLoader, test: test ? test : () => true, dependsOn: dependsOn, waitFor: waitFor });
+    registerPolyfill(polyfill: Polyfill) {
+        this._taskMap.ensureOrCreateAsync(polyfill.src, polyfill);
     }
 }

@@ -7,13 +7,11 @@
     "moduleResolution": "node",
     "module": "es2015",
     "noEmitOnError": false,
-    "outDir": "../__artifacts/build/entrypoint/local",
+    "noEmit": true,
     "lib": ["es2015", "dom"],
     "target": "es2015",
     "skipLibCheck": true,
     "strictNullChecks": true,
-    "inlineSources": true,
-    "inlineSourceMap": true,
     "importHelpers": true,
     "types": [
       "node",
@@ -24,9 +22,6 @@
       "@sharpangles/platform-global": ["../../platform-global/__artifacts/release"]
     }
   },
-  "files": [
-    "./entrypoint.web.local.ts"
-  ],
   "angularCompilerOptions": {
     "strictMetadataEmit": true
   }

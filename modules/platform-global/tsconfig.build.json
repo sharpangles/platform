@@ -7,9 +7,10 @@
     "noImplicitAny": true,
     "strictNullChecks": true,
     "baseUrl": ".",
-    "module": "commonjs",
-    "outDir": "./__artifacts/local",
+    "module": "es2015",
+    "outDir": "./__artifacts/build",
     "declaration": true,
+    "declarationDir": "./__artifacts/release",
     "stripInternal": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
@@ -26,8 +27,6 @@
     ]
   },
   "include": [
-    "./index.ts",
-    "./src/**/*.ts",
-    "./spec/**/*.ts"
-    ]
+    "./index.ts"
+  ]
 }

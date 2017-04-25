@@ -10,7 +10,7 @@ export interface SystemJSModuleResolutionContext extends ModuleResolutionContext
 
 export class SystemJSModuleLoader extends ModuleLoader<SystemJSModuleResolutionContext> {
     static create(initialConfig: SystemJSLoader.Config, systemJsPath: string): FeatureReference {
-        return new FeatureReference(SystemJSModuleLoader, () => new SystemJSModuleLoader(initialConfig, systemJsPath)).withDependency(new FeatureReference(Polyfiller));
+        return new FeatureReference(SystemJSModuleLoader, () => new SystemJSModuleLoader(initialConfig, systemJsPath)).withDependency(Polyfiller).withDependency(BrowserModuleLoader);
     }
 
     public constructor(public initialConfig: SystemJSLoader.Config, public systemJsPath: string) {
@@ -25,7 +25,8 @@ export class SystemJSModuleLoader extends ModuleLoader<SystemJSModuleResolutionC
     async onInitAsync(entryPoint: EntryPoint) {
         await super.onInitAsync(entryPoint);
         let polyfiller = <Polyfiller>FeatureReference.getFeature(Polyfiller);
-        polyfiller.registerPolyfill(this.systemJsPath, () => typeof System === 'undefined', undefined, true, new BrowserModuleLoader()); // tag loading for the systemjs polyfill
+        polyfiller.registerPolyfill({ src: this.systemJsPath, test: () => typeof System === 'undefined', waitFor: true, moduleLoader: <BrowserModuleLoader>FeatureReference.getFeature(BrowserModuleLoader) });
+        await polyfiller.ensureAllAsync();
         System.config(this.initialConfig);
     }
 }

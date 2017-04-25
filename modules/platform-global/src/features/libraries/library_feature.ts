@@ -4,8 +4,8 @@ import { ModuleLoader, ModuleResolutionContext } from '../module_loaders/module_
 import { LibraryResolver } from './library_resolver';
 
 export class LibraryFeature extends Feature {
-    static create(): FeatureReference {
-        return new FeatureReference(LibraryFeature).withDependency(new FeatureReference(ModuleLoader));
+    static create(libraryResolver: LibraryResolver): FeatureReference {
+        return new FeatureReference(LibraryFeature, () => new LibraryFeature(libraryResolver)).withDependency(ModuleLoader);
     }
 
     protected constructor(public libraryResolver: LibraryResolver) {
@@ -15,14 +15,13 @@ export class LibraryFeature extends Feature {
     async onInitAsync(entryPoint: EntryPoint) {
         await super.onInitAsync(entryPoint);
         let moduleLoader = <ModuleLoader>FeatureReference.getFeature(ModuleLoader);
-        moduleLoader.registerResolver(this.resolveAsync.bind(this));
+        moduleLoader.registerResolver((c, n) => this.resolveAsync(moduleLoader, c, n));
     }
 
-    async resolveAsync(moduleLoader: ModuleResolutionContext, context: ModuleResolutionContext, next: (context: ModuleResolutionContext) => Promise<any>): Promise<any> {
-        let libraryModule = await this.libraryResolver.tryGetLibraryAsync(moduleLoader, context);
-        if (libraryModule) {
-            await this.libraryResolver.applyLibraryFeaturesAsync(moduleLoader, context);
-        }
+    async resolveAsync(moduleLoader: ModuleLoader, context: ModuleResolutionContext, next: (context: ModuleResolutionContext) => Promise<any>): Promise<any> {
+        let library = await this.libraryResolver.tryGetLibraryAsync(moduleLoader, context);
+        if (library)
+            await this.libraryResolver.applyCapabilitiesAsync(context.key, moduleLoader, context, library);
         return await next(context);
     }
 }

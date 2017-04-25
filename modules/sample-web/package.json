@@ -19,16 +19,22 @@
   },
   "homepage": "https://github.com/sharpangles/platform/tree/master/modules/bootstrap#readme",
   "scripts": {
-    "build:entrypoint": "tsc -p build/tsconfig.entrypoint.web.local.json",
-    "build:app": "tsc -p build/tsconfig.app.local.json",
-    "build": "npm run build:entrypoint && npm run build:app",
-    "rollup": "rollup -c build/rollup.config.js",
+    "tsc:ep:local": "tsc -p build/tsconfig.entrypoint.web.local.json",
+    "rollup:ep:local": "rollup -c build/rollup.config.entrypoint.web.local.js",
+    "build:ep:local": "npm run tsc:ep:local && npm run rollup:ep:local",
+    "tsc:ep:local-singlefile": "tsc -p build/tsconfig.entrypoint.web.local.singlefile.json",
+    "rollup:ep:local-singlefile": "rollup -c build/rollup.config.entrypoint.web.local.singlefile.js",
+    "build:ep:local-singlefile": "npm run tsc:ep:local-singlefile && npm run rollup:ep:local-singlefile && node ./build/build.entrypoint.web.local.singlefile.js",
+    "tsc:app": "tsc -p build/tsconfig.app.local.json",
+    "rollup:app": "rollup -c build/rollup.config.js",
+    "build:app": "npm run tsc:app && npm run rollup:app",
     "minify:entrypoint": "closure-compiler --compilation_level ADVANCED_OPTIMIZATIONS --create_source_map ./__artifacts/build/entrypoint/customEntryPoint.min.js.map --js node_modules/google-closure-library/closure/goog/base.js --js ./__artifacts/build/entrypoint/customEntryPoint.js --js node_modules/systemjs/dist/system.src.js --language_in ECMASCRIPT6 --language_out ES5_STRICT > ./__artifacts/build/entrypoint/customEntryPoint.min.js",
     "copy:web": "cpy index.html __artifacts/serve",
-    "copy:polyfills": "cpy ../../node_modules/systemjs/dist/system.src.js __artifacts/serve/polyfills",
-    "copy:entrypoint": "cpy __artifacts/build/entrypoint/* __artifacts/serve/entrypoint",
-    "copy": "npm run copy:web && npm run copy:polyfills && npm run copy:entrypoint",
-    "postbuild": "npm run rollup && npm run copy"
+    "copy:polyfills": "cpy ../../node_modules/systemjs/dist/system.src.js ../../node_modules/tslib/tslib.js  __artifacts/serve/polyfills",
+    "copy": "npm run copy:web && npm run copy:polyfills",
+    "build": "npm run build:ep:local && npm run build:ep:local-singlefile && npm run build:app",
+    "postbuild": "npm run copy",
+    "clean": "rimraf -rf __artifacts"
   },
   "peerDependencies": {
     "@angular/animations": "^4.0.0",
@@ -59,9 +65,11 @@
     "rollup": "^0.41.6",
     "rollup-plugin-commonjs": "^8.0.2",
     "rollup-plugin-node-resolve": "^3.0.0",
+    "rollup-plugin-alias": "^1.3.1",
     "concurrently": "^3.4.0",
     "closure-compiler-cli": "^1.0.2",
     "google-closure-compiler": "^20170409.0.0",
-    "google-closure-library": "^20170409.0.0"
+    "google-closure-library": "^20170409.0.0",
+    "concat-with-sourcemaps": "^1.0.4"
   }
 }

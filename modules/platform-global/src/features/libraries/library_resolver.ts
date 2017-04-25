@@ -1,5 +1,5 @@
 import { FeatureReference } from '../feature';
-import { LibraryCapability } from './library_capability';
+import { LibraryCapability } from './capabilities/library_capability';
 import { Library } from './library';
 import { TaskMap, Task } from '../../task_map';
 import { ModuleResolutionContext, ModuleLoader } from '../module_loaders/module_loader';
@@ -17,7 +17,7 @@ export abstract class LibraryResolver<TContext extends ModuleResolutionContext =
             return;
         this._forEachChildLibrary(context.key, library, (name, lib) => {
             this._taskMap.setResult(name, { moduleLoader: moduleLoader, context: context }, lib);
-            this.applyLibraryFeaturesAsync(moduleLoader, context, lib);
+            this.applyCapabilitiesAsync(name, moduleLoader, context, lib);
         });
         return library;
     }
@@ -28,13 +28,13 @@ export abstract class LibraryResolver<TContext extends ModuleResolutionContext =
         this._capabilities.set(capability.name, capability);
     }
 
-    async applyLibraryFeaturesAsync(moduleLoader: ModuleLoader<TContext>, context: TContext, library: Library): Promise<void> {
+    async applyCapabilitiesAsync(libraryName: string, moduleLoader: ModuleLoader<TContext>, context: TContext, library: Library): Promise<void> {
         if (!library.capabilityContexts)
             return;
         for (let ctx in library.capabilityContexts) {
             let capability = this._capabilities.get(ctx);
             if (capability)
-                await capability.applyAsync(library, library.capabilityContexts[ctx], FeatureReference.getFeature(capability.featureType));
+                await capability.applyAsync(libraryName, library, library.capabilityContexts[ctx], FeatureReference.getFeature(capability.featureType));
         }
     }
 

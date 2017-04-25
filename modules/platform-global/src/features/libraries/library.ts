@@ -1,8 +1,8 @@
-import { Feature } from '../feature';
-import { LibraryCapabilityContext } from './library_context';
-
+/**
+ * An interface provided by dependencies that wish to participate in entry point features.
+ */
 export interface Library {
-    capabilityContexts?: { [capabilityName: string]: any };
+    capabilityContexts: { [capabilityName: string]: any };
 
     /**
      * When explicitly set, child libraries are not resolved via module loading.

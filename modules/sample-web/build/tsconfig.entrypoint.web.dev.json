@@ -17,9 +17,11 @@
     "importHelpers": true,
     "types": [
       "node",
-      "jasmine",
-      "systemjs"
-    ]
+      "jasmine"
+    ],
+    "paths": {
+      "@sharpangles/platform-global": ["../../platform-global"]
+    }
   },
   "files": [
     "./entrypoint.web.dev.ts"

@@ -1,10 +1,15 @@
 import { EntryPoint } from '../entry_point';
 
+/**
+ * @todo Could also use this as an entrypoint compiler of sorts.
+ * Could connect to build process stuff, perhaps detecting polyfills to bundle.
+ * Could also do this down the library chain...
+ */
 export class FeatureReference {
     constructor(public type: any, factory?: () => Feature) {
         if (factory) {
             if (FeatureReference.factories.has(type))
-                throw new Error('Already ahve a factory for this feature.');
+                throw new Error('Already have a factory for this feature.');
             FeatureReference.factories.set(type, factory);
         }
     }
@@ -23,28 +28,16 @@ export class FeatureReference {
     static getFeature(type: any) {
         let feature = FeatureReference._instances.get(type);
         if (!feature)
-            throw new Error('Not found');
+            throw new Error(`The feature ${type.constructor.name} was not found`);
         return feature;
     }
 
-    // /** Gets a dependency of the same type with an already constructed instance. */
-    // private _getDependencyInDepth(type: any): FeatureReference | undefined {
-    //     if (!this.dependencies)
-    //         return;
-    //     let reference: FeatureReference | undefined;
-    //     if (reference = this.dependencies.get(type))
-    //         return reference;
-    //     for (let dep of this.dependencies.values()) {
-    //         if (reference = dep._getDependencyInDepth(type))
-    //             return reference;
-    //     }
-    //     return;
-    // }
-
-    withDependency(type: any) {
+    withDependency(referenceOrType: FeatureReference | any, factory?: () => Feature) {
         if (!this.dependencies)
             this.dependencies = new Map<any, FeatureReference>();
-        this.dependencies.set(type, new FeatureReference(type));
+        this.dependencies.set(
+            referenceOrType instanceof FeatureReference ? referenceOrType.type : referenceOrType,
+            referenceOrType instanceof FeatureReference ? referenceOrType : new FeatureReference(referenceOrType, factory));
         return this;
     }
 
@@ -53,9 +46,9 @@ export class FeatureReference {
      * Typical usage: new FeatureReference(Derived).as(Base);
      */
     as(type: any) {
-        if (!this.dependencies)
-            this.dependencies = new Map<any, FeatureReference>();
-        this.dependencies.set(type, this);
+        if (FeatureReference.factories.has(type))
+            throw new Error('Already have an alias for this feature.');
+        FeatureReference.factories.set(type, () => this.getFeature());
         return this;
     }
 
