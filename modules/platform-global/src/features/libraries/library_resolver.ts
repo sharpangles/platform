@@ -8,6 +8,10 @@ import { ModuleResolutionContext, ModuleLoader } from '../module_loaders/module_
  * Manages resolution of a Library object for a particular module load activity.
  */
 export abstract class LibraryResolver<TContext extends ModuleResolutionContext = ModuleResolutionContext> {
+    initAsync() {
+        return Promise.resolve();
+    }
+
     /**
      * Could filter by name, try-catch an import, etc...
      */
