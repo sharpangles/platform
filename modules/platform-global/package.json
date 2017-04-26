@@ -39,6 +39,7 @@
     "nyc": "^10.1.2",
     "rimraf": "^2.5.4",
     "rollup": "^0.41.6",
+    "rollup-plugin-sourcemaps": "^0.4.2",
     "concurrently": "^3.4.0",
     "closure-compiler-cli": "1.0.2",
     "google-closure-compiler": "20170409.0.0",

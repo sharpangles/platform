@@ -46,9 +46,6 @@ export class EntryPoint extends FeatureReference {
         }
     }
 
-    private _dostuff(featureReference: FeatureReference) {
-    }
-
     private _traverse<T>(node: T, childrenSelector: (node: T) => T[], func: (node: T) => void, visitedStack?: Set<T>) {
         if (visitedStack) {
             if (visitedStack.has(node))

@@ -1,5 +1,5 @@
 import alias from 'rollup-plugin-alias';
-
+import sourcemaps from 'rollup-plugin-sourcemaps';
 
 export default {
   entry: './__artifacts/build/entrypoint/local-singlefile/sample-web/build/entrypoint.web.local.singlefile.js',
@@ -8,9 +8,12 @@ export default {
   moduleName: 'sharpangles.sample-app',
   sourceMap: true,
   onwarn: function (warning) { if (warning.code !== 'THIS_IS_UNDEFINED') console.error(warning.message); },
-  plugins: [alias({
+  plugins: [
+    alias({
       '@sharpangles': '../..'
-  })]
+    }),
+    sourcemaps()
+  ]
 }
 
 

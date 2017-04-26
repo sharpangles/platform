@@ -20,6 +20,8 @@
     "target": "es2015",
     "skipLibCheck": true,
     "importHelpers": true,
+    "inlineSourceMap": true,
+    "inlineSources": true,
     "types": [
       "node",
       "jasmine",

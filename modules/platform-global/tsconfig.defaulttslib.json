@@ -18,6 +18,8 @@
     "rootDir": ".",
     "lib": ["es2015", "dom"],
     "target": "es2015",
+    "inlineSourceMap": true,
+    "inlineSources": true,
     "skipLibCheck": true,
     "types": [
       "node",
