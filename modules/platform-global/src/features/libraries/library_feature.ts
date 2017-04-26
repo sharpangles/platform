@@ -14,7 +14,7 @@ export class LibraryFeature extends Feature {
 
     async onInitAsync(entryPoint: EntryPoint) {
         await super.onInitAsync(entryPoint);
-        let moduleLoader = <ModuleLoader>FeatureReference.getFeature(ModuleLoader);
+        let moduleLoader = FeatureReference.getFeature<ModuleLoader>(ModuleLoader);
         moduleLoader.registerResolver((c, n) => this.resolveAsync(moduleLoader, c, n));
     }
 

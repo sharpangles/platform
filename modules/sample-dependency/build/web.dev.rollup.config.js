@@ -1,12 +1,9 @@
-import sourcemaps from 'rollup-plugin-sourcemaps';
-
 export default {
   entry: './__artifacts/build/app/index.js',
-  dest: './__artifacts/serve/app.umd.js',
+  dest: './__artifacts/release/bundles/sample-dependency.umd.js',
   format: 'umd',
-  moduleName: 'sharpangles.sample-app',
-  sourceMap: true,
-  plugins: [sourcemaps()],
+  moduleName: 'sharpangles.sample-dependency',
+  sourceMap: 'inline',
   onwarn: function (warning) { if (warning.code !== 'THIS_IS_UNDEFINED') console.error(warning.message); },
   external: [
     '@angular/core',

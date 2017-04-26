@@ -7,27 +7,21 @@
     "moduleResolution": "node",
     "module": "es2015",
     "noEmitOnError": false,
-    "outDir": "../__artifacts/build/entrypoint/local",
+    "outDir": "../__artifacts/build/entrypoint/local-singlefile",
     "lib": ["es2015", "dom"],
     "target": "es2015",
     "skipLibCheck": true,
     "strictNullChecks": true,
     "inlineSources": true,
     "inlineSourceMap": true,
-    "importHelpers": true,
+    "noEmitHelpers": true,
     "types": [
       "node",
       "jasmine",
       "systemjs"
-    ],
-    "paths": {
-      "@sharpangles/platform-global": ["../../platform-global/__artifacts/release"]
-    }
+    ]
   },
   "files": [
-    "./entrypoint.web.local.ts"
-  ],
-  "angularCompilerOptions": {
-    "strictMetadataEmit": true
-  }
+    "./web.dev.entrypoint.ts"
+  ]
 }

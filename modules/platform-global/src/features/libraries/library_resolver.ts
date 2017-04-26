@@ -1,4 +1,4 @@
-import { FeatureReference } from '../feature';
+import { Feature, FeatureReference } from '../feature';
 import { LibraryCapability } from './capabilities/library_capability';
 import { Library } from './library';
 import { TaskMap, Task } from '../../task_map';
@@ -34,7 +34,7 @@ export abstract class LibraryResolver<TContext extends ModuleResolutionContext =
         for (let ctx in library.capabilityContexts) {
             let capability = this._capabilities.get(ctx);
             if (capability)
-                await capability.applyAsync(libraryName, library, library.capabilityContexts[ctx], FeatureReference.getFeature(capability.featureType));
+                await capability.applyAsync(libraryName, library, library.capabilityContexts[ctx], FeatureReference.getFeature<Feature>(capability.featureType));
         }
     }
 

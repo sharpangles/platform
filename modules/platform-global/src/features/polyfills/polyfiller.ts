@@ -14,7 +14,7 @@ export interface Polyfill {
     waitFor?: boolean;
 
     /** A test to determine if the polyfill is needed or already loaded. */
-    test(): boolean;
+    test?: () => boolean;
 }
 
 export class Polyfiller extends Feature {
@@ -29,9 +29,9 @@ export class Polyfiller extends Feature {
         if (source.dependsOn) {
             await Promise.all(source.dependsOn.map(d => this._taskMap.ensureAsync(d)));
         }
-        if (!source.test())
+        if (source.test && !source.test())
             return;
-        return await (source.moduleLoader || <ModuleLoader>FeatureReference.getFeature(ModuleLoader)).loadModuleAsync(<ModuleResolutionContext>{ key: key });
+        return await (source.moduleLoader || FeatureReference.getFeature<ModuleLoader>(ModuleLoader)).loadModuleAsync(<ModuleResolutionContext>{ key: key });
     }
 
     registerPolyfill(polyfill: Polyfill) {

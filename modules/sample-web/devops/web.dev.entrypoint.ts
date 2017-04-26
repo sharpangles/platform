@@ -1,4 +1,4 @@
-import { unescapeIdentifier } from '@angular/compiler/compiler';
+import { AngularPlatformBrowserDynamicFeature } from '../../platform-global/src/features/angular/angular_platform_browser_dynamic_feature';
 import { ImportingLibraryResolver } from '../../platform-global/src/features/libraries/importing_library_resolver';
 import { EntryPoint } from '../../platform-global/src/entry_point';
 import { SystemJSModuleLoader } from '../../platform-global/src/features/module_loaders/systemjs_module_loader';
@@ -32,6 +32,7 @@ let initialSystemJSConfig = {
 new EntryPoint()
     .withDependency(SystemJSModuleLoader.create(initialSystemJSConfig, '__artifacts/serve/polyfills/system.src.js').as(ModuleLoader))
     .withDependency(LibraryFeature.create(new ImportingLibraryResolver(undefined, undefined, ctx => ctx.key.startsWith('@sharpangles/'))))
+    .withDependency(AngularPlatformBrowserDynamicFeature.create())
     .startAsync();
 
 // namespace __sharpangles.app {

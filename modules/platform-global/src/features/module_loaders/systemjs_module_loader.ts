@@ -15,7 +15,6 @@ export class SystemJSModuleLoader extends ModuleLoader<SystemJSModuleResolutionC
 
     public constructor(public initialConfig: SystemJSLoader.Config, public systemJsPath: string) {
         super();
-        this.resolver = this.onLoadModuleAsync.bind(this);
     }
 
     onLoadModuleAsync(context: SystemJSModuleResolutionContext): Promise<any> {
@@ -24,8 +23,8 @@ export class SystemJSModuleLoader extends ModuleLoader<SystemJSModuleResolutionC
 
     async onInitAsync(entryPoint: EntryPoint) {
         await super.onInitAsync(entryPoint);
-        let polyfiller = <Polyfiller>FeatureReference.getFeature(Polyfiller);
-        polyfiller.registerPolyfill({ src: this.systemJsPath, test: () => typeof System === 'undefined', waitFor: true, moduleLoader: <BrowserModuleLoader>FeatureReference.getFeature(BrowserModuleLoader) });
+        let polyfiller = FeatureReference.getFeature<Polyfiller>(Polyfiller);
+        polyfiller.registerPolyfill({ src: this.systemJsPath, test: () => typeof System === 'undefined', waitFor: true, moduleLoader: FeatureReference.getFeature<BrowserModuleLoader>(BrowserModuleLoader) });
         await polyfiller.ensureAllAsync();
         System.config(this.initialConfig);
     }

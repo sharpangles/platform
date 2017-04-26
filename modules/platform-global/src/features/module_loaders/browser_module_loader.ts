@@ -14,11 +14,6 @@ export class BrowserModuleLoader extends ModuleLoader<BrowserModuleResolutionCon
         return new FeatureReference(BrowserModuleLoader);
     }
 
-    public constructor() {
-        super();
-        this.resolver = this.onLoadModuleAsync.bind(this);
-    }
-
     private _taskMap = new TaskMap<string, BrowserModuleResolutionContext, void>((key, context) => new Task<void>(() => this._createTagAsync(context)));
 
     onLoadModuleAsync(context: BrowserModuleResolutionContext): Promise<any> {

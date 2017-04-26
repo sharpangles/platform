@@ -6,5 +6,5 @@ import { SomethingComponent } from './something.component';
     declarations: [SomethingComponent],
     imports: [CommonModule]
 })
-export class AppModule {
+export class SampleDependencyModule {
 }

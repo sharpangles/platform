@@ -1,5 +1,15 @@
 {
   "typescript.tsdk": "node_modules/typescript/lib",
+  "code-runner.fileDirectoryAsCwd": true,
   "vsicons.presets.angular": true,
-  "code-runner.fileDirectoryAsCwd": true
+  "vsicons.associations.files": [
+    { "icon": "config", "extensions": ["entrypoint.ts"], "format": "svg" },
+    { "icon": "rollup", "extensions": ["rollup.config.js"], "format": "svg" },
+    { "icon": "tsconfig", "extensions": ["tsconfig.json"], "format": "svg" },
+    { "icon": "script", "extensions": ["build.js"], "format": "svg" }
+  ],
+  "vsicons.associations.folders": [
+    { "icon": "dist", "extensions": ["__artifacts"], "format": "svg" },
+    { "icon": "script", "extensions": ["devops"], "format": "svg" }
+  ]
 }

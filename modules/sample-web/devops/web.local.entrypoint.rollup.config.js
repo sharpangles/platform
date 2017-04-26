@@ -1,8 +1,8 @@
 import sourcemaps from 'rollup-plugin-sourcemaps';
 
 export default {
-  entry: './__artifacts/build/entrypoint/local/entrypoint.web.local.js',
-  dest: './__artifacts/serve/entrypoint.web.local.umd.js',
+  entry: './__artifacts/build/entrypoint/local/web.local.entrypoint.js',
+  dest: './__artifacts/serve/web.local.entrypoint.umd.js',
   format: 'umd',
   moduleName: 'sharpangles.sample-app',
   sourceMap: true,

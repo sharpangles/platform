@@ -4,27 +4,24 @@
     "stripInternal": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "module": "system",
     "moduleResolution": "node",
+    "module": "es2015",
     "noEmitOnError": false,
     "outDir": "../__artifacts/build/app",
     "lib": ["es2015", "dom"],
-    "target": "es5",
+    "target": "es2015",
     "skipLibCheck": true,
     "strictNullChecks": true,
-    "inlineSources": true,
-    "inlineSourceMap": true,
+    "importHelpers": true,
     "types": [
       "node",
       "jasmine"
     ]
   },
-  "files": [
-    "../../../node_modules/tslib/tslib.d.ts"
-  ],
   "include": [
     "../index.ts",
-    "./dependencies.local.ts"
+    "../src/**/*.ts",
+    "../spec/**/*.ts"
   ],
   "angularCompilerOptions": {
     "strictMetadataEmit": true

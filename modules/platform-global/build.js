@@ -24,3 +24,5 @@ concat.add(null, `if (typeof exports !== 'object' && typeof define !== 'function
 concat.add('./__artifacts/release/bundles/platform-global.umd.js', platformGlobalSource, platformGlobalSourcemap);
 fs.writeFileSync('./__artifacts/release/bundles/platform-global.all.umd.js', concat.content);
 fs.writeFileSync('./__artifacts/release/bundles/platform-global.all.umd.js.map', concat.sourceMap);
+
+// @todo concat with sourcemaps doesnt really work... the open issue has been there for several years.

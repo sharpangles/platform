@@ -5,28 +5,17 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "moduleResolution": "node",
-    "module": "none",
     "noEmitOnError": false,
-    "outFile": "../__artifacts/build/entrypoint/entrypoint.web.dev.js",
     "lib": ["es2015", "dom"],
-    "target": "es2015",
+    "noEmit": true,
+    "target": "es5",
     "skipLibCheck": true,
     "strictNullChecks": true,
-    "inlineSources": true,
-    "inlineSourceMap": true,
-    "importHelpers": true,
-    "types": [
-      "node",
-      "jasmine"
-    ],
     "paths": {
       "@sharpangles/platform-global": ["../../platform-global"]
     }
   },
-  "files": [
-    "./entrypoint.web.dev.ts"
-  ],
-  "angularCompilerOptions": {
-    "strictMetadataEmit": true
-  }
+  "include": [
+    "./library.ts"
+  ]
 }
