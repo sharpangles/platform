@@ -4,25 +4,24 @@
     "stripInternal": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "moduleResolution": "node",
     "module": "es2015",
+    "moduleResolution": "node",
     "noEmitOnError": false,
     "outDir": "../__artifacts/build/app",
     "lib": ["es2015", "dom"],
-    "target": "es2015",
+    "target": "es5",
     "skipLibCheck": true,
     "strictNullChecks": true,
-    "noEmitHelpers": true,
-    "types": [
-      "node",
-      "jasmine"
-    ]
+    "inlineSources": true,
+    "inlineSourceMap": true,
+    "importHelpers": true,
+    "paths": {
+      "@sharpangles/platform-global": ["../../platform-global/__artifacts/release"]
+    }
   },
   "include": [
-    "../library.ts",
     "../index.ts",
-    "../src/**/*.ts",
-    "../spec/**/*.ts"
+    "../library.ts"
   ],
   "angularCompilerOptions": {
     "strictMetadataEmit": true

@@ -5,14 +5,14 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "moduleResolution": "node",
-    "module": "es2015",
+    "module": "commonjs",
     "noEmitOnError": false,
-    "outDir": "../__artifacts/build/app",
+    "outDir": "../__artifacts/local/app",
     "lib": ["es2015", "dom"],
     "target": "es2015",
     "skipLibCheck": true,
     "strictNullChecks": true,
-    "noEmitHelpers": true,
+    "importHelpers": true,
     "types": [
       "node",
       "jasmine"

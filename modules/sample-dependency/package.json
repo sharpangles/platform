@@ -19,11 +19,14 @@
   },
   "homepage": "https://github.com/sharpangles/platform/tree/master/modules/bootstrap#readme",
   "scripts": {
-    "build:app": "tsc -p build/tsconfig.app.local.json",
-    "build": "npm run build:app",
-    "rollup": "rollup -c build/rollup.config.js",
-    "copy": "cpy LICENSE package.json README.md __artifacts/release",
-    "postbuild": "npm run rollup && npm run copy"
+    "build:library": "tsc -p devops/library.dev.tsconfig.json",
+    "tsc:app": "tsc -p devops/web.dev.tsconfig.json",
+    "rollup:app": "rollup -c devops/web.dev.rollup.config.js",
+    "build:app": "npm run tsc:app && npm run rollup:app",
+    "copy": "cpy package.json README.md __artifacts/release",
+    "build": "npm run build:library && npm run build:app",
+    "postbuild": "npm run copy",
+    "clean": "rimraf -rf __artifacts"
   },
   "peerDependencies": {
     "@angular/animations": "^4.0.0",
@@ -54,6 +57,7 @@
     "rollup": "^0.41.6",
     "rollup-plugin-commonjs": "^8.0.2",
     "rollup-plugin-node-resolve": "^3.0.0",
+    "rollup-plugin-multi-entry": "^2.0.1",
     "concurrently": "^3.4.0",
     "closure-compiler-cli": "^1.0.2",
     "google-closure-compiler": "^20170409.0.0",

@@ -1,6 +1,7 @@
 import { ModuleLoader } from '../module_loaders/module_loader';
 import { Polyfiller } from '../polyfills/polyfiller';
-import { Feature, FeatureReference } from '../feature';
+import { Feature } from '../feature';
+import { FeatureReference } from '../feature_reference';
 import { EntryPoint } from '../../entry_point';
 
 let __karma__: any = (<any>window)['__karma__'];

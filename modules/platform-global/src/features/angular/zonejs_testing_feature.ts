@@ -1,5 +1,6 @@
 import { Polyfiller } from '../polyfills/polyfiller';
-import { Feature, FeatureReference } from '../feature';
+import { Feature } from '../feature';
+import { FeatureReference } from '../feature_reference';
 import { EntryPoint } from '../../entry_point';
 
 export class ZoneJSTestingFeature extends Feature {

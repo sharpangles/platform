@@ -1,4 +1,4 @@
-import { FeatureReference } from '../feature';
+import { FeatureReference } from '../feature_reference';
 import { CoreJSFeature } from '../polyfills/corejs_feature';
 import { platformServer } from '@angular/platform-server';
 import { AngularPlatformFeature } from './angular_platform_feature';

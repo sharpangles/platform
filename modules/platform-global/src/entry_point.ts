@@ -1,4 +1,5 @@
-import { FeatureReference, Feature } from './features/feature';
+import { FeatureReference } from './features/feature_reference';
+import { Feature } from './features/feature';
 
 export class RootFeature extends Feature {
     constructor(public entryPoint: EntryPoint) {
@@ -9,20 +10,25 @@ export class RootFeature extends Feature {
      * Start the application.
      */
     async startAsync(): Promise<void> {
-        if (rootFeature) {
-            throw new Error('Already started');
-        }
         await this._wireFeatureAsync(this);
-        await this.initAsync(this.entryPoint);
-        await this.runAsync(this.entryPoint);
+        await rootFeature.modifiedAsync(this.entryPoint);
     }
 
-    async addFeatureAsync(featureReference: FeatureReference) {
-        let feature = featureReference.findFeature();
-        rootFeature.addDependency(feature);
+    /**
+     * In larger enterprise systems, managing configuration across numerous entry points may require some amount of centralization.
+     * Additionally, dynamically loaded capabilities may bring their own configuration and feature baggage.
+     * For example, perhaps there is an angular shared kernel that is shared across many apps.
+     * Setting up this configuration is often opinionated and changes based on a variety of bundling scenarios and architectural philosophies.
+     * While this configuration could be statically referenced in every endpoint, it would cause our build to traverse all angular, the bootstrapped module, and all their dependencies.
+     * This method handles dynamically adding features and rewiring the entire feature tree.
+     */
+    async addFeaturesAsync(featureReferences: FeatureReference[]) {
+        for (let featureReference of featureReferences) {
+            let feature = featureReference.findFeature();
+            rootFeature.addDependency(feature);
+        }
         await this._wireFeatureAsync(rootFeature);
-        await feature.modifiedAsync(this.entryPoint);
-        return feature;
+        await rootFeature.modifiedAsync(this.entryPoint);
     }
 
     private async _wireFeatureAsync(feature: Feature) {
@@ -96,9 +102,8 @@ export class EntryPoint extends FeatureReference {
      * Start the application.
      */
     async startAsync(): Promise<void> {
-        if (rootFeature) {
+        if (rootFeature)
             throw new Error('Already started');
-        }
         rootFeature = <RootFeature>this.findFeature();
         return rootFeature.startAsync();
     }

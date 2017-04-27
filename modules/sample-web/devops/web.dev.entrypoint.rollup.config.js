@@ -2,7 +2,7 @@ import alias from 'rollup-plugin-alias';
 import sourcemaps from 'rollup-plugin-sourcemaps';
 
 export default {
-  entry: './__artifacts/build/entrypoint/local-singlefile/sample-web/devops/web.dev.entrypoint.js',
+  entry: './__artifacts/build/entrypoint/dev/sample-web/devops/web.dev.entrypoint.js',
   dest: './__artifacts/serve/web.dev.entrypoint.umd.js',
   format: 'umd',
   moduleName: 'sharpangles.sample-app',

@@ -1,4 +1,4 @@
-import { FeatureReference } from '../feature';
+import { FeatureReference } from '../feature_reference';
 import { ModuleLoader, ModuleResolutionContext } from './module_loader';
 
 export interface CommonJSModuleResolutionContext extends ModuleResolutionContext {

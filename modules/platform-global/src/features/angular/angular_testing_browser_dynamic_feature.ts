@@ -1,5 +1,5 @@
 import { ZoneJSTestingFeature } from './zonejs_testing_feature';
-import { FeatureReference } from '../feature';
+import { FeatureReference } from '../feature_reference';
 import { CoreJSFeature } from '../polyfills/corejs_feature';
 import { getTestBed } from '@angular/core/testing';
 import { platformBrowserDynamicTesting, BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';

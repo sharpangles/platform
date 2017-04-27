@@ -1,4 +1,5 @@
-import { Feature, FeatureReference } from '../feature';
+import { Feature } from '../feature';
+import { FeatureReference } from '../feature_reference';
 import { Polyfiller, Polyfill } from './polyfiller';
 import { EntryPoint } from '../../entry_point';
 

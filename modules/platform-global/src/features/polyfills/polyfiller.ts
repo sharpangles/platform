@@ -1,5 +1,6 @@
 ﻿import { TaskMap, Task } from '../../task_map';
-import { Feature, FeatureReference } from '../feature';
+import { Feature } from '../feature';
+import { FeatureReference } from '../feature_reference';
 import { ModuleLoader, ModuleResolutionContext } from '../module_loaders/module_loader';
 
 export interface Polyfill {

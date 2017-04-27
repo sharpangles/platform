@@ -1,8 +1,10 @@
+import { FeatureReference } from '../feature_reference';
+
 /**
  * An interface provided by dependencies that wish to participate in entry point features.
  */
 export interface Library {
-    capabilityContexts: { [capabilityName: string]: any };
+    featureReferences?: FeatureReference[];
 
     /**
      * When explicitly set, child libraries are not resolved via module loading.

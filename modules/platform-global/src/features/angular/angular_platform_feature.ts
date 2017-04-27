@@ -1,5 +1,6 @@
 import { ModuleLoader } from '../module_loaders/module_loader';
-import { Feature, FeatureReference } from '../feature';
+import { Feature } from '../feature';
+import { FeatureReference } from '../feature_reference';
 import { EntryPoint } from '../../entry_point';
 
 export abstract class AngularPlatformFeature extends Feature {
@@ -15,31 +16,16 @@ export abstract class AngularPlatformFeature extends Feature {
 
     protected async onInitAsync(entryPoint: EntryPoint) {
         await super.onInitAsync(entryPoint);
-        let rootModuleType = typeof this.rootModuleReference === 'string' ? await FeatureReference.getFeature<ModuleLoader>(ModuleLoader).loadModuleAsync({ key: this.rootModuleReference }) : this.rootModuleReference;
-        this.bootstrap(rootModuleType);
+        let ngModule: any;
+        if (typeof this.rootModuleReference === 'string') {
+            let ind = this.rootModuleReference.indexOf('#');
+            let mod = await FeatureReference.getFeature<ModuleLoader>(ModuleLoader).loadModuleAsync({ key: ind >= 0 ? this.rootModuleReference.substr(0, ind) : this.rootModuleReference });
+            ngModule = mod[ind >= 0 ? this.rootModuleReference.substr(ind + 1) : 'default'];
+        }
+        else
+            ngModule = this.rootModuleReference;
+        this.bootstrap(ngModule);
     }
 
     protected abstract bootstrap(rootModule: any): void;
 }
-
-// import { ModuleLoader } from '../module_loaders/module_loader';
-// import { Feature, FeatureReference } from '../feature';
-// import { EntryPoint } from '../../entry_point';
-
-// /**
-//  * Angular features.
-//  */
-// export abstract class AngularPlatformFeature extends Feature {
-//     constructor(public platformModuleName: string, public entryModuleName: string, public entryModuleExport: string = 'default') {
-//         super();
-//     }
-
-//     protected async onInitAsync(entryPoint: EntryPoint) {
-//         let moduleLoader = FeatureReference.getFeature<ModuleLoader>(ModuleLoader);
-//         let platformModule = await moduleLoader.loadModuleAsync({ key: this.platformModuleName });
-//         let entryModule = await (<any>moduleLoader.loadModuleAsync({ key: this.entryModuleName }))[this.entryModuleExport];
-//         this.bootstrap(platformModule, entryModule);
-//     }
-
-//     protected abstract bootstrap(platformModule: any, entryModule: any): void;
-// }

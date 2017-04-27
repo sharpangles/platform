@@ -2,9 +2,6 @@ import { LibraryResolver } from './library_resolver';
 import { Library } from './library';
 import { ModuleResolutionContext, ModuleLoader } from '../module_loaders/module_loader';
 
-export interface LibraryResolutionContext extends ModuleResolutionContext {
-    libraryName: string;
-}
 
 /**
  * A library resolver that simply imports a library module first.
@@ -18,18 +15,20 @@ export class ImportingLibraryResolver<TContext extends ModuleResolutionContext =
      * @param libraryModuleLoader Allows providing a different module loader to use for libraries.
      * @param libraryModulePath The path to append to the triggering resolution.
      */
-    constructor(public libraryModuleLoader?: ModuleLoader<LibraryResolutionContext>, public libraryModulePath: string = 'library', public libraryFilter?: (context: TContext) => boolean) {
+    constructor(public libraryModuleLoader?: ModuleLoader<ModuleResolutionContext>, public libraryModulePath: string = '/library', public libraryFilter?: (context: TContext) => boolean) {
         super();
     }
 
-    async tryGetLibraryAsync(moduleLoader: ModuleLoader<TContext>, context: TContext): Promise<Library | undefined> {
-        if (this.libraryFilter && !this.libraryFilter(context) || (<LibraryResolutionContext><ModuleResolutionContext>context).libraryName)
-            return Promise.resolve(undefined);
-        return super.tryGetLibraryAsync(moduleLoader, context);
+    async tryGetLibraryAsync(moduleLoader: ModuleLoader<TContext>, context: TContext, next: (context: ModuleResolutionContext) => Promise<any>): Promise<{ library?: Library, module: any }> {
+        if (this.libraryFilter && !this.libraryFilter(context) || context.key.endsWith(this.libraryModulePath))
+            return { module: await next(context) };
+        return super.tryGetLibraryAsync(moduleLoader, context, next);
     }
 
-    protected async loadLibraryAsync(moduleLoader: ModuleLoader, context: TContext): Promise<Library | undefined> {
-        let libraryResolutionContext = <LibraryResolutionContext>{ libraryName: context.key, key: context.key + this.libraryModulePath };
-        return <Library>await (this.libraryModuleLoader || <ModuleLoader<LibraryResolutionContext>>moduleLoader).loadModuleAsync(libraryResolutionContext);
+    protected async loadLibraryAsync(moduleLoader: ModuleLoader<TContext>, context: TContext, next: (context: ModuleResolutionContext) => Promise<any>): Promise<{ library?: Library, module: any }> {
+        return {
+            library: <Library>await (this.libraryModuleLoader || moduleLoader).loadModuleAsync(<any>{ key: context.key + this.libraryModulePath }),
+            module: await next(context)
+        };
     }
 }

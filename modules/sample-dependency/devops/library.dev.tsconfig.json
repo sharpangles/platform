@@ -5,26 +5,21 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "moduleResolution": "node",
-    "module": "es2015",
+    "module": "umd",
     "noEmitOnError": false,
-    "outDir": "../__artifacts/build/app",
+    "outDir": "../__artifacts/release/bundles",
     "lib": ["es2015", "dom"],
     "target": "es2015",
     "skipLibCheck": true,
     "strictNullChecks": true,
-    "noEmitHelpers": true,
-    "types": [
-      "node",
-      "jasmine"
-    ]
+    "inlineSources": true,
+    "inlineSourceMap": true,
+    "importHelpers": true,
+    "paths": {
+      "@sharpangles/platform-global": ["../../platform-global/__artifacts/release"]
+    }
   },
-  "include": [
-    "../library.ts",
-    "../index.ts",
-    "../src/**/*.ts",
-    "../spec/**/*.ts"
-  ],
-  "angularCompilerOptions": {
-    "strictMetadataEmit": true
-  }
+  "files": [
+    "../config_library.ts"
+  ]
 }
