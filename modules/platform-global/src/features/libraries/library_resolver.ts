@@ -1,7 +1,16 @@
 import { rootFeature } from '../../entry_point';
 import { Library } from './library';
+import { LibraryResolutionContext } from './library_feature';
 import { TaskMap, Task } from '../../task_map';
 import { ModuleResolutionContext, ModuleLoader } from '../module_loaders/module_loader';
+
+export interface LibraryLoad<TContext extends ModuleResolutionContext = ModuleResolutionContext> {
+    libraryModuleLoader: ModuleLoader<LibraryResolutionContext>;
+    libraryContext: LibraryResolutionContext;
+    moduleLoader: ModuleLoader<TContext>;
+    context: TContext;
+    next: (context: ModuleResolutionContext) => Promise<any>;
+}
 
 /**
  * Manages resolution of a Library object for a particular module load activity.
@@ -14,33 +23,39 @@ export abstract class LibraryResolver<TContext extends ModuleResolutionContext =
     /**
      * Could filter by name, try-catch an import, etc...
      */
-    async tryGetLibraryAsync(moduleLoader: ModuleLoader<TContext>, context: TContext, next: (context: ModuleResolutionContext) => Promise<any>): Promise<{ library?: Library, module: any }> {
-        let result = await this._taskMap.ensureOrCreateAsync(context.key, { moduleLoader: moduleLoader, context: context, next: next });
+    async tryGetLibraryAsync(libraryLoad: LibraryLoad<TContext>): Promise<{ library?: Library, module: any }> {
+        let result = await this._taskMap.ensureOrCreateAsync(libraryLoad.libraryContext.key, libraryLoad);
         if (!result.library)
             return result.module;
-        this._forEachLibrary(context.key, result.library, (name, lib) => {
-            this._taskMap.setResult(name, { moduleLoader: moduleLoader, context: context, next: <any>undefined }, { library: lib, module: <any>undefined });
-            this.applyFeaturesAsync(name, moduleLoader, context, lib);
-        });
+        await this.applyLibraryAsync(libraryLoad, result.library);
+        if (result.library.nextLibraryModule)
+            return this.tryGetLibraryAsync(libraryLoad);
         return result;
     }
 
-    async applyFeaturesAsync(libraryName: string, moduleLoader: ModuleLoader<TContext>, context: TContext, library: Library): Promise<void> {
+    async applyLibraryAsync(libraryLoad: LibraryLoad<TContext>, library: Library): Promise<void> {
+        await this._forEachLibraryAsync(libraryLoad.libraryContext.key, library, async (name, lib) => {
+            this._taskMap.setResult(name, libraryLoad, { library: lib, module: <any>undefined });
+            await this.applyFeaturesAsync(name, lib);
+        });
+    }
+
+    async applyFeaturesAsync(libraryName: string, library: Library): Promise<void> {
         if (!library.featureReferences)
             return;
         rootFeature.addFeaturesAsync(library.featureReferences);
     }
 
-    private _taskMap = new TaskMap<string, { moduleLoader: ModuleLoader<TContext>, context: TContext, next: (context: ModuleResolutionContext) => Promise<any> }, { library?: Library, module: any }>((key, source) =>
-        new Task<any>(() => this.loadLibraryAsync(source.moduleLoader, source.context, source.next)));
+    private _taskMap = new TaskMap<string, LibraryLoad<TContext>, { library?: Library, module: any }>((key, source) =>
+        new Task<any>(() => this.loadLibraryAsync(source)));
 
-    protected abstract loadLibraryAsync(moduleLoader: ModuleLoader<TContext>, context: TContext, next: (context: ModuleResolutionContext) => Promise<any>): Promise<{ library?: Library, module: any }>;
+    protected abstract loadLibraryAsync(libraryLoad: LibraryLoad<TContext>): Promise<{ library?: Library, module: any }>;
 
-    private _forEachLibrary(name: string, library: Library, func: (name: string, lib: Library) => void) {
+    private _forEachLibraryAsync(name: string, library: Library, func: (name: string, lib: Library) => Promise<void>) {
         func(name, library);
         if (!library.childLibraries)
             return;
         for (let childName in Object.keys(library.childLibraries))
-            this._forEachLibrary(childName, library.childLibraries[childName], func);
+            this._forEachLibraryAsync(childName, library.childLibraries[childName], func);
     }
 }

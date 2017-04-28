@@ -1,16 +1,16 @@
-import { SystemJSConfigFeature } from '../systemjs/systemjs_config_feature';
 import { SystemJSModuleLoader } from '../systemjs/systemjs_module_loader';
+import { RxjsSystemJSConfigFeature } from './rxjs_systemjs_config_feature';
 import { EntryPoint } from '../../entry_point';
 import { Feature } from '../feature';
-import { FeatureReference } from '../feature_reference';
+import { Type } from '../feature_reference';
 
 export class AngularSystemJSConfigFeature extends Feature {
-    static create(angularPathRoot?: string, useBundle?: boolean, useMin?: boolean, useES5?: boolean, includeTest?: boolean, platforms?: string[]): FeatureReference {
-        return new FeatureReference(AngularSystemJSConfigFeature, () => new AngularSystemJSConfigFeature(angularPathRoot, useBundle, useMin, useES5, includeTest, platforms)).withDependency(SystemJSModuleLoader);
-    }
-
     constructor(public angularPathRoot?: string, public useBundle?: boolean, public useMin?: boolean, public useES5?: boolean, public includeTest?: boolean, public platforms?: string[]) {
         super();
+    }
+
+    dependentTypes(): Type[] {
+        return [SystemJSModuleLoader, RxjsSystemJSConfigFeature];
     }
 
     protected async onInitAsync(entryPoint: EntryPoint) {
@@ -56,6 +56,8 @@ export class AngularSystemJSConfigFeature extends Feature {
     ];
 
     private getBundlePath(pkg: string): string | undefined {
+        // @todo Whats the most 'appropriate' way to do this, map, path, bundle, ...?
+        // @todo try bundle, its exactly what it is, and lets us use path for things like 'npm:'
         if (!this.includeTest && pkg.endsWith('/testing'))
             return;
         if (this.platforms && pkg.startsWith('@angular/platform-') && !this.platforms.find(p => pkg.startsWith(`@angular/platform-${p}`)))
@@ -64,56 +66,4 @@ export class AngularSystemJSConfigFeature extends Feature {
             return `${this.angularPathRoot || ''}${pkg}/bundles/${pkg.substr(9).replace('/', '-')}.umd.${this.useMin ? 'min.js' : 'js'}`;
         return `${this.angularPathRoot || ''}${pkg}//${pkg}.${this.useES5 ? 'es5.js' : 'js'}`;
     }
-
-    // private createSystemConfig(): SystemJSLoader.Config {
-    //     return {
-    //         packages: {
-    //             'rxjs': { main: 'Rx.js', defaultExtension: 'js', format: 'cjs' },
-    //             '@angular/animations': { defaultExtension: 'js', format: 'esm' },
-    //             '@angular/animations/browser': { defaultExtension: 'js', format: 'esm' },
-    //             '@angular/animations/browser/testing': { defaultExtension: 'js', format: 'esm' },
-    //             '@angular/core': { defaultExtension: 'js', format: 'esm' },
-    //             '@angular/core/testing': { defaultExtension: 'js', format: 'esm' },
-    //             '@angular/common': { defaultExtension: 'js', format: 'esm' },
-    //             '@angular/common/testing': { defaultExtension: 'js', format: 'esm' },
-    //             '@angular/compiler': { defaultExtension: 'js', format: 'esm' },
-    //             '@angular/compiler/testing': { defaultExtension: 'js', format: 'esm' },
-    //             '@angular/forms': { defaultExtension: 'js', format: 'esm' },
-    //             '@angular/http': { defaultExtension: 'js', format: 'esm' },
-    //             '@angular/http/testing': { defaultExtension: 'js', format: 'esm' },
-    //             '@angular/router': { defaultExtension: 'js', format: 'esm' },
-    //             '@angular/router/testing': { defaultExtension: 'js', format: 'esm' },
-    //             '@angular/platform-browser': { defaultExtension: 'js', format: 'esm' },
-    //             '@angular/platform-browser/animations': { defaultExtension: 'js', format: 'esm' },
-    //             '@angular/platform-browser/testing': { defaultExtension: 'js', format: 'esm' },
-    //             '@angular/platform-browser-dynamic': { defaultExtension: 'js', format: 'esm' },
-    //             '@angular/platform-browser-dynamic/testing': { defaultExtension: 'js', format: 'esm' },
-    //             '@angular/platform-webworker': { defaultExtension: 'js', format: 'esm' },
-    //             '@angular/platform-webworker-dynamic': { defaultExtension: 'js', format: 'esm' }
-    //         },
-    //         paths: {
-    //             '@angular/animations': `${this.angularPathRoot}/animations/@angular/animations.es5.js`,
-    //             '@angular/animations/browser': `${this.angularPathRoot}/animations/@angular/animations/browser.es5.js`,
-    //             '@angular/animations/browser/testing': `${this.angularPathRoot}/animations/@angular/animations/browser/testing.es5.js`,
-    //             '@angular/core': `${this.angularPathRoot}/core/@angular/core.es5.js`,
-    //             '@angular/core/testing': `${this.angularPathRoot}/core/@angular/core/testing.es5.js`,
-    //             '@angular/common': `${this.angularPathRoot}/common/@angular/common.es5.js`,
-    //             '@angular/common/testing': `${this.angularPathRoot}/common/@angular/common/testing.es5.js`,
-    //             '@angular/compiler': `${this.angularPathRoot}/compiler/@angular/compiler.es5.js`,
-    //             '@angular/compiler/testing': `${this.angularPathRoot}/compiler/@angular/compiler/testing.es5.js`,
-    //             '@angular/forms': `${this.angularPathRoot}/forms/@angular/forms.es5.js`,
-    //             '@angular/http': `${this.angularPathRoot}/http/@angular/http.es5.js`,
-    //             '@angular/http/testing': `${this.angularPathRoot}/http/@angular/http/testing.es5.js`,
-    //             '@angular/router': `${this.angularPathRoot}/router/@angular/router.es5.js`,
-    //             '@angular/router/testing': `${this.angularPathRoot}/router/@angular/router/testing.es5.js`,
-    //             '@angular/platform-browser': `${this.angularPathRoot}/platform-browser/@angular/platform-browser.es5.js`,
-    //             '@angular/platform-browser/animations': `${this.angularPathRoot}/platform-browser/@angular/platform-browser/animations.es5.js`,
-    //             '@angular/platform-browser/testing': `${this.angularPathRoot}/platform-browser/@angular/platform-browser/testing.es5.js`,
-    //             '@angular/platform-browser-dynamic': `${this.angularPathRoot}/platform-browser-dynamic/@angular/platform-browser-dynamic.es5.js`,
-    //             '@angular/platform-browser-dynamic/testing': `${this.angularPathRoot}/platform-browser-dynamic/@angular/platform-browser-dynamic/testing.es5.js`,
-    //             '@angular/platform-webworker': `${this.angularPathRoot}/platform-webworker/@angular/platform-webworker.es5.js`,
-    //             '@angular/platform-webworker-dynamic': `${this.angularPathRoot}/platform-webworker-dynamic/@angular/platform-webworker-dynamic.es5.js`
-    //         }
-    //    };
-    // }
 }

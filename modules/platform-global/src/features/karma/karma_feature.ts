@@ -1,21 +1,21 @@
 import { ModuleLoader } from '../module_loaders/module_loader';
 import { Polyfiller } from '../polyfills/polyfiller';
 import { Feature } from '../feature';
-import { FeatureReference } from '../feature_reference';
+import { FeatureReference, Type } from '../feature_reference';
 import { EntryPoint } from '../../entry_point';
 
 let __karma__: any = (<any>window)['__karma__'];
 
 export class KarmaFeature extends Feature {
-    static create(): FeatureReference {
-        return new FeatureReference(KarmaFeature).withDependency(Polyfiller).withDependency(ModuleLoader);
-    }
-
     constructor(private _testFilter?: (path: string) => boolean) {
         super();
         if (!_testFilter)
             this._testFilter = path => !path.startsWith('/base/node_modules/') && /.spec\.js$/.test(path);
         __karma__.loaded = function () { };
+    }
+
+    dependentTypes(): Type[] {
+        return [Polyfiller, ModuleLoader];
     }
 
     protected async onRunAsync(entryPoint: EntryPoint) {

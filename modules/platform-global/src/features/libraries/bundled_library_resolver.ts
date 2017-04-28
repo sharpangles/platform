@@ -1,4 +1,4 @@
-import { LibraryResolver } from './library_resolver';
+import { LibraryResolver, LibraryLoad } from './library_resolver';
 import { Library } from './library';
 import { ModuleResolutionContext, ModuleLoader } from '../module_loaders/module_loader';
 
@@ -15,8 +15,8 @@ export class BundledLibraryResolver<TContext extends ModuleResolutionContext = M
         super();
     }
 
-    protected async loadLibraryAsync(moduleLoader: ModuleLoader<TContext>, context: TContext, next: (context: ModuleResolutionContext) => Promise<any>): Promise<{ library?: Library, module: any }> {
-        let mod = await next(context);
+    protected async loadLibraryAsync(libraryLoad: LibraryLoad<TContext>): Promise<{ library?: Library, module: any }> {
+        let mod = await libraryLoad.next(libraryLoad.context);
         return { library: <Library>mod[this.libraryExport], module: mod };
     }
 }

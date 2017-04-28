@@ -1,11 +1,11 @@
 import { Polyfiller } from '../polyfills/polyfiller';
 import { Feature } from '../feature';
-import { FeatureReference } from '../feature_reference';
+import { FeatureReference, Type } from '../feature_reference';
 import { EntryPoint } from '../../entry_point';
 
 export class ZoneJSTestingFeature extends Feature {
-    static create(): FeatureReference {
-        return new FeatureReference(ZoneJSTestingFeature).withDependency(Polyfiller);
+    dependentTypes(): Type[] {
+        return [Polyfiller];
     }
 
     protected async onInitAsync(entryPoint: EntryPoint) {

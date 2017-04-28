@@ -1,13 +1,16 @@
 import { ZoneJSTestingFeature } from './zonejs_testing_feature';
-import { FeatureReference } from '../feature_reference';
-import { CoreJSFeature } from '../polyfills/corejs_feature';
 import { getTestBed } from '@angular/core/testing';
-import { platformBrowserDynamicTesting, BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
+import { BrowserDynamicTestingModule, platformBrowserDynamicTesting } from '@angular/platform-browser-dynamic/testing';
 import { AngularPlatformFeature } from './angular_platform_feature';
+import { Type } from '../feature_reference';
 
 export class AngularTestingBrowserDynamicFeature extends AngularPlatformFeature {
-    static create(): FeatureReference {
-        return new FeatureReference(AngularTestingBrowserDynamicFeature, () => new AngularTestingBrowserDynamicFeature(BrowserDynamicTestingModule)).withDependency(CoreJSFeature).withDependency(ZoneJSTestingFeature);
+    constructor() {
+        super(BrowserDynamicTestingModule);
+    }
+
+    dependentTypes(): Type[] {
+        return super.dependentTypes().concat([ZoneJSTestingFeature]);
     }
 
     protected async bootstrap(rootModule: any) {

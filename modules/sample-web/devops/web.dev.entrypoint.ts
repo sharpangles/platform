@@ -1,5 +1,5 @@
 import { ImportingLibraryResolver } from '../../platform-global/src/features/libraries/importing_library_resolver';
-import { StagedLibraryResolver } from '../../platform-global/src/features/libraries/staged_library_resolver';
+// import { StagedLibraryResolver } from '../../platform-global/src/features/libraries/staged_library_resolver';
 import { EntryPoint } from '../../platform-global/src/entry_point';
 import { ModuleLoader } from '../../platform-global/src/features/module_loaders/module_loader';
 import { LibraryFeature } from '../../platform-global/src/features/libraries/library_feature';
@@ -32,12 +32,13 @@ let initialSystemJSConfig = {
     }
 };
 
-let configLibraryResolver = new ImportingLibraryResolver(undefined, '/bundles/config_library', ctx => ctx.key.startsWith('@sharpangles/') && !ctx.key.startsWith('@sharpangles/sample-web') && !ctx.key.endsWith('/library'));
-let packageLibraryResolver = new ImportingLibraryResolver(undefined, undefined, ctx => ctx.key.startsWith('@sharpangles/') && !ctx.key.endsWith('/bundles/config_library'));
+// let configLibraryResolver = new ImportingLibraryResolver(undefined, '/bundles/config_library', ctx => ctx.key.startsWith('@sharpangles/') && !ctx.key.startsWith('@sharpangles/sample-web') && !ctx.key.endsWith('/library'));
+// let packageLibraryResolver = new ImportingLibraryResolver(undefined, undefined, ctx => ctx.key.startsWith('@sharpangles/') && !ctx.key.endsWith('/bundles/config_library'));
 
-new EntryPoint()
-    .withDependency(SystemJSModuleLoader.create(initialSystemJSConfig, '__artifacts/serve/polyfills/system.src.js').as(ModuleLoader))
-    .withDependency(LibraryFeature.create(new StagedLibraryResolver([configLibraryResolver, packageLibraryResolver])))
-    .withDependency(AngularSystemJSConfigFeature.create('/node_modules/', true, true, undefined, true))
-    .startAsync()
-    .then(() => FeatureReference.getFeature<ModuleLoader>(ModuleLoader).loadModuleAsync({ key: '@sharpangles/sample-web' }));
+let entryPoint = new EntryPoint();
+entryPoint.withDependency(SystemJSModuleLoader, () => new SystemJSModuleLoader(initialSystemJSConfig, '__artifacts/serve/polyfills/system.src.js')).as(ModuleLoader);
+entryPoint.withDependency(LibraryFeature, () => new LibraryFeature(new ImportingLibraryResolver(undefined, ctx => !ctx.key.startsWith('@sharpangles/sample-web'))));
+// entryPoint.withDependency(LibraryFeature, () => new LibraryFeature(new StagedLibraryResolver([configLibraryResolver, packageLibraryResolver])));
+entryPoint.withDependency(AngularSystemJSConfigFeature, () => new AngularSystemJSConfigFeature('/node_modules/', true, true, undefined, true));
+entryPoint.startAsync().then(() => FeatureReference.getFeature<ModuleLoader>(ModuleLoader).loadModuleAsync({ key: '@sharpangles/sample-web' }));
+// LEFT OFF HERE: Root loader?  trigger module loads option for library chain?

@@ -95,7 +95,7 @@ export let rootFeature: RootFeature;
 export class EntryPoint extends FeatureReference {
     constructor() {
         super(RootFeature);
-        FeatureReference.factories.set(RootFeature, () => new RootFeature(this));
+        FeatureReference.setFactory(RootFeature, () => new RootFeature(this));
     }
 
     /**

@@ -1,13 +1,16 @@
 import { ZoneJSTestingFeature } from './zonejs_testing_feature';
-import { FeatureReference } from '../feature_reference';
-import { CoreJSFeature } from '../polyfills/corejs_feature';
+import { Type } from '../feature_reference';
 import { getTestBed } from '@angular/core/testing';
 import { platformServerTesting, ServerTestingModule } from '@angular/platform-server/testing';
 import { AngularPlatformFeature } from './angular_platform_feature';
 
 export class AngularTestingServerFeature extends AngularPlatformFeature {
-    static create(): FeatureReference {
-        return new FeatureReference(AngularTestingServerFeature, () => new AngularTestingServerFeature(ServerTestingModule)).withDependency(CoreJSFeature).withDependency(ZoneJSTestingFeature);
+    constructor() {
+        super(ServerTestingModule);
+    }
+
+    dependentTypes(): Type[] {
+        return super.dependentTypes().concat([ZoneJSTestingFeature]);
     }
 
     protected async bootstrap(rootModule: any) {

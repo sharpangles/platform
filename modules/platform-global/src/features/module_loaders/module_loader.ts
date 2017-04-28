@@ -25,6 +25,7 @@ export abstract class ModuleLoader<TContext extends ModuleResolutionContext = Mo
 
     /**
      * Allows registering a new resolver in front of the current.  The current will be the 'next' during resolution.
+     * The hope is that this approach will be easily migratable to whatever hooks ultimately get exposed in any dynamic import or loader work in es2017+.
      */
     registerResolver(resolver: (context: TContext, next: (context: TContext) => Promise<any>) => Promise<any>) {
         let oldResolver = this.resolver || this.onLoadModuleAsync.bind(this);

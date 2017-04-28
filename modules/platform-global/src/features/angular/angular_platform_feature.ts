@@ -1,7 +1,8 @@
 import { ModuleLoader } from '../module_loaders/module_loader';
 import { Feature } from '../feature';
-import { FeatureReference } from '../feature_reference';
+import { FeatureReference, Type } from '../feature_reference';
 import { EntryPoint } from '../../entry_point';
+import { CoreJSFeature } from '../polyfills/corejs_feature';
 
 export abstract class AngularPlatformFeature extends Feature {
     /**
@@ -12,6 +13,10 @@ export abstract class AngularPlatformFeature extends Feature {
      */
     constructor(public rootModuleReference: string | any) {
         super();
+    }
+
+    dependentTypes(): Type[] {
+        return [CoreJSFeature, ModuleLoader];
     }
 
     protected async onInitAsync(entryPoint: EntryPoint) {

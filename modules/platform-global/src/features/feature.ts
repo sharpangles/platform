@@ -1,3 +1,4 @@
+import { FeatureReference, Type } from './feature_reference';
 import { EntryPoint } from '../entry_point';
 
 /**
@@ -5,6 +6,11 @@ import { EntryPoint } from '../entry_point';
  */
 export class Feature {
     dependencies: Feature[];
+
+    /**
+     * Returns compile-time Feature dependency types.
+     */
+    dependentTypes(): Type[] { return []; }
 
     /**
      * Allows runtime-checking to add dependencies.
@@ -22,6 +28,8 @@ export class Feature {
     private _initTask?: Promise<void>;
     async initAsync(entryPoint: EntryPoint) {
         if (!this._initTask) {
+            for (let dep of this.dependentTypes())
+                this.addDependency(new FeatureReference(dep).findFeature());
             this._initTask = this.onInitAsync(entryPoint);
         }
         return this._initTask;

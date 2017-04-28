@@ -41,3 +41,15 @@ See build.js for a simple way to compose tslib per the above options.
 
 ### Single-file entrypoints
 This library publishes the typescript directly with the package to enable simpler and quicker builds for single-file entries.  See the sample web app for an example.
+
+
+
+
+
+
+
+
+
+### Stuff I need to write up:
+Increased complexity and segmentation often requires pushing more configuration and dependency modeling into the runtime environment.
+Explain motivation for config in dependent libraries, rationale for ecosystem knowledge need (i.e. sharing entrypoints, not duplicating configs across libraries or alternatively centralizing config interpretation in a module loader implementation)...
