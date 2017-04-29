@@ -66,7 +66,10 @@ export class Feature {
         return this._runTask;
     }
 
-    /** @internal */
+    /**
+     * Adds a dependency to the feature.
+     * It is acceptable to add a feature as a dependency multiple times for numerous parents without worrying about multiple initializations.
+     */
     addDependency(child: Feature): boolean {
         if (!this.dependencies)
             this.dependencies = [child];

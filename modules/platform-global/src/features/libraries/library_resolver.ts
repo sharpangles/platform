@@ -3,6 +3,7 @@ import { Library } from './library';
 import { LibraryResolutionContext } from './library_feature';
 import { TaskMap, Task } from '../../task_map';
 import { ModuleResolutionContext, ModuleLoader } from '../module_loaders/module_loader';
+import { traverse } from '../../traverse';
 
 export interface LibraryLoad<TContext extends ModuleResolutionContext = ModuleResolutionContext> {
     libraryModuleLoader: ModuleLoader<LibraryResolutionContext>;
@@ -34,10 +35,12 @@ export abstract class LibraryResolver<TContext extends ModuleResolutionContext =
     }
 
     async applyLibraryAsync(libraryLoad: LibraryLoad<TContext>, library: Library): Promise<void> {
-        await this._forEachLibraryAsync(libraryLoad.libraryContext.key, library, async (name, lib) => {
+        await Promise.all(this.forEachLibrary(libraryLoad.libraryContext.key, library, async (name, lib) => {
+            if (this._taskMap.tryGetSource(name))
+                return;
             this._taskMap.setResult(name, libraryLoad, { library: lib, module: <any>undefined });
             await this.applyFeaturesAsync(name, lib);
-        });
+        }));
     }
 
     async applyFeaturesAsync(libraryName: string, library: Library): Promise<void> {
@@ -51,11 +54,12 @@ export abstract class LibraryResolver<TContext extends ModuleResolutionContext =
 
     protected abstract loadLibraryAsync(libraryLoad: LibraryLoad<TContext>): Promise<{ library?: Library, module: any }>;
 
-    private _forEachLibraryAsync(name: string, library: Library, func: (name: string, lib: Library) => Promise<void>) {
-        func(name, library);
-        if (!library.childLibraries)
-            return;
-        for (let childName in Object.keys(library.childLibraries))
-            this._forEachLibraryAsync(childName, library.childLibraries[childName], func);
+    /**
+     * Features handle dependency graphs, not libraries.  Therefore this simply produces a flat list of all libraries.
+     */
+    forEachLibrary(name: string, library: Library, func: (name: string, lib: Library) => any) {
+        let libraries: [string, Library][] = [];
+        traverse<[string, Library]>([name, library], l => Object.keys(l[1].childLibraries).map(n => <[string, Library]>[n, (<any>l[1].childLibraries)[n]]), f => libraries.push(f));
+        return libraries.map(l => func(l[0], l[1]));
     }
 }

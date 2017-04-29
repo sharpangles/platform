@@ -1,5 +1,6 @@
 import { FeatureReference } from './features/feature_reference';
 import { Feature } from './features/feature';
+import { traverse } from './traverse';
 
 export class RootFeature extends Feature {
     constructor(public entryPoint: EntryPoint) {
@@ -34,7 +35,7 @@ export class RootFeature extends Feature {
     private async _wireFeatureAsync(feature: Feature) {
         // Flatten and check for cyclical
         let features: Feature[] = [];
-        this._traverse(feature, f => f.dependencies, f => features.push(f), new Set<Feature>());
+        traverse(feature, f => f.dependencies, f => features.push(f));
 
         // let originalFeatures: Feature[] = [];
         // if (rootFeature)
@@ -73,21 +74,6 @@ export class RootFeature extends Feature {
         return true;
     }
 
-    private _traverse<T>(node: T, childrenSelector: (node: T) => T[], func: (node: T) => void, visitedStack?: Set<T>) {
-        if (visitedStack) {
-            if (visitedStack.has(node))
-                throw new Error('Cyclical features.');
-            visitedStack.add(node);
-        }
-        func(node);
-        let children = childrenSelector(node);
-        if (children && children.length !== 0) {
-            for (let child of children)
-                this._traverse(child, childrenSelector, func, visitedStack);
-        }
-        if (visitedStack)
-            visitedStack.delete(node);
-    }
 }
 
 export let rootFeature: RootFeature;
