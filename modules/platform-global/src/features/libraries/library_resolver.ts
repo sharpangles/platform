@@ -4,6 +4,7 @@ import { LibraryResolutionContext } from './library_feature';
 import { TaskMap, Task } from '../../task_map';
 import { ModuleResolutionContext, ModuleLoader } from '../module_loaders/module_loader';
 import { traverse } from '../../traverse';
+import { FeatureReference } from '../feature_reference';
 
 export interface LibraryLoad<TContext extends ModuleResolutionContext = ModuleResolutionContext> {
     libraryModuleLoader: ModuleLoader<LibraryResolutionContext>;
@@ -17,8 +18,10 @@ export interface LibraryLoad<TContext extends ModuleResolutionContext = ModuleRe
  * Manages resolution of a Library object for a particular module load activity.
  */
 export abstract class LibraryResolver<TContext extends ModuleResolutionContext = ModuleResolutionContext> {
-    initAsync() {
-        return Promise.resolve();
+    /**
+     * @param loadModuleForLibrary Can infer how to load a module given a library context.  If set, libraries cause their modules to preload.
+     */
+    constructor(public loadModuleForLibrary?: (libraryContext: ModuleResolutionContext) => Promise<any>) {
     }
 
     /**
@@ -29,30 +32,49 @@ export abstract class LibraryResolver<TContext extends ModuleResolutionContext =
         if (!result.library)
             return result.module;
         await this.applyLibraryAsync(libraryLoad, result.library);
-        if (result.library.nextLibraryModule)
-            return this.tryGetLibraryAsync(libraryLoad);
         return result;
     }
 
     async applyLibraryAsync(libraryLoad: LibraryLoad<TContext>, library: Library): Promise<void> {
-        await Promise.all(this.forEachLibrary(libraryLoad.libraryContext.key, library, async (name, lib) => {
-            if (this._taskMap.tryGetSource(name))
-                return;
-            this._taskMap.setResult(name, libraryLoad, { library: lib, module: <any>undefined });
-            await this.applyFeaturesAsync(name, lib);
-        }));
-    }
-
-    async applyFeaturesAsync(libraryName: string, library: Library): Promise<void> {
-        if (!library.featureReferences)
-            return;
-        rootFeature.addFeaturesAsync(library.featureReferences);
+        let nexts = this.addDependencies(libraryLoad, library);
+        await nexts.map(async n => {
+            await this.tryGetLibraryAsync(<LibraryLoad<TContext>>{
+                libraryModuleLoader: libraryLoad.libraryModuleLoader,
+                libraryContext: { key: n },
+                moduleLoader: libraryLoad.moduleLoader,
+                context: libraryLoad.libraryContext,
+                next: this.loadModuleForLibrary ? ((context) => (<any>this.loadModuleForLibrary)(context)) : undefined
+            });
+            if (this.loadModuleForLibrary)
+                this.loadModuleForLibrary(libraryLoad.libraryContext); // trigger preload
+        });
     }
 
     private _taskMap = new TaskMap<string, LibraryLoad<TContext>, { library?: Library, module: any }>((key, source) =>
         new Task<any>(() => this.loadLibraryAsync(source)));
 
     protected abstract loadLibraryAsync(libraryLoad: LibraryLoad<TContext>): Promise<{ library?: Library, module: any }>;
+
+    /**
+     * Traverses the known libraries to add all dependencies.
+     * Returns an array of all discovered nextLibraryModules.
+     */
+    addDependencies(libraryLoad: LibraryLoad<TContext>, library: Library): string[] {
+        let nexts: string[] = [];
+        let featureReferences: FeatureReference[] = [];
+        this.forEachLibrary(libraryLoad.libraryContext.key, library, (name, lib) => {
+            if (this._taskMap.tryGetSource(name))
+                return;
+            this._taskMap.setResult(name, libraryLoad, { library: lib, module: <any>undefined });
+            if (lib.nextLibraryModule)
+                nexts.push(lib.nextLibraryModule);
+            if (lib.featureReferences)
+                featureReferences.push(...lib.featureReferences);
+        });
+        if (featureReferences.length > 0)
+            rootFeature.addFeatures(featureReferences);
+        return nexts;
+    }
 
     /**
      * Features handle dependency graphs, not libraries.  Therefore this simply produces a flat list of all libraries.

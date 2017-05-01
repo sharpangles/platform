@@ -11,7 +11,7 @@ export class RootFeature extends Feature {
      * Start the application.
      */
     async startAsync(): Promise<void> {
-        await this._wireFeatureAsync(this);
+        await this._wireFeature(this);
         await rootFeature.modifiedAsync(this.entryPoint);
     }
 
@@ -23,31 +23,21 @@ export class RootFeature extends Feature {
      * While this configuration could be statically referenced in every endpoint, it would cause our build to traverse all angular, the bootstrapped module, and all their dependencies.
      * This method handles dynamically adding features and rewiring the entire feature tree.
      */
-    async addFeaturesAsync(featureReferences: FeatureReference[]) {
+    addFeatures(featureReferences: FeatureReference[]) {
         for (let featureReference of featureReferences) {
             let feature = featureReference.findFeature();
             rootFeature.addDependency(feature);
         }
-        await this._wireFeatureAsync(rootFeature);
-        await rootFeature.modifiedAsync(this.entryPoint);
+        this._wireFeature(rootFeature);
+        // if (this._started)
+        //     await rootFeature.modifiedAsync(this.entryPoint);
     }
 
-    private async _wireFeatureAsync(feature: Feature) {
+    private _wireFeature(feature: Feature) {
         // Flatten and check for cyclical
         let features: Feature[] = [];
         traverse(feature, f => f.dependencies, f => features.push(f));
-
-        // let originalFeatures: Feature[] = [];
-        // if (rootFeature)
-        //     this._traverse(feature, f => f.dependencies, f => originalFeatures.push(f), new Set<Feature>());
-
         this._checkFeatureDependencies(features);
-
-        // for (let newFeature of features) {
-        //     for (let originalFeature of originalFeatures)
-        //         // Only checking in one direction.
-        //         this._checkRuntimeDependency(newFeature, originalFeature);
-        // }
     }
 
     private _checkFeatureDependencies(features: Feature[]) {

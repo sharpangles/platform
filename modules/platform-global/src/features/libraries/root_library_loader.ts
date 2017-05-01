@@ -20,6 +20,12 @@ export class RootLibraryLoader extends Feature {
     }
 
     dependsOn(feature: Feature) {
+
+
+
+
+
+        
         if (this.rootLibrary && this.rootLibrary.featureReferences) {
             for (let featureRef of this.rootLibrary.featureReferences)
                 rootFeature.addDependency(featureRef.findFeature());
