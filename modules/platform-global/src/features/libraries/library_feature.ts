@@ -2,15 +2,10 @@ import { Feature } from '../feature';
 import { FeatureReference, Type } from '../feature_reference';
 import { EntryPoint } from '../../entry_point';
 import { ModuleLoader, ModuleResolutionContext } from '../module_loaders/module_loader';
-import { LibraryResolver, LibraryLoad } from './library_resolver';
-import { Library } from './library';
-
-export interface LibraryResolutionContext extends ModuleResolutionContext {
-    inLibrary$?: boolean;
-}
+import { LibraryResolver, LibraryResolutionContext } from './library_resolver';
 
 export class LibraryFeature extends Feature {
-    constructor(public libraryResolver: LibraryResolver, public libraryModuleLoader?: ModuleLoader<ModuleResolutionContext>) {
+    constructor(public libraryResolver: LibraryResolver) {
         super();
     }
 
@@ -24,19 +19,9 @@ export class LibraryFeature extends Feature {
         moduleLoader.registerResolver((c, n) => this.resolveAsync(moduleLoader, c, n));
     }
 
-    async resolveAsync(moduleLoader: ModuleLoader, context: ModuleResolutionContext, next: (context: ModuleResolutionContext) => Promise<any>): Promise<{ library?: Library, module: any }> {
-        if ((<LibraryResolutionContext>context).inLibrary$)
-            return { module: await next(context) };
-        let libraryLoad = <LibraryLoad>{
-            libraryModuleLoader: this.libraryModuleLoader || moduleLoader,
-            moduleLoader: moduleLoader,
-            libraryContext: { key: context.key, parentKey: context.parentKey, inLibrary$: true },
-            context: context,
-            next: next
-        };
-        let result = await this.libraryResolver.tryGetLibraryAsync(libraryLoad);
-        if (!result.module)
-            result.module = await next(context);
-        return result;
+    async resolveAsync(moduleLoader: ModuleLoader, context: ModuleResolutionContext, next: (context: ModuleResolutionContext) => Promise<any>): Promise<any> {
+        if (!(context instanceof LibraryResolutionContext))
+            await this.libraryResolver.resolveAsync(context);
+        return await next(context);
     }
 }

@@ -19,7 +19,6 @@
     ]
   },
   "include": [
-    "../library.ts",
     "../index.ts",
     "../src/**/*.ts",
     "../spec/**/*.ts"

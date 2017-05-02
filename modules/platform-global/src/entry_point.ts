@@ -11,7 +11,7 @@ export class RootFeature extends Feature {
      * Start the application.
      */
     async startAsync(): Promise<void> {
-        await this._wireFeature(this);
+        await this.wireFeature(this);
         await rootFeature.modifiedAsync(this.entryPoint);
     }
 
@@ -28,12 +28,12 @@ export class RootFeature extends Feature {
             let feature = featureReference.findFeature();
             rootFeature.addDependency(feature);
         }
-        this._wireFeature(rootFeature);
+        this.wireFeature(rootFeature);
         // if (this._started)
         //     await rootFeature.modifiedAsync(this.entryPoint);
     }
 
-    private _wireFeature(feature: Feature) {
+    protected wireFeature(feature: Feature) {
         // Flatten and check for cyclical
         let features: Feature[] = [];
         traverse(feature, f => f.dependencies, f => features.push(f));
@@ -74,9 +74,6 @@ export class EntryPoint extends FeatureReference {
         FeatureReference.setFactory(RootFeature, () => new RootFeature(this));
     }
 
-    /**
-     * Start the application.
-     */
     async startAsync(): Promise<void> {
         if (rootFeature)
             throw new Error('Already started');

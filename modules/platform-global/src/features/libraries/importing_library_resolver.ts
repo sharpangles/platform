@@ -1,7 +1,7 @@
-import { LibraryResolutionContext } from './library_feature';
-import { LibraryResolver, LibraryLoad } from './library_resolver';
+import { LibraryResolver, LibraryResolutionContext } from './library_resolver';
 import { Library } from './library';
-import { ModuleResolutionContext } from '../module_loaders/module_loader';
+import { ModuleLoader, ModuleResolutionContext } from '../module_loaders/module_loader';
+import { FeatureReference } from '../feature_reference';
 
 
 /**
@@ -11,26 +11,26 @@ import { ModuleResolutionContext } from '../module_loaders/module_loader';
  * However, if the library provides configuration for the module loader, the bundle must be of a type that does not trigger
  * dependency resolution of anything but the library module itself until its configuration is complete.
  */
-export class ImportingLibraryResolver<TContext extends ModuleResolutionContext = ModuleResolutionContext> extends LibraryResolver<TContext> {
+export class ImportingLibraryResolver extends LibraryResolver {
     /**
      * @param libraryModuleLoader Allows providing a different module loader to use for libraries.
      * @param libraryModulePath The path to append to the triggering resolution.
      */
-    constructor(public libraryModulePath: string = '/library', public libraryFilter?: (context: TContext) => boolean) {
-        super();
+    constructor(public libraryModuleExport = 'default', public libraryModulePath: string = '/library', public libraryFilter?: (context: ModuleResolutionContext) => boolean) {
+        super(true);
+        LibraryResolver.libraryResolvers.set(ImportingLibraryResolver, this);
     }
 
-    async tryGetLibraryAsync(libraryLoad: LibraryLoad<TContext>): Promise<{ library?: Library, module: any }> {
-        if (this.libraryFilter && !this.libraryFilter(libraryLoad.context) || libraryLoad.context.key.endsWith(this.libraryModulePath))
-            return { module: await libraryLoad.next(libraryLoad.context) };
-        return super.tryGetLibraryAsync(libraryLoad);
+    protected async tryGetLibraryAsync(context: ModuleResolutionContext): Promise<Library | undefined> {
+        if (this.libraryFilter && !this.libraryFilter(context))
+            return;
+        return super.tryGetLibraryAsync(context);
     }
 
-    protected async loadLibraryAsync(libraryLoad: LibraryLoad<TContext>): Promise<{ library?: Library, module: any }> {
-        libraryLoad.libraryContext.key += this.libraryModulePath;
-        return {
-            library: <Library>await libraryLoad.libraryModuleLoader.loadModuleAsync(libraryLoad.libraryContext),
-            module: await libraryLoad.next(libraryLoad.context)
-        };
+    protected async loadLibraryAsync(context: LibraryResolutionContext): Promise<Library | undefined> {
+        let ctx = new LibraryResolutionContext(context.originalContext);
+        ctx.key += this.libraryModulePath;
+        let mod = await FeatureReference.getFeature<ModuleLoader>(ModuleLoader).loadModuleAsync(ctx);
+        return mod[this.libraryModuleExport];
     }
 }

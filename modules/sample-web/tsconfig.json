@@ -10,11 +10,14 @@
     "outDir": "./__artifacts/local",
     "target": "es5",
     "skipLibCheck": true,
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "paths": {
+      "@sharpangles/platform-global": ["../platform-global/__artifacts/release"]
+    }
   },
   "include": [
-    "./index.ts",
-    "./dependencies.ts",
-    "./src/**/*.ts"
+    "./*.ts",
+    "./src/**/*.ts",
+    "./spec/**/*.ts"
   ]
 }

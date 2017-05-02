@@ -13,7 +13,7 @@ export class CoreJSFeature extends Feature {
     }
 
     protected async onInitAsync(entryPoint: EntryPoint) {
-        super.onInitAsync(entryPoint);
+        await super.onInitAsync(entryPoint);
         if (this.reflect)
             FeatureReference.getFeature<Polyfiller>(Polyfiller).registerPolyfill(<Polyfill>{ src: 'core-js/es7/reflect', test: () => typeof Reflect === 'undefined' || !(<any>Reflect).getMetadata });
     }

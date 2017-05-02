@@ -1,7 +1,7 @@
 import sourcemaps from 'rollup-plugin-sourcemaps';
 
 export default {
-  entry: './__artifacts/build/app/sample-web/library.js',
+  entry: './__artifacts/build/app/index.js',
   dest: './__artifacts/serve/web.dev.umd.js',
   format: 'umd',
   moduleName: 'sharpangles.sample-app',
@@ -24,6 +24,7 @@ export default {
     'tslib'
   ],
   globals: {
+    '@sharpangles/platform-global': 'sharpangles.platform-global',
     '@angular/core': 'ng.core',
     '@angular/common': 'ng.common',
     '@angular/forms': 'ng.forms',

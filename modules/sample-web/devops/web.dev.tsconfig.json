@@ -16,10 +16,12 @@
     "types": [
       "node",
       "jasmine"
-    ]
+    ],
+    "paths": {
+      "@sharpangles/platform-global": ["../../platform-global/__artifacts/release"]
+    }
   },
   "include": [
-    "../library.ts",
     "../index.ts",
     "../src/**/*.ts",
     "../spec/**/*.ts"

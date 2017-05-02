@@ -70,11 +70,12 @@ export class Feature {
      * Adds a dependency to the feature.
      * It is acceptable to add a feature as a dependency multiple times for numerous parents without worrying about multiple initializations.
      */
-    addDependency(child: Feature): boolean {
+    addDependency(child: Feature | Type): boolean {
+        let childFeature = child instanceof Feature ? child : FeatureReference.getFeature(child);
         if (!this.dependencies)
-            this.dependencies = [child];
-        else if (this.dependencies.indexOf(child) < 0)
-            this.dependencies.push(child);
+            this.dependencies = [childFeature];
+        else if (this.dependencies.indexOf(childFeature) < 0)
+            this.dependencies.push(childFeature);
         return true;
     }
 }

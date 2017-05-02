@@ -77,8 +77,10 @@ export class FeatureReference {
         let factory = FeatureReference.factories.get(this.type);
         feature = factory ? factory() : <Feature>new (<any>this.type)();
         FeatureReference.instances.set(this.type, feature);
-        if (this.dependencies)
-            feature.dependencies = Array.from(this.dependencies.values()).map(d => d.findFeature());
+        if (this.dependencies) {
+            for (let dep of this.dependencies.values())
+                feature.addDependency(dep.findFeature());
+        }
         return feature;
     }
 }

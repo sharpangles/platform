@@ -16,7 +16,7 @@ export abstract class ModuleLoader<TContext extends ModuleResolutionContext = Mo
     }
 
     async loadModuleAsync(context: TContext): Promise<any> {
-        return await (this.resolver || this.onLoadModuleAsync.bind(this))(context);
+        return (this.resolver || this.onLoadModuleAsync.bind(this))(context);
     }
 
     abstract onLoadModuleAsync(context: TContext): Promise<any>;

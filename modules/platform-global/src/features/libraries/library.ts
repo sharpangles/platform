@@ -1,4 +1,4 @@
-import { FeatureReference } from '../feature_reference';
+import { FeatureReference, Type } from '../feature_reference';
 
 /**
  * An interface provided by dependencies that wish to participate in entry point features.
@@ -11,7 +11,7 @@ export interface Library {
      * For example, if configuring a module loader, this may have to occur first because the following library may
      * be included as part of a bundle that would start resolving dependencies that require that configuration.
      */
-    nextLibraryModule?: string;
+    nextLibraryModule?: { key: string, resolver?: Type };
 
     /**
      * When explicitly set, child libraries are not resolved via module loading.

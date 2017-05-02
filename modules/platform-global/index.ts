@@ -19,10 +19,12 @@ export { ImportingLibraryResolver } from './src/features/libraries/importing_lib
 export { LibraryFeature } from './src/features/libraries/library_feature';
 export { LibraryResolver } from './src/features/libraries/library_resolver';
 export { Library } from './src/features/libraries/library';
-export { StagedLibraryResolver } from './src/features/libraries/staged_library_resolver';
 
 export { BrowserModuleLoader, BrowserModuleResolutionContext } from './src/features/module_loaders/browser_module_loader';
 export { CommonJSModuleLoader, CommonJSModuleResolutionContext } from './src/features/module_loaders/commonjs_module_loader';
 export { JsonModuleLoader } from './src/features/module_loaders/json_module_loader';
 export { ModuleLoader } from './src/features/module_loaders/module_loader';
 export { ModulePreloaderFeature } from './src/features/module_loaders/module_preloader_feature';
+
+export { SystemJSModuleLoader, SystemJSModuleResolutionContext } from './src/features/systemjs/systemjs_module_loader';
+export { SystemJSConfigFeature } from './src/features/systemjs/systemjs_config_feature';

@@ -19,7 +19,7 @@
       "systemjs"
     ],
     "paths": {
-      "@sharpangles/platform-global": ["../../platform-global/__artifacts/release"]
+      "@sharpangles/platform-global": ["../../platform-global"]
     }
   },
   "angularCompilerOptions": {

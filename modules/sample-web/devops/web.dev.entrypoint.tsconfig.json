@@ -19,7 +19,10 @@
       "node",
       "jasmine",
       "systemjs"
-    ]
+    ],
+    "paths": {
+      "@sharpangles/platform-global": ["../../platform-global"]
+    }
   },
   "files": [
     "./web.dev.entrypoint.ts"
