@@ -1,8 +1,4 @@
-import { ModuleLoader } from '../module_loaders/module_loader';
-import { Feature } from '../feature';
-import { FeatureReference, Type } from '../feature_reference';
-import { EntryPoint } from '../../entry_point';
-import { CoreJSFeature } from '../polyfills/corejs_feature';
+import { EntryPoint, FeatureReference, Feature, ModuleLoader, Type, CoreJSFeature } from '@sharpangles/platform-global';
 
 export abstract class AngularPlatformFeature extends Feature {
     /**

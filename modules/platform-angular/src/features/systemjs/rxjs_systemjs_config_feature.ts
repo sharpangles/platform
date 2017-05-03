@@ -1,7 +1,4 @@
-import { SystemJSModuleLoader } from '../systemjs/systemjs_module_loader';
-import { EntryPoint } from '../../entry_point';
-import { Feature } from '../feature';
-import { Type } from '../feature_reference';
+import { SystemJSModuleLoader, Feature, Type, EntryPoint } from '@sharpangles/platform-global';
 
 export class RxjsSystemJSConfigFeature extends Feature {
     constructor(public rxjsBundle?: string) {

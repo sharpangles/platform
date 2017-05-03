@@ -1,7 +1,4 @@
-import { Polyfiller } from '../polyfills/polyfiller';
-import { Feature } from '../feature';
-import { FeatureReference, Type } from '../feature_reference';
-import { EntryPoint } from '../../entry_point';
+import { Polyfiller, Feature, Type, EntryPoint, FeatureReference } from '@sharpangles/platform-global';
 
 export class ZoneJSTestingFeature extends Feature {
     dependentTypes(): Type[] {

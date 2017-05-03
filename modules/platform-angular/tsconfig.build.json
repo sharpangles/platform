@@ -18,14 +18,18 @@
     "rootDir": ".",
     "lib": ["es2015", "dom"],
     "target": "es2015",
+    "skipLibCheck": true,
+    "importHelpers": true,
     "inlineSourceMap": true,
     "inlineSources": true,
-    "skipLibCheck": true,
     "types": [
       "node",
       "jasmine",
       "systemjs"
-    ]
+    ],
+    "paths": {
+      "@sharpangles/platform-global": ["../platform-global/__artifacts/release"]
+    }
   },
   "include": [
     "./index.ts"

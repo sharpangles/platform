@@ -41,7 +41,7 @@ let initialSystemJSConfig = {
     }
 };
 
-export * from '../../platform-global/index';
+// export * from '../../platform-global/index';
 
 // let configLibraryResolver = new ImportingLibraryResolver(undefined, '/bundles/config_library', ctx => ctx.key.startsWith('@sharpangles/') && !ctx.key.startsWith('@sharpangles/sample-web') && !ctx.key.endsWith('/library'));
 // let packageLibraryResolver = new ImportingLibraryResolver(undefined, undefined, ctx => ctx.key.startsWith('@sharpangles/') && !ctx.key.endsWith('/bundles/config_library'));
@@ -60,7 +60,7 @@ entryPoint.startAsync().then(() =>
 // @todo Root loader?  trigger module loads option for library chain?
 
 
-{.} // LEFT OFF HERE: Need a static list of potential features.  Thats what this is... it can export the features used.
+// LEFT OFF HERE: Need a static list of potential features.  Thats what this is... it can export the features used.
 // That, and endpoints are ultimately going to be auto-built anyway.
 // Need a better process for explicit foreknowledge tree-shaking.  rxjs, our own libraries, platform-global features...
 // Its still a mess, magically wiring up the global/module space...

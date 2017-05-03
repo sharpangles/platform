@@ -1,8 +1,5 @@
-import { SystemJSModuleLoader } from '../systemjs/systemjs_module_loader';
+import { EntryPoint, Feature, Type, SystemJSModuleLoader } from '@sharpangles/platform-global';
 import { RxjsSystemJSConfigFeature } from './rxjs_systemjs_config_feature';
-import { EntryPoint } from '../../entry_point';
-import { Feature } from '../feature';
-import { Type } from '../feature_reference';
 
 export class AngularSystemJSConfigFeature extends Feature {
     constructor(public angularPathRoot?: string, public useBundle?: boolean, public useMin?: boolean, public useES5?: boolean, public includeTest?: boolean, public platforms?: string[]) {

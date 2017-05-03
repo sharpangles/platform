@@ -4,8 +4,6 @@ import { EntryPoint } from '../../entry_point';
 import { Polyfiller } from '../polyfills/polyfiller';
 import { ModuleLoader, ModuleResolutionContext } from '../module_loaders/module_loader';
 
-declare var sharpangles: any;
-
 export interface SystemJSModuleResolutionContext extends ModuleResolutionContext {
 }
 
@@ -28,7 +26,7 @@ export class SystemJSModuleLoader extends ModuleLoader<SystemJSModuleResolutionC
         polyfiller.registerPolyfill({ src: this.systemJsPath, test: () => typeof System === 'undefined', waitFor: true, moduleLoader: FeatureReference.getFeature<BrowserModuleLoader>(BrowserModuleLoader) });
         await polyfiller.ensureAllAsync();
         System.config(this.initialConfig);
-        let globalVar = (window || global);
+        let globalVar: any = (window || global);
         // Since we configured systemjs, systemjs didn't load this module itself, so we assume its global and wire it up as a module.
         let entrypointGlobal = globalVar[this.globalNamespace];
         let keys = Object.keys(entrypointGlobal);
