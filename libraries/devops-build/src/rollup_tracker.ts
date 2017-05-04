@@ -1,8 +1,12 @@
 import * as rollup from 'rollup';
-import * as sourcemaps from 'rollup-plugin-sourcemaps';
-import * as nodeResolve from 'rollup-plugin-node-resolve';
+import * as sourcemapsProxy from 'rollup-plugin-sourcemaps';
+import * as nodeResolveProxy from 'rollup-plugin-node-resolve';
+import * as builtinsProxy from 'rollup-plugin-node-builtins';
 import * as path from 'path';
-import * as fs from 'fs';
+
+const nodeResolve: any = (<any>nodeResolveProxy).default || nodeResolveProxy; // https://github.com/rollup/rollup/issues/1267
+const sourcemaps: any = (<any>sourcemapsProxy).default || sourcemapsProxy; // https://github.com/rollup/rollup/issues/1267
+const builtins: any = (<any>builtinsProxy).default || builtinsProxy; // https://github.com/rollup/rollup/issues/1267
 
 /**
  * There is also rollup-watch, but we want control over the trigger.
@@ -44,10 +48,11 @@ export class RollupTracker {
                         return path.resolve(this._cwd, importee.substr(importee.indexOf('/') + 1), this._localBuildRoot);
                     }
                 },
-                sourcemaps()
+                sourcemaps(),
+                builtins()
             ],
             external: function (id) {
-                return !id.startsWith('.') && !id.startsWith('/') && !fs.existsSync(id);
+                return !id.startsWith('.') && !id.startsWith('/') && !id.startsWith('\\') && !path.isAbsolute(id) ? id : null;
             },
         };
         this._rollupTask = rollup.rollup(config);

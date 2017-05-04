@@ -34,7 +34,7 @@ let initialSystemJSConfig = {
     },
     paths: {
         'npm:': '/node_modules/',
-        'npm:@sharpangles/': '/modules/',
+        'npm:@sharpangles/': '/libraries/',
         'core-js/': 'node_modules/core-js/',
         '@sharpangles/sample-web': '__artifacts/serve/web.dev.umd.js',
         '@sharpangles/sample-web/library': '__artifacts/serve/web.dev.umd.js'
