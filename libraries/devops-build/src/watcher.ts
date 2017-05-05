@@ -7,7 +7,10 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/debounce';
 
 export interface WatchChange {
-    changes: string[];
+    changes?: string[];
+
+    /** True to trigger a change that assumes anything could have changed. */
+    init?: boolean;
 }
 
 export class Watcher {
@@ -23,4 +26,8 @@ export class Watcher {
 
     public watcher: chokidar.FSWatcher;
     changed: Observable<WatchChange>;
+
+    dispose() {
+        this.watcher.close();
+    }
 }

@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noEmitOnError": false,
+    "strictNullChecks": true,
+    "baseUrl": ".",
+    "module": "es2015",
+    "outDir": "./__artifacts/build",
+    "declaration": true,
+    "declarationDir": "./__artifacts/release",
+    "stripInternal": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "moduleResolution": "node",
+    "rootDir": ".",
+    "lib": ["es2015", "dom"],
+    "target": "es2015",
+    "skipLibCheck": true,
+    "importHelpers": true,
+    "inlineSourceMap": true,
+    "inlineSources": true,
+    "types": [
+      "node",
+      "jasmine"
+    ],
+    "paths": {
+      "@sharpangles/devops-build": ["../devops-build/__artifacts/release"]
+    }
+  },
+  "include": [
+    "./src/cli.ts"
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "version": "1.0.0-alpha.0",
+  "name": "@sharpangles/devops-cli",
+  "description": "CLI for sharpangles",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sharpangles/platform.git"
+  },
+  "keywords": [
+    "Angular",
+    "Enterprise",
+    "Bootstrap"
+  ],
+  "author": "Eric Nilsen",
+  "bin": {
+    "sharpangles": "./cli"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sharpangles/platform/issues"
+  },
+  "homepage": "https://github.com/sharpangles/platform/tree/master/libraries/devops-cli#readme",
+  "scripts": {
+    "build": "node ./cli",
+    "copy": "cpy package.json README.md __artifacts/release",
+    "postbuild": "npm run copy",
+    "test": "node ../../tests-typescript.js",
+    "clean": "rimraf -rf \"__artifacts\"",
+    "watch": "tsc -w"
+  },
+  "dependencies": {
+    "@sharpangles/devops-build": "1.0.0-alpha.0"
+  },
+  "devDependencies": {
+    "karma": "^1.3.0",
+    "karma-chrome-launcher": "^2.0.0",
+    "karma-cli": "^1.0.1",
+    "karma-jasmine": "^1.0.2",
+    "karma-jasmine-html-reporter": "^0.2.2",
+    "cpy-cli": "^1.0.1",
+    "jasmine": "^2.5.3",
+    "nyc": "^10.1.2",
+    "rimraf": "^2.5.4",
+    "rollup": "^0.41.6",
+    "rollup-plugin-sourcemaps": "^0.4.2",
+    "concurrently": "^3.4.0",
+    "closure-compiler-cli": "1.0.2",
+    "google-closure-compiler": "20170409.0.0",
+    "google-closure-library": "^20170409.0.0",
+    "concat-with-sourcemaps": "^1.0.4"
+  },
+  "types": "index.d.ts",
+  "main": "bundles/devops-cli.umd.js",
+  "module": "bundles/devops-cli.es.js"
+}
