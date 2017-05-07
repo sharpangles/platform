@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs/Observable';
-import { Tracker } from './tracker';
+import { Tracker } from '../tracking/tracker';
 import { RollupCompiler } from './rollup_compiler';
 
 /**

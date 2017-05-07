@@ -1,9 +1,9 @@
-import { TypescriptIncrementalCompiler } from './typescript_incremental_compiler';
+import { TypescriptIncrementalCompiler } from '../typescript/typescript_incremental_compiler';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/merge';
 import { TypescriptCompiler } from './typescript_compiler';
-import { Tracker } from './tracker';
-import { WatchChange, Watcher } from './watcher';
+import { Tracker } from '../tracking/tracker';
+import { WatchChange, Watcher } from '../tracking/watcher';
 import { ParsedCommandLine } from 'typescript';
 
 export class TypescriptTracker extends Tracker<WatchChange, boolean> {

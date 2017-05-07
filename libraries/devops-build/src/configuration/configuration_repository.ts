@@ -2,7 +2,9 @@ import * as os from 'os';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as locker from 'proper-lockfile';
-import * as extend from 'deep-extend';
+import * as extendProxy from 'deep-extend';
+
+const extend: any = (<any>extendProxy).default || extendProxy; // https://github.com/rollup/rollup/issues/1267
 
 export abstract class ConfigurationRepository {
     abstract loadAsync(): Promise<any>;

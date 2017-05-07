@@ -1,4 +1,6 @@
 #!/usr/bin/env node
 'use strict';
 process.title = '@sharpangles/cli';
-require('./src/cli');
+let CLI = require('./src/cli').CLI;
+new CLI();
+

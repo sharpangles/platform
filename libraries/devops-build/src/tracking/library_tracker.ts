@@ -1,11 +1,14 @@
-import { TypescriptIncrementalCompiler } from './typescript_incremental_compiler';
+import { TypescriptIncrementalCompiler } from '../typescript/typescript_incremental_compiler';
 import { WatchChange } from './watcher';
 import { Observable } from 'rxjs/Observable';
-import { RollupCompiler } from './rollup_compiler';
-import { RollupTracker } from './rollup_tracker';
-import { TypescriptTracker } from './typescript_tracker';
+import { RollupCompiler } from '../rollup/rollup_compiler';
+import { RollupTracker } from '../rollup/rollup_tracker';
+import { TypescriptTracker } from '../typescript/typescript_tracker';
 import * as path from 'path';
 import { Tracker } from './tracker';
+
+export interface LibraryConfig {
+}
 
 export class LibraryTracker extends Tracker<any, boolean> {
     constructor(observable?: Observable<any>, name?: string, cwd?: string, watch?: boolean) {

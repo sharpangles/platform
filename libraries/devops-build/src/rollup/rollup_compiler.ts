@@ -2,11 +2,15 @@ import * as rollup from 'rollup';
 import * as sourcemapsProxy from 'rollup-plugin-sourcemaps';
 import * as nodeResolveProxy from 'rollup-plugin-node-resolve';
 import * as builtinsProxy from 'rollup-plugin-node-builtins';
+import * as globalsProxy from 'rollup-plugin-node-globals';
+import * as commonjsProxy from 'rollup-plugin-commonjs';
 import * as path from 'path';
 
 const nodeResolve: any = (<any>nodeResolveProxy).default || nodeResolveProxy; // https://github.com/rollup/rollup/issues/1267
 const sourcemaps: any = (<any>sourcemapsProxy).default || sourcemapsProxy; // https://github.com/rollup/rollup/issues/1267
 const builtins: any = (<any>builtinsProxy).default || builtinsProxy; // https://github.com/rollup/rollup/issues/1267
+const globals: any = (<any>globalsProxy).default || globalsProxy; // https://github.com/rollup/rollup/issues/1267
+const commonjs: any = (<any>commonjsProxy).default || commonjsProxy; // https://github.com/rollup/rollup/issues/1267
 
 /**
  * There is also rollup-watch, but we want control over the trigger.
@@ -28,7 +32,10 @@ export class RollupCompiler {
             cache: this.cache, // The rollup call is consistent, so it doesnt matter if we contend over this value.
             entry: path.resolve(this.cwd, this.localBuildRoot),
             plugins: [
+                globals(),
+                builtins(),
                 nodeResolve(),
+                commonjs(),
                 {
                     // Assumes any remaining scoped package is a local neighbor.
                     resolveId: (importee, importer) => {
@@ -37,8 +44,7 @@ export class RollupCompiler {
                         return path.resolve(this.cwd, importee.substr(importee.indexOf('/') + 1), this.localBuildRoot);
                     }
                 },
-                sourcemaps(),
-                builtins()
+                sourcemaps()
             ],
             external: function (id) {
                 return !id.startsWith('.') && !id.startsWith('/') && !id.startsWith('\\') && !path.isAbsolute(id) ? id : null;
@@ -57,9 +63,9 @@ export class RollupCompiler {
             format: 'umd',
             sourceMap: true,
             moduleName: `${this.getGlobalName(this.name)}`,
-            globals: function (id) {
+            globals: id => {
                 if (id.startsWith('@'))
-                    return this._getGlobalName(id);
+                    return this.getGlobalName(id);
                 if (id.startsWith('rxjs/add/operator'))
                     return 'Rx.Observable.prototype';
                 if (id.startsWith('rxjs/add/observable'))
@@ -68,13 +74,14 @@ export class RollupCompiler {
                     return 'Rx';
                 if (id === 'tslib')
                     return 'tslib';
+                return;
             }
         });
     }
 
     async buildEsAsync() {
         return this.buildAsync({
-            dest: `${this.cwd}/${this.localReleaseRoot}/${this.name}.es.js`,
+            dest: `${this.cwd}/${this.localReleaseRoot}/${this.name.startsWith('@') ? this.name.substr(this.name.indexOf('/') + 1) : this.name }.es.js`,
             format: 'es',
             sourceMap: true
         });

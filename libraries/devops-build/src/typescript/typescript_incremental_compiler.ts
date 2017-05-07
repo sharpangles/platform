@@ -1,4 +1,4 @@
-import { Watcher } from './watcher';
+import { Watcher } from '../tracking//watcher';
 import { TypescriptCompiler } from './typescript_compiler';
 import { ParsedCommandLine, LanguageService, LanguageServiceHost, MapLike, ScriptSnapshot, createLanguageService, getDefaultLibFilePath, createDocumentRegistry, flattenDiagnosticMessageText, Diagnostic } from 'typescript';
 import * as fs from 'fs';

@@ -1,7 +1,9 @@
-import * as minimist from 'minimist';
+import * as minimistProxy from 'minimist';
 import { TrackerFactory } from './tracker_factory';
 
-class CLI {
+const minimist: any = (<any>minimistProxy).default || minimistProxy; // https://github.com/rollup/rollup/issues/1267
+
+export class CLI {
     constructor() {
         let argv = minimist(process.argv.slice(2));
         if (argv._.length < 1)
@@ -18,5 +20,3 @@ class CLI {
         }
     }
 }
-
-new CLI();

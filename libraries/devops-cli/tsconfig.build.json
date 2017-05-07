@@ -30,6 +30,6 @@
     }
   },
   "include": [
-    "./src/cli.ts"
+    "./index.ts"
   ]
 }

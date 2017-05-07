@@ -21,17 +21,19 @@
   },
   "homepage": "https://github.com/sharpangles/platform/tree/master/libraries/devops-cli#readme",
   "scripts": {
-    "build": "node ./cli",
+    "prebuild": "tsc && tsc -p tsconfig.build.json && cpy cli __artifacts/local",
+    "build": "node -r tsconfig-paths/register ./__artifacts/local/cli build",
     "copy": "cpy package.json README.md __artifacts/release",
     "postbuild": "npm run copy",
     "test": "node ../../tests-typescript.js",
     "clean": "rimraf -rf \"__artifacts\"",
     "watch": "tsc -w"
   },
-  "dependencies": {
+  "peerDependencies": {
     "@sharpangles/devops-build": "1.0.0-alpha.0"
   },
   "devDependencies": {
+    "tsconfig-paths": "^2.1.2",
     "karma": "^1.3.0",
     "karma-chrome-launcher": "^2.0.0",
     "karma-cli": "^1.0.1",
