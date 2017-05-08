@@ -1,45 +1,54 @@
+import { Subscription } from 'rxjs/Subscription';
+import { OverridingTracker } from '../trackers/overriding_tracker';
 import { TypescriptIncrementalCompiler } from '../typescript/typescript_incremental_compiler';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/merge';
-import { TypescriptCompiler } from './typescript_compiler';
-import { Tracker } from '../tracking/tracker';
-import { WatchChange, Watcher } from '../tracking/watcher';
+import { Tracker } from '../trackers/tracker';
+import { MutexTracker } from '../trackers/mutex_tracker';
+import { AsyncTrackerProcess } from '../processes/async_tracker_process';
+import { WatcherProcess } from '../os/watcher_process';
 import { ParsedCommandLine } from 'typescript';
 
-export class TypescriptTracker extends Tracker<WatchChange, boolean> {
-    static createDefault(cwd?: string, config: ParsedCommandLine | string = 'tsconfig.json', observable?: Observable<WatchChange>) {
-        let compiler = new TypescriptCompiler(cwd, config);
-        return new TypescriptTracker(compiler, true, observable);
+export class TypescriptTracker extends MutexTracker {
+    static async createWatcherTrackerAsync(sources: Tracker[], cwd?: string, config: ParsedCommandLine | string = 'tsconfig.json') {
+// todo configtracker
+
+        let tracker = { watcherTracker: new OverridingTracker(), typescriptTracker: new TypescriptTracker() };
+        await Promise.all(sources.map(s => tracker.typescriptTracker.connectAsync(s)));
+        await tracker.typescriptTracker.connectAsync(tracker.watcherTracker);
+        tracker.watcherTracker.runProcessAsync(new WatcherProcess(tracker.typescriptTracker.compiler.config.fileNames, cwd));
+        return tracker;
     }
 
-    static createIncremental(cwd?: string, config: ParsedCommandLine | string = 'tsconfig.json', observable?: Observable<WatchChange>, watcher?: Watcher) {
-        let compiler = new TypescriptIncrementalCompiler(cwd, config, watcher);
-        return new TypescriptTracker(compiler, true, TypescriptTracker.getObservable(compiler, observable));
+    constructor(cwd?: string, config: ParsedCommandLine | string = 'tsconfig.json') {
+        super();
+        this.compiler = new TypescriptIncrementalCompiler(cwd, config);
     }
 
-    static create(compiler: TypescriptCompiler, observable?: Observable<WatchChange>) {
-        return new TypescriptTracker(compiler, false, TypescriptTracker.getObservable(compiler, observable));
+    get rootFiles() { return this.compiler.config.fileNames; }
+
+    protected addSourceTracker(sourceTracker: Tracker, dispose?: () => void) {
+        let sub: Subscription;
+        if (sourceTracker instanceof WatcherTracker) {
+            sub = sourceTracker.progressed.subscribe(progress => {
+                if (progress.trackerProcess instanceof WatcherProcess)
+                    this.runProcessAsync(new AsyncTrackerProcess(() => this.compiler.compileAsync(progress.progress)));
+            });
+        }
+        else {
+            // By default, anytime a source succeeds, it will trigger a full compilation.
+            sub = sourceTracker.succeeded.subscribe(() => {
+                this.runProcessAsync(new AsyncTrackerProcess(() => this.compiler.compileAsync()));
+            });
+        }
+        super.addSourceTracker(sourceTracker, () => {
+            sub.unsubscribe();
+            if (dispose)
+                dispose();
+        });
     }
 
-    private static getObservable(compiler: TypescriptCompiler, observable?: Observable<WatchChange>) {
-        return observable && compiler instanceof TypescriptIncrementalCompiler ? Observable.merge(observable, compiler.watcher.changed) : compiler instanceof TypescriptIncrementalCompiler ? compiler.watcher.changed : observable;
-    }
+    compiler: TypescriptIncrementalCompiler;
 
-    private constructor(public compiler: TypescriptCompiler, private disposeCompiler: boolean, observable?: Observable<WatchChange>) {
-        super(observable);
-    }
-
-    protected async onRunAsync(source: WatchChange): Promise<boolean | undefined> {
-        if (!source.init && (!source.changes || source.changes.length === 0))
-            return;
-        console.log('Compiling typescript');
-        await this.compiler.compileAsync(source && source.changes);
-        return true;
-    }
-
-    dispose() {
-        super.dispose();
-        if (this.disposeCompiler)
-            this.compiler.dispose();
+    protected async onDisposeAsync() {
+        this.compiler.dispose();
     }
 }

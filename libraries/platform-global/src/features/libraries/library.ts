@@ -10,6 +10,7 @@ export interface Library {
      * Sometimes a library requires multiple stages.  This allows such a chain.
      * For example, if configuring a module loader, this may have to occur first because the following library may
      * be included as part of a bundle that would start resolving dependencies that require that configuration.
+     * @todo Need to create a custom bundle build that includes a global async init call before the module definition, this would support bundling module config with a single bundle.
      */
     nextLibraryModule?: { key: string, resolver?: Type };
 

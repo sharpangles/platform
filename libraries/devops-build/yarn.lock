@@ -144,10 +144,6 @@ asynckit@^0.4.0:
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/asynckit/-/asynckit-0.4.0.tgz#c79ed97f7f34cb8f2ba1bc9790bcc366474b4b79"
 
-atob@^2.0.0:
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/atob/-/atob-2.0.3.tgz#19c7a760473774468f20b2d2d03372ad7d4cbf5d"
-
 aws-sign2@~0.6.0:
   version "0.6.0"
   resolved "https://registry.yarnpkg.com/aws-sign2/-/aws-sign2-0.6.0.tgz#14342dd38dbcc94d0e5b87d763cd63612c0e794f"
@@ -757,10 +753,6 @@ escape-string-regexp@^1.0.0, escape-string-regexp@^1.0.2:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/escape-string-regexp/-/escape-string-regexp-1.0.5.tgz#1b61c0562190a8dff6ae3bb2cf0200ca130b86d4"
 
-estree-walker@^0.3.0:
-  version "0.3.1"
-  resolved "https://registry.yarnpkg.com/estree-walker/-/estree-walker-0.3.1.tgz#e6b1a51cf7292524e7237c312e5fe6660c1ce1aa"
-
 esutils@^2.0.2:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/esutils/-/esutils-2.0.2.tgz#0abf4f1caa5bcb1f7a9d8acc6dea4faaa04bac9b"
@@ -994,7 +986,7 @@ globby@^4.0.0:
     pify "^2.0.0"
     pinkie-promise "^2.0.0"
 
-google-closure-compiler@20170409.0.0, google-closure-compiler@>=20170218.0.0:
+google-closure-compiler@>=20170218.0.0, google-closure-compiler@^20170409.0.0:
   version "20170409.0.0"
   resolved "https://registry.yarnpkg.com/google-closure-compiler/-/google-closure-compiler-20170409.0.0.tgz#dc1be29a9f7eef8611364533b271b9fac757c970"
   dependencies:
@@ -1308,7 +1300,7 @@ jasmine-core@~2.6.0:
   version "2.6.1"
   resolved "https://registry.yarnpkg.com/jasmine-core/-/jasmine-core-2.6.1.tgz#66a61cddb699958e3613edef346c996f6311fc3b"
 
-jasmine@^2.5.3:
+jasmine@^2.6.0:
   version "2.6.0"
   resolved "https://registry.yarnpkg.com/jasmine/-/jasmine-2.6.0.tgz#6b22e70883e8e589d456346153b4d206ddbe217f"
   dependencies:
@@ -1365,7 +1357,7 @@ jsprim@^1.2.2:
     json-schema "0.2.3"
     verror "1.3.6"
 
-karma-chrome-launcher@^2.0.0:
+karma-chrome-launcher@^2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/karma-chrome-launcher/-/karma-chrome-launcher-2.1.1.tgz#216879c68ac04d8d5140e99619ba04b59afd46cf"
   dependencies:
@@ -1384,11 +1376,11 @@ karma-jasmine-html-reporter@^0.2.2:
   dependencies:
     karma-jasmine "^1.0.2"
 
-karma-jasmine@^1.0.2:
+karma-jasmine@^1.0.2, karma-jasmine@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/karma-jasmine/-/karma-jasmine-1.1.0.tgz#22e4c06bf9a182e5294d1f705e3733811b810acf"
 
-karma@^1.3.0:
+karma@^1.7.0:
   version "1.7.0"
   resolved "https://registry.yarnpkg.com/karma/-/karma-1.7.0.tgz#6f7a1a406446fa2e187ec95398698f4cee476269"
   dependencies:
@@ -1566,17 +1558,13 @@ mime@^1.3.4:
   dependencies:
     brace-expansion "^1.0.0"
 
-minimist@0.0.8:
+minimist@0.0.8, minimist@~0.0.1:
   version "0.0.8"
   resolved "https://registry.yarnpkg.com/minimist/-/minimist-0.0.8.tgz#857fcabfc3397d2625b8228262e86aa7a011b05d"
 
 minimist@^1.1.3, minimist@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.0.tgz#a35008b20f41383eec1fb914f4cd5df79a264284"
-
-minimist@~0.0.1:
-  version "0.0.10"
-  resolved "https://registry.yarnpkg.com/minimist/-/minimist-0.0.10.tgz#de3f98543dbf96082be48ad1a0c7cda836301dcf"
 
 "mkdirp@>=0.5 0", mkdirp@^0.5.0, mkdirp@^0.5.1:
   version "0.5.1"
@@ -1659,7 +1647,7 @@ number-is-nan@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/number-is-nan/-/number-is-nan-1.0.1.tgz#097b602b53422a522c1afb8790318336941a011d"
 
-nyc@^10.1.2:
+nyc@^10.3.2:
   version "10.3.2"
   resolved "https://registry.yarnpkg.com/nyc/-/nyc-10.3.2.tgz#f27f4d91f2a9db36c24f574ff5c6efff0233de46"
   dependencies:
@@ -2028,10 +2016,6 @@ resolve-from@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/resolve-from/-/resolve-from-2.0.0.tgz#9480ab20e94ffa1d9e80a804c7ea147611966b57"
 
-resolve-url@^0.2.1:
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/resolve-url/-/resolve-url-0.2.1.tgz#2c637fe77c893afd2a663fe21aa9080068e2052a"
-
 resolve@^1.1.6:
   version "1.3.3"
   resolved "https://registry.yarnpkg.com/resolve/-/resolve-1.3.3.tgz#655907c3469a8680dc2de3a275a8fdd69691f0e5"
@@ -2053,26 +2037,6 @@ rimraf@2, rimraf@^2.3.3, rimraf@^2.5.1, rimraf@^2.5.4, rimraf@^2.6.0, rimraf@^2.
   resolved "https://registry.yarnpkg.com/rimraf/-/rimraf-2.6.1.tgz#c2338ec643df7a1b7fe5c54fa86f57428a55f33d"
   dependencies:
     glob "^7.0.5"
-
-rollup-plugin-sourcemaps@^0.4.2:
-  version "0.4.2"
-  resolved "https://registry.yarnpkg.com/rollup-plugin-sourcemaps/-/rollup-plugin-sourcemaps-0.4.2.tgz#62125aa94087aadf7b83ef4dfaf629b473135e87"
-  dependencies:
-    rollup-pluginutils "^2.0.1"
-    source-map-resolve "^0.5.0"
-
-rollup-pluginutils@^2.0.1:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/rollup-pluginutils/-/rollup-pluginutils-2.0.1.tgz#7ec95b3573f6543a46a6461bd9a7c544525d0fc0"
-  dependencies:
-    estree-walker "^0.3.0"
-    micromatch "^2.3.11"
-
-rollup@^0.41.6:
-  version "0.41.6"
-  resolved "https://registry.yarnpkg.com/rollup/-/rollup-0.41.6.tgz#e0d05497877a398c104d816d2733a718a7a94e2a"
-  dependencies:
-    source-map-support "^0.4.0"
 
 rx@2.3.24:
   version "2.3.24"
@@ -2164,32 +2128,13 @@ socket.io@1.7.3:
     socket.io-client "1.7.3"
     socket.io-parser "2.3.1"
 
-source-map-resolve@^0.5.0:
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/source-map-resolve/-/source-map-resolve-0.5.0.tgz#fcad0b64b70afb27699e425950cb5ebcd410bc20"
-  dependencies:
-    atob "^2.0.0"
-    resolve-url "^0.2.1"
-    source-map-url "^0.4.0"
-    urix "^0.1.0"
-
-source-map-support@^0.4.0:
-  version "0.4.15"
-  resolved "https://registry.yarnpkg.com/source-map-support/-/source-map-support-0.4.15.tgz#03202df65c06d2bd8c7ec2362a193056fef8d3b1"
-  dependencies:
-    source-map "^0.5.6"
-
-source-map-url@^0.4.0:
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/source-map-url/-/source-map-url-0.4.0.tgz#3e935d7ddd73631b97659956d55128e87b5084a3"
-
 source-map@^0.4.4:
   version "0.4.4"
   resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.4.4.tgz#eba4f5da9c0dc999de68032d8b4f76173652036b"
   dependencies:
     amdefine ">=0.0.4"
 
-source-map@^0.5.0, source-map@^0.5.1, source-map@^0.5.3, source-map@^0.5.6, source-map@~0.5.1:
+source-map@^0.5.0, source-map@^0.5.1, source-map@^0.5.3, source-map@~0.5.1:
   version "0.5.6"
   resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.5.6.tgz#75ce38f52bf0733c5a7f0c118d81334a2bb5f412"
 
@@ -2416,10 +2361,6 @@ ultron@1.0.x:
 unpipe@1.0.0, unpipe@~1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/unpipe/-/unpipe-1.0.0.tgz#b2bf4ee8514aae6165b4817829d21b2ef49904ec"
-
-urix@^0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/urix/-/urix-0.1.0.tgz#da937f7a62e21fec1fd18d49b35c2935067a6c72"
 
 useragent@^2.1.12:
   version "2.1.13"

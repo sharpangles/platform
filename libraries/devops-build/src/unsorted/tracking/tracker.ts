@@ -5,6 +5,7 @@ import 'rxjs/add/operator/toPromise';
 
 /**
  * Optionally performs an asynchronous task on each observed event.
+ * @todo This gets us off the ground but needs to become a workflow node with hooks, status, etc....
  */
 export abstract class Tracker<TSource, TResult> {
     constructor(observable?: Observable<TSource>) {

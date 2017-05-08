@@ -1,17 +1,14 @@
-import { Watcher } from '../tracking//watcher';
 import { TypescriptCompiler } from './typescript_compiler';
 import { ParsedCommandLine, LanguageService, LanguageServiceHost, MapLike, ScriptSnapshot, createLanguageService, getDefaultLibFilePath, createDocumentRegistry, flattenDiagnosticMessageText, Diagnostic } from 'typescript';
 import * as fs from 'fs';
 import * as path from 'path';
 
 export class TypescriptIncrementalCompiler extends TypescriptCompiler {
-    constructor(cwd?: string, config: ParsedCommandLine | string = 'tsconfig.json', watcher?: Watcher) {
+    constructor(cwd?: string, config: ParsedCommandLine | string = 'tsconfig.json') {
         super(cwd, config);
         this.languageService = this.createLanguageService();
-        this.watcher = watcher || new Watcher(this.config.fileNames, this.cwd);
     }
 
-    watcher: Watcher;
     files: MapLike<{ version: number }> = {};
     languageService: LanguageService;
 

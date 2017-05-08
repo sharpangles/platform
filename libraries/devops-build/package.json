@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/sharpangles/platform/tree/master/modules/bootstrap#readme",
   "scripts": {
-    "build": "tsc && node build.js",
+    "build": "tsc && tsc -p tsconfig.json && node build.js",
     "copy": "cpy package.json README.md __artifacts/release",
     "postbuild": "npm run copy",
     "clean": "rimraf -rf \"__artifacts\"",
