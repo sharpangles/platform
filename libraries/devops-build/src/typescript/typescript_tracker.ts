@@ -5,12 +5,11 @@ import { AsyncTrackerProcess } from '../tracking/async_tracker_process';
 import { ParsedCommandLine } from 'typescript';
 
 export interface TypescriptConfig {
-    /** Providing this rebuilds the compiler each time. */
-    config?: ParsedCommandLine | string;
-    files?: string[];
+    config: ParsedCommandLine | string;
+    incremental?: boolean;
 }
 
-export class TypescriptTracker extends OverridingTracker<AsyncTrackerProcess, TypescriptConfig> {
+export class TypescriptTracker extends OverridingTracker<AsyncTrackerProcess, TypescriptConfig, string[] | undefined> {
     constructor(cwd?: string) {
         super();
         this.cwd = cwd || process.cwd();
@@ -18,18 +17,20 @@ export class TypescriptTracker extends OverridingTracker<AsyncTrackerProcess, Ty
 
     private cwd: string;
 
-    createProcess(config: TypescriptConfig): AsyncTrackerProcess | undefined {
-        if (config.config) {
-            if (this.compiler)
-                this.compiler.dispose();
-            this.compiler = new TypescriptIncrementalCompiler(this.cwd, config.config);
-        }
-        return new AsyncTrackerProcess(() => this.compiler.compileAsync(config.files));
+    configure(config: TypescriptConfig) {
+        if (this.compiler)
+            this.compiler.dispose();
+        this.compiler = config.incremental ? new TypescriptIncrementalCompiler(this.cwd, config.config) : new TypescriptCompiler(this.cwd, config.config);
+    }
+
+    protected createProcess(state: string[] | undefined): AsyncTrackerProcess | undefined {
+        return new AsyncTrackerProcess(() => this.compiler.compileAsync(state));
     }
 
     compiler: TypescriptCompiler;
 
     protected async onDisposeAsync() {
-        this.compiler.dispose();
+        if (this.compiler)
+            this.compiler.dispose();
     }
 }

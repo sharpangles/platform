@@ -4,7 +4,7 @@ import { SubjectTracker } from './subject_tracker';
 /**
  * A tracker that waits for the previous process to finish.
  */
-export abstract class MutexTracker<TProcess extends TrackerProcess<TProgress, TError> = TrackerProcess<TProgress, TError>, TConfig = any, TProgress = any, TError = any> extends SubjectTracker<TProcess, TConfig, TProgress, TError> {
+export abstract class MutexTracker<TProcess extends TrackerProcess<TProgress, TError> = TrackerProcess<TProgress, TError>, TConfig = any, TConnectState = any, TProgress = any, TError = any> extends SubjectTracker<TProcess, TConfig, TConnectState, TProgress, TError> {
     get activeProcess(): TProcess | undefined {
         for (let cur of this.activeProcesses)
             return cur;
@@ -22,7 +22,8 @@ export abstract class MutexTracker<TProcess extends TrackerProcess<TProgress, TE
         super.removeProcess(trackerProcess);
         if (trackerProcess !== this.queue.splice(0, 1)[0])
             throw new Error('Out of order queue.');
-        super.startProcess(trackerProcess);
+        if (this.queue.length > 0)
+            super.startProcess(this.queue[0]);
     }
 
     protected startProcess(trackerProcess: TProcess) {

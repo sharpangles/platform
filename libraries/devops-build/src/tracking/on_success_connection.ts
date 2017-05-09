@@ -3,11 +3,8 @@ import { TrackerProcess } from './tracker_process';
 import { Tracker } from './tracker';
 import { TrackerConnection } from './tracker_connection';
 
-export interface Type {
-}
-
 export class OnSuccessTrackerConnection extends TrackerConnection {
-    constructor(source: Tracker, target: Tracker, public processFactory: (process: TrackerProcess) => TrackerProcess | undefined) {
+    constructor(source: Tracker, target: Tracker, public connectionStateFactory: (process: TrackerProcess) => any) {
         super(source, target);
     }
 
@@ -15,9 +12,9 @@ export class OnSuccessTrackerConnection extends TrackerConnection {
 
     async connectAsync(): Promise<void> {
         this.subscription = this.source.succeeded.subscribe(p => {
-            let proc = this.processFactory(p);
-            if (proc)
-                this.target.runProcess(proc);
+            let connectionState = this.connectionStateFactory(p);
+            if (connectionState)
+                this.target.runProcess(connectionState);
         });
     }
 

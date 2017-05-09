@@ -1,7 +1,7 @@
 import { LoadSource, LoadProgress } from '../loading/load_source';
 
-export abstract class WrappedLoadSource<TOriginal, TData> implements LoadSource<TData> {
-    constructor(public wrapped: LoadSource<TOriginal>) {
+export class WrappedLoadSource<TOriginal, TData> implements LoadSource<TData> {
+    constructor(public wrapped: LoadSource<TOriginal>, private converter?: (original: TOriginal) => TData) {
     }
 
     openAsync() {
@@ -19,7 +19,11 @@ export abstract class WrappedLoadSource<TOriginal, TData> implements LoadSource<
         return false;
     }
 
-    abstract convert(original: TOriginal): TData;
+    convert(original: TOriginal): TData {
+        if (!this.converter)
+            throw new Error('Not implemented');
+        return this.converter(original);
+    }
 
     dispose() {
         this.wrapped.dispose();

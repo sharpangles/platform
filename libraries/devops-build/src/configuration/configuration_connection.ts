@@ -1,3 +1,4 @@
+import { ConfigurationTracker } from './configuration_tracker';
 import { LoadProcess } from '../loading/load_process';
 import { Subscription } from 'rxjs/Subscription';
 import { Tracker } from '../tracking/tracker';
@@ -7,10 +8,10 @@ import * as extendProxy from 'deep-extend';
 const extend: any = (<any>extendProxy).default || extendProxy; // https://github.com/rollup/rollup/issues/1267
 
 /**
- * Connects a tracker for json-sourced LoadProcesses to a target, configuring the state of the target on change.
+ * Connects a tracker for json-sourced LoadProcesses to a target, configuring the target on change.
  */
 export class ConfigurationConnection<TConfig> extends TrackerConnection {
-    constructor(source: Tracker, target: Tracker, public configurationSelector?: (data: { [key: string]: any }) => TConfig) {
+    constructor(source: ConfigurationTracker, target: Tracker, public configurationSelector?: (data: { [key: string]: any }) => TConfig) {
         super(source, target);
     }
 
@@ -32,6 +33,8 @@ export class ConfigurationConnection<TConfig> extends TrackerConnection {
 }
 
 /** Connect two configuration trackers together, where the target load will extend the source load. */
-export function createExtendingConfig(source: Tracker, target: Tracker) {
-    return new ConfigurationConnection<{ [key: string]: any }>(source, target, data => extend({}, data));
+export async function wireExtendingConfigAsync(source: ConfigurationTracker, target: ConfigurationTracker) {
+    let connection = new ConfigurationConnection<{ [key: string]: any }>(source, target, data => extend({}, data));
+    await connection.connectAsync();
+    return connection;
 }

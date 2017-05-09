@@ -6,7 +6,7 @@ import 'rxjs/add/operator/filter';
 /**
  * The devops environment is composed of long-lived trackers in a directional graph.
  */
-export abstract class Tracker<TProcess extends TrackerProcess<TProgress, TError> = TrackerProcess<TProgress, TError>, TConfig = any, TProgress = any, TError = any> {
+export abstract class Tracker<TProcess extends TrackerProcess<TProgress, TError> = TrackerProcess<TProgress, TError>, TConfig = any, TConnectState = any, TProgress = any, TError = any> {
     abstract get sourceConnections(): IterableIterator<TrackerConnection>;
     abstract get targetConnections(): IterableIterator<TrackerConnection>;
     abstract get activeProcesses(): IterableIterator<TProcess>;
@@ -41,14 +41,18 @@ export abstract class Tracker<TProcess extends TrackerProcess<TProgress, TError>
         await Promise.all(Array.from(this.activeProcesses).map(p => p.cancelAsync()));
     }
 
-    abstract createProcess(config: TConfig): TProcess | undefined;
+    configure(config: TConfig) {
+    }
 
-    runProcess(config: TConfig): TProcess | undefined {
-        let proc = this.createProcess(config);
-        if (!proc)
+    protected abstract createProcess(state: TConnectState): TProcess | undefined;
+
+    runProcess(state: TConnectState): TProcess | undefined {
+        let trackerProcess = this.createProcess(state);
+        if (!trackerProcess)
             return;
-        this.startProcess(proc);
-        return proc;
+        // await this.flowProcessAsync(trackerProcess);
+        trackerProcess.start();
+        return trackerProcess;
     }
 
     protected startProcess(trackerProcess: TProcess) {
