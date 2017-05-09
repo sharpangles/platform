@@ -1,4 +1,5 @@
 import { TrackerProcess } from '../processes/tracker_process';
+import { TrackerConnection } from './tracker_connection';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/toPromise';
 import 'rxjs/add/operator/filter';
@@ -7,8 +8,8 @@ import 'rxjs/add/operator/filter';
  * Tracks an activity in an overall workflow.
  */
 export abstract class Tracker<TProgress = any, TError = any> {
-    abstract get sourceTrackers(): IterableIterator<Tracker>;
-    abstract get targetTrackers(): IterableIterator<Tracker>;
+    sourceConnections: TrackerConnection[] = [];
+    targetConnections: TrackerConnection[] = [];
     abstract get activeProcesses(): IterableIterator<TrackerProcess<TProgress, TError>>;
 
     abstract get progressed(): Observable<{ trackerProcess: TrackerProcess<TProgress, TError>, progress: TProgress }>;
@@ -22,37 +23,23 @@ export abstract class Tracker<TProgress = any, TError = any> {
     get succeeded(): Observable<TrackerProcess<TProgress, TError>> { return this.completed.filter(c => !c.error && !c.cancelled).map(c => c.trackerProcess); }
     get failed(): Observable<{ trackerProcess: TrackerProcess<TProgress, TError>, error: TError }> { return this.completed.filter(c => !!c.error).map(c => { return { trackerProcess: c.trackerProcess, error: c.error }; }); }
 
-    protected abstract addSourceTracker(sourceTracker: Tracker): void;
-    protected abstract removeSourceTracker(sourceTracker: Tracker): void;
-    protected abstract addTargetTracker(targetTracker: Tracker): void;
-    protected abstract removeTargetTracker(targetTracker: Tracker): void;
-
-    async connectAsync(sourceTracker: Tracker): Promise<void> {
-        this.addSourceTracker(sourceTracker);
-        await sourceTracker.connectingAsync(this);
-    }
-
-    protected async connectingAsync(targetTracker: Tracker) {
-        this.addTargetTracker(targetTracker);
-    }
-
-    async disconnectAsync(sourceTracker: Tracker): Promise<void> {
-        this.removeSourceTracker(sourceTracker);
-        await sourceTracker.disconnectingAsync(this);
-    }
-
-    protected async disconnectingAsync(targetTracker: Tracker) {
-        this.removeTargetTracker(targetTracker);
-    }
+    abstract addSource(connection: TrackerConnection): void;
+    abstract removeSource(connection: TrackerConnection): void;
+    abstract addTarget(connection: TrackerConnection): void;
+    abstract removeTarget(connection: TrackerConnection): void;
 
     async disposeAsync(): Promise<void> {
-        await Promise.all(Array.from(this.targetTrackers).map(t => t.disconnectAsync(this)));
+        await Promise.all(Array.from(this.targetTrackers).map(t => t.breakAsync()));
         await this.onDisposeAsync();
-        await Promise.all(Array.from(this.sourceTrackers).map(t => this.disconnectAsync(t)));
+        await Promise.all(Array.from(this.sourceTrackers).map(t => this.breakAsync()));
     }
 
-    /** Called after the targets have been disconnected, but before disconnecting from sources. */
+    /**
+     * Called after the targets have been disconnected, but before disconnecting from sources.
+     * The base implementation cancels all active processes.
+     */
     protected async onDisposeAsync() {
+        await Promise.all(Array.from(this.activeProcesses).map(p => p.cancelAsync()));
     }
 
     /**

@@ -5,9 +5,16 @@ import { Tracker } from '../trackers/tracker';
 import { MutexTracker } from '../trackers/mutex_tracker';
 import { AsyncTrackerProcess } from '../processes/async_tracker_process';
 import { WatcherProcess } from '../os/watcher_process';
+import { WatcherTracker } from '../os/watcher_tracker';
 import { ParsedCommandLine } from 'typescript';
 
 export class TypescriptTracker extends MutexTracker {
+
+
+// switch to connections, trackers are pretty low level now.
+
+
+
     static async createWatcherTrackerAsync(sources: Tracker[], cwd?: string, config: ParsedCommandLine | string = 'tsconfig.json') {
 // todo configtracker
 

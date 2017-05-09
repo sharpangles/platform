@@ -71,6 +71,7 @@ export class TrackerProcess<TProgress = any, TError = any> {
     async cancelAsync() {
         if (this.isFinished || this.error)
             throw new Error('TrackerProcess is already completed.');
+        this.isCancelled = true;
         let cancelPromise = this.onCancelAsync();
         this.cancelledSubject.next(cancelPromise);
         this.complete(undefined, !await cancelPromise);
@@ -79,6 +80,7 @@ export class TrackerProcess<TProgress = any, TError = any> {
     private complete(error?: TError, cancelled?: boolean) {
         if (this.completedSubject.isStopped)
             throw new Error('TrackerProcess is already completed.');
+        this.isFinished = true;
         this.completedSubject.next({ error: error, cancelled: cancelled });
         this.cancelledSubject.next(cancelled);
         this.progressedSubject.complete();
