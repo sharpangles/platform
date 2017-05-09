@@ -1,4 +1,4 @@
-import { TrackerProcess } from '../processes/tracker_process';
+import { TrackerProcess } from '../tracking/tracker_process';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 import * as chokidar from 'chokidar';
@@ -20,6 +20,7 @@ export class WatcherProcess extends TrackerProcess<string[], Error> {
     cwd: string;
 
     start() {
+        super.start();
         this.watcher = chokidar.watch(this.patterns, { cwd: this.cwd });
         let obs = Observable.fromEvent<string>(this.watcher, 'change');
         // Buffer a set of saved files so long as changes keep occuring within x.  Only emit distinct.

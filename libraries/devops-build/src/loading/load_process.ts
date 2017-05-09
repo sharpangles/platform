@@ -1,12 +1,12 @@
-import { TrackerProcess } from '../processes/tracker_process';
+import { TrackerProcess } from '../tracking/tracker_process';
 import { LoadSource, LoadProgress } from './load_source';
 
 /**
  * A process that starts, progresses, and the completes.
  * Completion can be due to success, failure, or cancellation.
  */
-export abstract class LoadProcess extends TrackerProcess<LoadProgress, any> {
-    constructor(public loadSource: LoadSource) {
+export class LoadProcess<TData = any> extends TrackerProcess<LoadProgress, any> {
+    constructor(public loadSource: LoadSource<TData>) {
         super();
     }
 
@@ -17,13 +17,6 @@ export abstract class LoadProcess extends TrackerProcess<LoadProgress, any> {
             return Promise.resolve(false);
         return new Promise(resolve => this.cancelResolve = resolve);
     }
-
-
-    protected applyBuffer(buffer: Buffer, offset: number, bytesRead: number) {
-    }
-
-    protected abstract getBufferSize();
-    protected abstract getBufferOffset();
 
     private async readAsync() {
         try {
@@ -50,6 +43,7 @@ export abstract class LoadProcess extends TrackerProcess<LoadProgress, any> {
     }
 
     start() {
+        super.start();
         this.readAsync();
     }
 

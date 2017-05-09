@@ -1,4 +1,4 @@
-import { Tracker } from '../trackers/tracker';
+import { Tracker } from './tracker';
 
 export interface Type {
 }
