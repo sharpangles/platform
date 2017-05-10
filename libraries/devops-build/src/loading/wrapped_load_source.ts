@@ -1,22 +1,7 @@
-import { LoadSource, LoadProgress } from '../loading/load_source';
+import { LoadSource } from '../loading/load_source';
 
 export class WrappedLoadSource<TOriginal, TData> implements LoadSource<TData> {
     constructor(public wrapped: LoadSource<TOriginal>, private converter?: (original: TOriginal) => TData) {
-    }
-
-    openAsync() {
-        return this.wrapped.openAsync();
-    }
-
-    closeAsync() {
-        return this.wrapped.closeAsync();
-    }
-
-    async readNextAsync() {
-        if (await this.wrapped.readNextAsync())
-            return true;
-        this.data = this.convert(this.wrapped.data);
-        return false;
     }
 
     convert(original: TOriginal): TData {
@@ -25,12 +10,14 @@ export class WrappedLoadSource<TOriginal, TData> implements LoadSource<TData> {
         return this.converter(original);
     }
 
-    dispose() {
-        this.wrapped.dispose();
+    async readAsync(onData: () => any): Promise<TData> {
+        this.data = this.convert(await this.wrapped.readAsync(onData));
+        return this.data;
     }
 
     data: TData;
-    get progress(): LoadProgress {
-        return this.wrapped.progress;
+
+    dispose(): void {
+        return this.wrapped.dispose();
     }
 }

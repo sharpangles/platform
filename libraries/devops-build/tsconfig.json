@@ -20,7 +20,8 @@
     "importHelpers": true,
     "types": [
       "node",
-      "jasmine"
+      "jasmine",
+      "glob"
     ]
   },
   "include": [

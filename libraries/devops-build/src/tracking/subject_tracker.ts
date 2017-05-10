@@ -7,7 +7,17 @@ import { Observable } from 'rxjs/Observable';
 /**
  * A tracker that aggregates TrackerProcess observables through the Tracker via subjects.
  */
-export abstract class SubjectTracker<TProcess extends TrackerProcess<TProgress, TError> = TrackerProcess<TProgress, TError>, TConfig = any, TConnectState = any, TProgress = any, TError = any> extends Tracker<TProcess, TConfig, TConnectState, TProgress, TError> {
+export class SubjectTracker<TProcess extends TrackerProcess<TProgress, TError> = TrackerProcess<TProgress, TError>, TConfig = any, TConnectState = any, TProgress = any, TError = any> extends Tracker<TProcess, TConfig, TConnectState, TProgress, TError> {
+    constructor(private processFactory?: (state: TConnectState) => TProcess | undefined) {
+        super();
+    }
+
+    protected createProcess(state: TConnectState): TProcess | undefined {
+        if (!this.processFactory)
+            throw new Error('Not implemented.');
+        return this.processFactory(state);
+    }
+
     get sourceConnections(): IterableIterator<TrackerConnection> { return this.sourceConnectionDisposals.keys(); }
     protected sourceConnectionDisposals = new Map<TrackerConnection, () => void>();
     get targetConnections(): IterableIterator<TrackerConnection> { return this.targetConnectionDisposals.keys(); }

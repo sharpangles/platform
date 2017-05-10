@@ -11,5 +11,9 @@
   "vsicons.associations.folders": [
     { "icon": "dist", "extensions": ["__artifacts"], "format": "svg" },
     { "icon": "script", "extensions": ["devops"], "format": "svg" }
+  ],
+  "typescriptHero.resolver.ignorePatterns": [
+    "__artifacts",
+    "index.ts"
   ]
 }

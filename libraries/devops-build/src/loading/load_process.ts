@@ -20,23 +20,17 @@ export class LoadProcess<TData = any> extends TrackerProcess<LoadProgress, any> 
 
     private async readAsync() {
         try {
-            this.loadSource.openAsync();
-            while (true) {
+            await this.loadSource.readAsync(progress => {
                 if (this.cancelResolve) {
                     this.cancelResolve();
                     return;
                 }
-                if (!await this.loadSource.readNextAsync())
-                    break;
-                this.setProgress(this.loadSource.progress);
-            }
+                this.setProgress(progress);
+            });
         }
         catch (err) {
             this.fail(err);
             return;
-        }
-        finally {
-            await this.loadSource.closeAsync();
         }
         this.succeed();
         return;

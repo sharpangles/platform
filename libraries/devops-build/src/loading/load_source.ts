@@ -4,11 +4,7 @@ export interface LoadProgress {
 }
 
 export interface LoadSource<TData = any> {
-    openAsync(): Promise<void>;
-    closeAsync(): Promise<void>;
-    readNextAsync(): Promise<boolean>;
+    readAsync(onData: (progress: LoadProgress) => any): Promise<TData>;
     dispose(): void;
-
     data: TData;
-    progress: LoadProgress;
 }

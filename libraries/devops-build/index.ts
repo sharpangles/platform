@@ -1,6 +1,4 @@
-export { FileBufferLoadSource } from './src/loading/file_buffer_load_source';
 export { FileLoadSource } from './src/loading/file_load_source';
-export { FileStringLoadSource } from './src/loading/file_string_load_source';
 export { LoadProcess } from './src/loading/load_process';
 export { LoadSource, LoadProgress } from './src/loading/load_source';
 export { WatcherProcess } from './src/loading/watcher_process';

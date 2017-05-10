@@ -1,11 +1,11 @@
+import { FileLoadSource } from '../loading/file_load_source';
 import { ParsedCommandLine, sys, parseJsonConfigFileContent, parseConfigFileTextToJson } from 'typescript';
 import { WrappedLoadSource } from '../loading/wrapped_load_source';
-import { FileStringLoadSource } from '../loading/file_string_load_source';
 import * as path from 'path';
 
 export class TsConfigLoadSource extends WrappedLoadSource<string, ParsedCommandLine> {
     constructor(public file: string = 'tsconfig.json') {
-        super(new FileStringLoadSource(file));
+        super(new FileLoadSource(file));
     }
 
     convert(original: string) {
