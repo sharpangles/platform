@@ -4,7 +4,7 @@ import { Tracker } from './tracker';
 import { TrackerConnection } from './tracker_connection';
 
 export class OnProgressConnection<TProgress = any> extends TrackerConnection {
-    constructor(source: Tracker, target: Tracker, public connectionStateFactory: (process: TrackerProcess, progress: TProgress) => any) {
+    constructor(source: Tracker, target: Tracker, public connectionStateFactory?: (process: TrackerProcess, progress: TProgress) => any) {
         super(source, target);
     }
 
@@ -12,6 +12,10 @@ export class OnProgressConnection<TProgress = any> extends TrackerConnection {
 
     async connectAsync(): Promise<void> {
         this.subscription = this.source.progressed.subscribe(p => {
+            if (!this.connectionStateFactory) {
+                this.target.runProcess();
+                return;
+            }
             let connectionState = this.connectionStateFactory(p.trackerProcess, p.progress);
             if (connectionState)
                 this.target.runProcess(connectionState);

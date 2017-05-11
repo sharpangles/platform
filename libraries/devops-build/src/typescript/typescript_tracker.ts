@@ -17,13 +17,14 @@ export class TypescriptTracker extends OverridingTracker<AsyncTrackerProcess, Ty
 
     private cwd: string;
 
-    configure(config: TypescriptConfig) {
+    async configureAsync(config: TypescriptConfig) {
         if (this.compiler)
             this.compiler.dispose();
         this.compiler = config.incremental ? new TypescriptIncrementalCompiler(this.cwd, config.config) : new TypescriptCompiler(this.cwd, config.config);
+        this.runProcess();
     }
 
-    protected createProcess(state: string[] | undefined): AsyncTrackerProcess | undefined {
+    protected createProcess(state?: string[]): AsyncTrackerProcess | undefined {
         return new AsyncTrackerProcess(() => this.compiler.compileAsync(state));
     }
 

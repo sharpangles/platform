@@ -8,9 +8,11 @@
             "type": "node",
             "request": "launch",
             "name": "Launch Program",
-            "program": "${workspaceRoot}/libraries/devops-build/__artifacts/local/src/build.js",
+            "program": "${workspaceRoot}/libraries/devops-build/build.js",
             "cwd": "${workspaceRoot}/libraries/devops-build",
-            "outFiles": []
+            "outFiles": [],
+            "protocol": "inspector",
+            "stopOnEntry": true
         },
         {
             "type": "node",

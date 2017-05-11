@@ -14,11 +14,11 @@ export interface WatcherConfig {
  * Completion can be due to success, failure, or cancellation.
  */
 export class WatcherTracker extends OverridingTracker<WatcherProcess, WatcherConfig, WatcherConfig | undefined, string[]> {
-    configure(config: WatcherConfig) {
-        this.runProcess(config);
-    }
-
     private config: WatcherConfig;
+
+    async configureAsync(config: WatcherConfig) {
+        this.config = config;
+    }
 
     protected createProcess(state?: WatcherConfig): WatcherProcess | undefined {
         return new WatcherProcess(

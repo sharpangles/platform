@@ -1,7 +1,4 @@
-/**
- * A local build for the library needed before we have a cli.
- */
+let ConfigurationTrackerFactory = require('./__artifacts/local/src/configuration/configuration_tracker_factory').ConfigurationTrackerFactory;
 
-let LibraryTracker = require('./__artifacts/local/src/tracking/library_tracker').LibraryTracker;
-
-new LibraryTracker().runAsync();
+let factory = new ConfigurationTrackerFactory({configName: '../../sharpangles.config.json' });
+factory.createTrackersAsync().then(() => factory.start());

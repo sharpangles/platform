@@ -5,8 +5,8 @@ import { SubjectTracker } from './subject_tracker';
  * A tracker that waits for the previous process to finish.
  */
 export class MutexTracker<TProcess extends TrackerProcess<TProgress, TError> = TrackerProcess<TProgress, TError>, TConfig = any, TConnectState = any, TProgress = any, TError = any> extends SubjectTracker<TProcess, TConfig, TConnectState, TProgress, TError> {
-    constructor(processFactory?: (state: TConnectState) => TProcess | undefined) {
-        super();
+    constructor(processFactory?: (state?: TConnectState) => TProcess | undefined) {
+        super(processFactory);
     }
 
     get activeProcess(): TProcess | undefined {

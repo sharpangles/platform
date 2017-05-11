@@ -1,26 +1,23 @@
-import { Tracker } from '../tracking/tracker';
 import { TypescriptTrackerFactory } from '../typescript/typescript_tracker_factory';
+import { MutexTracker } from '../tracking/mutex_tracker';
 import { TrackerFactoriesConfig } from './configuration_tracker_factory';
-import { TrackerProcess } from '../tracking/tracker_process';
+import { AsyncTrackerProcess } from '../tracking/async_tracker_process';
 
-export class ConfigurationFactoriesInvoker extends TrackerProcess {
-    constructor(public sourceTracker: Tracker, public config: TrackerFactoriesConfig, private cwd?: string) {
+export class ConfigurationFactoriesInvoker extends MutexTracker<AsyncTrackerProcess, any, TrackerFactoriesConfig> {
+    constructor(public cwd?: string) {
         super();
     }
 
-    start() {
-        super.start();
-        this.runAsync();
+    protected createProcess(state?: TrackerFactoriesConfig): AsyncTrackerProcess | undefined {
+        if (!state || !state.factories)
+            return;
+        return new AsyncTrackerProcess(() => this.createFactoriesAsync(<{ [key: string]: any }>state.factories));
     }
 
-    async runAsync() {
-        if (!this.config.factories) {
-            this.succeed();
-            return;
-        }
-        for (let factoryType of Object.keys(this.config.factories)) {
-            let factory = this.getFactory(factoryType, this.config.factories);
-            await factory.createTrackersAsync(this.sourceTracker);
+    private async createFactoriesAsync(factories: { [key: string]: any }) {
+        for (let factoryName of Object.keys(factories)) {
+            let factory = this.getFactory(factoryName, factories[factoryName]);
+            await factory.createTrackersAsync(this);
             factory.start();
         }
     }

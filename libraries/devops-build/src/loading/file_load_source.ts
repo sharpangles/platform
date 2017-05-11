@@ -23,7 +23,7 @@ export class FileLoadSource extends StreamLoadSource {
     }
 
     protected async createStreamAsync() {
-        return fs.createReadStream(this.file, 'r');
+        return fs.createReadStream(this.file, { encoding: this.encoding, flags: 'r' });
     }
 
     protected destroyStream(stream: NodeJS.ReadableStream) {

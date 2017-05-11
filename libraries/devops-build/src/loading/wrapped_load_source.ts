@@ -10,12 +10,15 @@ export class WrappedLoadSource<TOriginal, TData> implements LoadSource<TData> {
         return this.converter(original);
     }
 
-    async readAsync(onData: () => any): Promise<TData> {
-        this.data = this.convert(await this.wrapped.readAsync(onData));
+    async readAsync(onData: () => any): Promise<TData | undefined> {
+        let val = await this.wrapped.readAsync(onData);
+        if (typeof val === 'undefined')
+            return;
+        this.data = this.convert(val);
         return this.data;
     }
 
-    data: TData;
+    data?: TData;
 
     dispose(): void {
         return this.wrapped.dispose();

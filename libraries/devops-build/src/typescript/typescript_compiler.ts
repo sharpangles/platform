@@ -27,8 +27,8 @@ export class TypescriptCompiler {
         this.logErrors(getPreEmitDiagnostics(program).concat(emitResult.diagnostics));
     }
 
-    protected logErrors(disagnostics: Diagnostic[]) {
-        for (let diagnostic of disagnostics) {
+    protected logErrors(diagnostics: Diagnostic[]) {
+        for (let diagnostic of diagnostics) {
             let message = flattenDiagnosticMessageText(diagnostic.messageText, '\n');
             if (diagnostic.file) {
                 let { line, character } = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);

@@ -23,7 +23,7 @@ export abstract class StreamLoadSource implements LoadSource<string> {
     protected abstract createStreamAsync(): Promise<NodeJS.ReadableStream>;
     protected abstract destroyStream(stream: NodeJS.ReadableStream);
 
-    async readAsync(onData: (progress: LoadProgress) => any): Promise<Buffer | string> {
+    async readAsync(onData: (progress: LoadProgress) => any): Promise<string | undefined> {
         this.stream = await this.createStreamAsync();
         return await new Promise<string>((resolve, reject) => {
             this.resolve = val => {
@@ -32,7 +32,10 @@ export abstract class StreamLoadSource implements LoadSource<string> {
                 delete this.resolve;
             };
             this.reject = val => {
-                reject(val);
+                if (val.code === 'ENOENT')
+                    resolve(undefined);
+                else
+                    reject(val);
                 delete this.reject;
                 delete this.resolve;
             };
@@ -51,6 +54,8 @@ export abstract class StreamLoadSource implements LoadSource<string> {
             let data = this.stream.read();
             if (!data)
                 return;
+            if (!this.data)
+                this.data = '';
             this.data += <string>data;
             this.progress.position = this.data.length;
             onData(this.progress);

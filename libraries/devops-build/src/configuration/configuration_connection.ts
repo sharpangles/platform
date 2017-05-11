@@ -15,9 +15,11 @@ export class ConfigurationConnection<TLoadType, TConfig> extends TrackerConnecti
 
     async connectAsync(): Promise<void> {
         this.subscription = this.source.succeeded.subscribe((p: LoadProcess<TLoadType>) => {
+            if (!p.loadSource.data)
+                return;
             let config = this.configurationSelector ? this.configurationSelector(p.loadSource.data) : <TConfig><any>p.loadSource.data;
             if (config)
-                this.target.configure(config);
+                this.target.configureAsync(config);
         });
     }
 

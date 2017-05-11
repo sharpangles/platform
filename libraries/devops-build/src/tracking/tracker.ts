@@ -41,17 +41,18 @@ export abstract class Tracker<TProcess extends TrackerProcess<TProgress, TError>
         await Promise.all(Array.from(this.activeProcesses).map(p => p.cancelAsync()));
     }
 
-    configure(config: TConfig) {
+    async configureAsync(config: TConfig) {
     }
 
-    protected abstract createProcess(state: TConnectState): TProcess | undefined;
+    protected abstract createProcess(state?: TConnectState): TProcess | undefined;
 
-    runProcess(state: TConnectState): TProcess | undefined {
+    runProcess(state?: TConnectState): TProcess | undefined {
+        console.log(`Created ${this.constructor.name}`);
         let trackerProcess = this.createProcess(state);
         if (!trackerProcess)
             return;
         // await this.flowProcessAsync(trackerProcess);
-        trackerProcess.start();
+        this.startProcess(trackerProcess);
         return trackerProcess;
     }
 
