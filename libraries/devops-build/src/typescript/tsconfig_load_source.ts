@@ -12,6 +12,6 @@ export class TsConfigLoadSource extends WrappedLoadSource<string, ParsedCommandL
         const result = parseConfigFileTextToJson(this.file, original);
         if (result.error)
             throw new Error(`failed to parse ${this.file}`);
-        return parseJsonConfigFileContent(result.config, sys, path.dirname(this.file), undefined, this.file);
+        return parseJsonConfigFileContent(result.config, sys, path.resolve(path.dirname(this.file)), undefined, this.file);
     }
 }

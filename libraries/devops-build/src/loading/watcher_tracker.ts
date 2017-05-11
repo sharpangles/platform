@@ -18,6 +18,8 @@ export class WatcherTracker extends OverridingTracker<WatcherProcess, WatcherCon
 
     async configureAsync(config: WatcherConfig) {
         this.config = config;
+        if (this.activeProcess)
+            this.runProcess();
     }
 
     protected createProcess(state?: WatcherConfig): WatcherProcess | undefined {

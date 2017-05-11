@@ -47,7 +47,6 @@ export abstract class Tracker<TProcess extends TrackerProcess<TProgress, TError>
     protected abstract createProcess(state?: TConnectState): TProcess | undefined;
 
     runProcess(state?: TConnectState): TProcess | undefined {
-        console.log(`Created ${this.constructor.name}`);
         let trackerProcess = this.createProcess(state);
         if (!trackerProcess)
             return;

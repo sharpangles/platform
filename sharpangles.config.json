@@ -1,6 +1,7 @@
 {
   "factories": {
     "typescript": {
+      "incremental": true
     }
   }
 }

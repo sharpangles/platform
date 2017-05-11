@@ -1,3 +1,4 @@
+import { TrackerContext } from '../tracking/tracker_context';
 import { AsyncTrackerProcess } from '../tracking/async_tracker_process';
 import { ConfigurationFactoriesInvoker } from './configuration_factories_invoker';
 import { FileLoadSource } from '../loading/file_load_source';
@@ -40,11 +41,13 @@ export interface ConfigurationTrackerFactoryOptions {
 }
 
 export class ConfigurationTrackerFactory implements TrackerFactory {
-    constructor(public options: ConfigurationTrackerFactoryOptions, cwd?: string) {
+    constructor(public options: ConfigurationTrackerFactoryOptions, cwd?: string, trackerContext?: TrackerContext) {
         this.cwd = cwd || process.cwd();
+        this.trackerContext = trackerContext || new TrackerContext();
     }
 
     cwd: string;
+    trackerContext: TrackerContext;
 
     rootTracker: ConfigurationTracker;
 
@@ -61,9 +64,10 @@ export class ConfigurationTrackerFactory implements TrackerFactory {
                 await new OnSuccessTrackerConnection(prevTracker, tracker).connectAsync();
             prevTracker = tracker;
         }
-        let invoker = new ConfigurationFactoriesInvoker(this.cwd);
+        let invoker = new ConfigurationFactoriesInvoker(this.trackerContext, this.cwd);
         await new OnSuccessTrackerConnection(tracker, invoker, proc => (<AsyncTrackerProcess>proc).result).connectAsync();
         this.rootTracker = <ConfigurationTracker>trackers[0];
+        this.trackerContext.onTrackersCreated(this, trackers);
         return trackers;
     }
 
