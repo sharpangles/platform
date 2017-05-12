@@ -1,5 +1,6 @@
+import { Description } from '../tracking/description';
 import { WatcherProcess } from './watcher_process';
-import { OverridingTracker } from '../tracking/overriding_tracker';
+import { OverridingTracker } from '../tracking/trackers/overriding_tracker';
 
 export interface WatcherConfig {
     cwd?: string;
@@ -14,18 +15,23 @@ export interface WatcherConfig {
  * Completion can be due to success, failure, or cancellation.
  */
 export class WatcherTracker extends OverridingTracker<WatcherProcess, WatcherConfig, WatcherConfig | undefined, string[]> {
+    constructor(description?: Description) {
+        super(description || {
+            name: 'File watcher',
+            description: 'Runs a long-lived process to watch for changes'
+        });
+    }
+
     private config: WatcherConfig;
 
     async configureAsync(config: WatcherConfig) {
         this.config = config;
-        if (this.activeProcess)
-            this.runProcess();
     }
 
     protected createProcess(state?: WatcherConfig): WatcherProcess | undefined {
         return new WatcherProcess(
-            state && state.patterns || this.config.patterns,
-            state && state.cwd || this.config.cwd,
-            state && state.idleTime || this.config.idleTime);
+            state && state.patterns || this.config && this.config.patterns,
+            state && state.cwd || this.config && this.config.cwd,
+            state && state.idleTime || this.config && this.config.idleTime);
     }
 }

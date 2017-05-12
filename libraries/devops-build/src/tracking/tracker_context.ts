@@ -8,11 +8,11 @@ export class TrackerContext {
     }
 
     private enableLogging(tracker: Tracker) {
-        tracker.started.subscribe(proc => console.log(`Started: ${tracker.constructor.name}.${proc.constructor.name}`));
-        tracker.progressed.subscribe(proc => console.log(`Progress: ${tracker.constructor.name}.${proc.trackerProcess.constructor.name} - ${typeof proc.progress === 'string' ? proc.progress : JSON.stringify(proc.progress)}`));
-        tracker.succeeded.subscribe(proc => console.log(`Succeeded: ${tracker.constructor.name}.${proc.constructor.name}`));
-        tracker.failed.subscribe(proc => console.log(`Failed: ${tracker.constructor.name}.${proc.trackerProcess.constructor.name} - ${typeof proc.error === 'string' ? proc.error : proc.error instanceof Error ? proc.error.message : JSON.stringify(proc.error)}`));
-        tracker.cancelling.subscribe(proc => console.log(`Cancelling: ${tracker.constructor.name}.${proc.trackerProcess.constructor.name}`));
-        tracker.cancelled.subscribe(proc => console.log(`Cancelled: ${tracker.constructor.name}.${proc.constructor.name}`));
+        tracker.started.subscribe(proc => console.log(`Started: ${tracker.description.name} (${tracker.description.description})`));
+        tracker.progressed.subscribe(proc => console.log(`${tracker.description.name}: - ${typeof proc.progress === 'string' ? proc.progress : JSON.stringify(proc.progress)}`));
+        tracker.succeeded.subscribe(proc => console.log(`Succeeded: ${tracker.description.name}`));
+        tracker.failed.subscribe(proc => console.log(`Failed: ${tracker.description.name} - ${typeof proc.error === 'string' ? proc.error : proc.error instanceof Error ? proc.error.message : JSON.stringify(proc.error)}`));
+        tracker.cancelling.subscribe(proc => console.log(`Cancelling: ${tracker.description.name}`));
+        tracker.cancelled.subscribe(proc => console.log(`Cancelled: ${tracker.description.name}`));
     }
 }

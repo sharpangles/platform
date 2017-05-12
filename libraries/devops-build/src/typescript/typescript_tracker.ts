@@ -1,7 +1,7 @@
 import { TypescriptCompiler } from '../typescript/typescript_compiler';
 import { TypescriptIncrementalCompiler } from '../typescript/typescript_incremental_compiler';
-import { OverridingTracker } from '../tracking/overriding_tracker';
-import { AsyncTrackerProcess } from '../tracking/async_tracker_process';
+import { OverridingTracker } from '../tracking/trackers/overriding_tracker';
+import { AsyncTrackerProcess } from '../tracking/processes/async_tracker_process';
 import { ParsedCommandLine } from 'typescript';
 
 export interface TypescriptConfig {
@@ -10,12 +10,12 @@ export interface TypescriptConfig {
 }
 
 export class TypescriptTracker extends OverridingTracker<AsyncTrackerProcess, TypescriptConfig, string[] | undefined> {
-    constructor(cwd?: string) {
-        super();
-        this.cwd = cwd || process.cwd();
+    constructor(private cwd?: string) {
+        super({
+            name: 'Typescript Compiler',
+            description: 'Compiles typescript with optional incremental support.'
+        });
     }
-
-    private cwd: string;
 
     async configureAsync(config: TypescriptConfig) {
         if (this.compiler)
@@ -25,7 +25,7 @@ export class TypescriptTracker extends OverridingTracker<AsyncTrackerProcess, Ty
     }
 
     protected createProcess(state?: string[]): AsyncTrackerProcess | undefined {
-        return new AsyncTrackerProcess(() => this.compiler.compileAsync(state));
+        return AsyncTrackerProcess.create(() => this.compiler.compileAsync(state));
     }
 
     compiler: TypescriptCompiler;

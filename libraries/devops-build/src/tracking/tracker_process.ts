@@ -1,4 +1,4 @@
-import { AsyncSubject } from 'rxjs/AsyncSubject';
+import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/toPromise';
 import 'rxjs/add/operator/filter';
@@ -34,7 +34,7 @@ export class TrackerProcess<TProgress = any, TError = any> {
     get failed(): Observable<TError> { return this.completedSubject.filter(c => !!c.error).map(c => c.error); }
 
 
-    setProgress(progress: TProgress) {
+    protected setProgress(progress: TProgress) {
         if (!this.isStarted || this.isFinished || this.isCancelled || this.error)
             throw new Error('Process is not running.');
         this.progress = progress;
@@ -45,8 +45,12 @@ export class TrackerProcess<TProgress = any, TError = any> {
         if (this.isStarted || this.isCancelled || this.error)
             throw new Error('Process already running or failed.');
         this.isStarted = true;
+        this.onStart();
         this.startedSubject.next({});
         this.startedSubject.complete();
+    }
+
+    protected onStart() {
     }
 
     fail(error: TError) {
@@ -81,6 +85,7 @@ export class TrackerProcess<TProgress = any, TError = any> {
         if (this.completedSubject.isStopped)
             throw new Error('TrackerProcess is already completed.');
         this.isFinished = true;
+        this.onComplete(error, cancelled);
         this.completedSubject.next({ error: error, cancelled: cancelled });
         this.cancelledSubject.next(cancelled);
         this.progressedSubject.complete();
@@ -89,11 +94,14 @@ export class TrackerProcess<TProgress = any, TError = any> {
         this.dispose();
     }
 
+    protected onComplete(error?: TError, cancelled?: boolean) {
+    }
+
     dispose() {
     }
 
-    private progressedSubject = new AsyncSubject<TProgress>();
-    private startedSubject = new AsyncSubject();
-    private completedSubject = new AsyncSubject<{ error?: TError, cancelled?: boolean }>();
-    private cancelledSubject = new AsyncSubject<any>();
+    private progressedSubject = new Subject<TProgress>();
+    private startedSubject = new Subject();
+    private completedSubject = new Subject<{ error?: TError, cancelled?: boolean }>();
+    private cancelledSubject = new Subject<any>();
 }

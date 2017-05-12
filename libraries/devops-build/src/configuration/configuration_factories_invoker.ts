@@ -1,18 +1,21 @@
-import { AsyncTrackerProcess } from '../tracking/async_tracker_process';
-import { MutexTracker } from '../tracking/mutex_tracker';
+import { AsyncTrackerProcess } from '../tracking/processes/async_tracker_process';
+import { MutexTracker } from '../tracking/trackers/mutex_tracker';
 import { TrackerContext } from '../tracking/tracker_context';
 import { TypescriptTrackerFactory } from '../typescript/typescript_tracker_factory';
 import { TrackerFactoriesConfig } from './configuration_tracker_factory';
 
 export class ConfigurationFactoriesInvoker extends MutexTracker<AsyncTrackerProcess, any, TrackerFactoriesConfig> {
     constructor(public trackerContext: TrackerContext, public cwd?: string) {
-        super();
+        super({
+            name: 'Factory Invoker',
+            description: 'Builds trackers from factories discovered via configuration.'
+        });
     }
 
     protected createProcess(state?: TrackerFactoriesConfig): AsyncTrackerProcess | undefined {
         if (!state || !state.factories)
             return;
-        return new AsyncTrackerProcess(() => this.createFactoriesAsync(<{ [key: string]: any }>state.factories));
+        return AsyncTrackerProcess.create(() => this.createFactoriesAsync(<{ [key: string]: any }>state.factories));
     }
 
     private async createFactoriesAsync(factories: { [key: string]: any }) {

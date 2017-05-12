@@ -16,11 +16,8 @@ const sourcemaps: any = (<any>sourcemapsProxy).default || sourcemapsProxy; // ht
  * There is also rollup-watch, but we want control over the trigger.
  */
 export class RollupCompiler {
-    constructor(public name: string, private localBuildRoot = './__artifacts/build/index.js', private localReleaseRoot = './__artifacts/release/bundles', cwd?: string) {
-        this.cwd = cwd || process.cwd();
+    constructor(public name: string, private localBuildRoot = './__artifacts/build/index.js', private localReleaseRoot = './__artifacts/release/bundles', private cwd?: string) {
     }
-
-    private cwd: string;
 
     reset() {
         delete this.cache;
@@ -30,7 +27,7 @@ export class RollupCompiler {
     private async setRollupTask() {
         let config = {
             cache: this.cache, // The rollup call is consistent, so it doesnt matter if we contend over this value.
-            entry: path.resolve(this.cwd, this.localBuildRoot),
+            entry: path.resolve(this.cwd || process.cwd(), this.localBuildRoot),
             plugins: [
                 // builtins(),
                 // globals(),

@@ -1,6 +1,7 @@
-import { Tracker } from './tracker';
-import { TrackerConnection } from './tracker_connection';
-import { TrackerProcess } from './tracker_process';
+import { Description } from '../description';
+import { Tracker } from '../tracker';
+import { Connection } from '../connection';
+import { TrackerProcess } from '../tracker_process';
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
 
@@ -8,8 +9,8 @@ import { Observable } from 'rxjs/Observable';
  * A tracker that aggregates TrackerProcess observables through the Tracker via subjects.
  */
 export class SubjectTracker<TProcess extends TrackerProcess<TProgress, TError> = TrackerProcess<TProgress, TError>, TConfig = any, TConnectState = any, TProgress = any, TError = any> extends Tracker<TProcess, TConfig, TConnectState, TProgress, TError> {
-    constructor(private processFactory?: (state?: TConnectState) => TProcess | undefined) {
-        super();
+    constructor(description: Description, private processFactory?: (state?: TConnectState) => TProcess | undefined) {
+        super(description);
     }
 
     protected createProcess(state?: TConnectState): TProcess | undefined {
@@ -18,10 +19,10 @@ export class SubjectTracker<TProcess extends TrackerProcess<TProgress, TError> =
         return this.processFactory(state);
     }
 
-    get sourceConnections(): IterableIterator<TrackerConnection> { return this.sourceConnectionDisposals.keys(); }
-    protected sourceConnectionDisposals = new Map<TrackerConnection, () => void>();
-    get targetConnections(): IterableIterator<TrackerConnection> { return this.targetConnectionDisposals.keys(); }
-    protected targetConnectionDisposals = new Map<TrackerConnection, () => void>();
+    get sourceConnections(): IterableIterator<Connection> { return this.sourceConnectionDisposals.keys(); }
+    protected sourceConnectionDisposals = new Map<Connection, () => void>();
+    get targetConnections(): IterableIterator<Connection> { return this.targetConnectionDisposals.keys(); }
+    protected targetConnectionDisposals = new Map<Connection, () => void>();
     get activeProcesses(): IterableIterator<TProcess> { return this.activeProcessDisposals.keys(); }
     private activeProcessDisposals = new Map<TProcess, () => void>();
 
@@ -34,19 +35,19 @@ export class SubjectTracker<TProcess extends TrackerProcess<TProgress, TError> =
     private startedSubject = new Subject<TProcess>();
     get started(): Observable<TProcess> { return this.startedSubject; }
 
-    addSource(connection: TrackerConnection, dispose?: () => void) {
-        this.setDisposal<TrackerConnection>(this.sourceConnectionDisposals, connection, dispose || (() => {}));
+    addSource(connection: Connection, dispose?: () => void) {
+        this.setDisposal<Connection>(this.sourceConnectionDisposals, connection, dispose || (() => {}));
     }
 
-    removeSource(connection: TrackerConnection) {
+    removeSource(connection: Connection) {
         this.deleteDisposal(this.sourceConnectionDisposals, connection);
     }
 
-    addTarget(connection: TrackerConnection, dispose?: () => void) {
+    addTarget(connection: Connection, dispose?: () => void) {
         this.setDisposal(this.targetConnectionDisposals, connection, dispose || (() => {}));
     }
 
-    removeTarget(connection: TrackerConnection) {
+    removeTarget(connection: Connection) {
         this.deleteDisposal(this.targetConnectionDisposals, connection);
     }
 

@@ -1,14 +1,18 @@
+import { Description } from './description';
 import { TrackerProcess } from './tracker_process';
-import { TrackerConnection } from './tracker_connection';
+import { Connection } from './connection';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/filter';
 
 /**
  * The devops environment is composed of long-lived trackers in a directional graph.
  */
-export abstract class Tracker<TProcess extends TrackerProcess<TProgress, TError> = TrackerProcess<TProgress, TError>, TConfig = any, TConnectState = any, TProgress = any, TError = any> {
-    abstract get sourceConnections(): IterableIterator<TrackerConnection>;
-    abstract get targetConnections(): IterableIterator<TrackerConnection>;
+export abstract class Tracker<TProcess extends TrackerProcess<TProgress, TError> = any, TConfig = any, TConnectState = any, TProgress = any, TError = any> {
+    constructor(public description: Description) {
+    }
+
+    abstract get sourceConnections(): IterableIterator<Connection>;
+    abstract get targetConnections(): IterableIterator<Connection>;
     abstract get activeProcesses(): IterableIterator<TProcess>;
 
     abstract get progressed(): Observable<{ trackerProcess: TProcess, progress: TProgress }>;
@@ -22,10 +26,10 @@ export abstract class Tracker<TProcess extends TrackerProcess<TProgress, TError>
     get succeeded(): Observable<TProcess> { return this.completed.filter(c => !c.error && !c.cancelled).map(c => c.trackerProcess); }
     get failed(): Observable<{ trackerProcess: TProcess, error: TError }> { return this.completed.filter(c => !!c.error).map(c => { return { trackerProcess: c.trackerProcess, error: c.error }; }); }
 
-    abstract addSource(connection: TrackerConnection): void;
-    abstract removeSource(connection: TrackerConnection): void;
-    abstract addTarget(connection: TrackerConnection): void;
-    abstract removeTarget(connection: TrackerConnection): void;
+    abstract addSource(connection: Connection): void;
+    abstract removeSource(connection: Connection): void;
+    abstract addTarget(connection: Connection): void;
+    abstract removeTarget(connection: Connection): void;
 
     async disposeAsync(): Promise<void> {
         await Promise.all(Array.from(this.targetConnections).map(t => t.breakAsync()));
@@ -61,22 +65,6 @@ export abstract class Tracker<TProcess extends TrackerProcess<TProgress, TError>
         trackerProcess.start();
     }
 
-    // /**
-    //  * Flows the process to targets.
-    //  * Returns whether the process should start after flowing.
-    //  * The base implementation performs work in parallel and always starts.
-    //  */
-    // protected async flowProcessAsync(trackerProcess: TProcess) {
-    //     await Promise.all(Array.from(this.targetConnections).map(t => t.flowAsync(this, trackerProcess)));
-    //     return true;
-    // }
-
     protected abstract addProcess(trackerProcess: TProcess);
     protected abstract removeProcess(trackerProcess: TProcess);
-
-    // /**
-    //  * Called by a source tracker when a process is created, prior to starting.
-    //  */
-    // async flowAsync(sourceTracker: Tracker<any, any>, trackerProcess: TrackerProcess) {
-    // }
 }

@@ -1,10 +1,10 @@
+import { Connections } from '../tracking/connections/connections';
 import { TrackerContext } from '../tracking/tracker_context';
-import { AsyncTrackerProcess } from '../tracking/async_tracker_process';
+import { AsyncTrackerProcess } from '../tracking/processes/async_tracker_process';
 import { ConfigurationFactoriesInvoker } from './configuration_factories_invoker';
 import { FileLoadSource } from '../loading/file_load_source';
 import { HttpLoadSource } from '../loading/http_load_source';
 import { JsonLoadSource } from '../loading/json_load_source';
-import { OnSuccessTrackerConnection } from '../tracking/on_success_connection';
 import { Tracker } from '../tracking/tracker';
 import { TrackerFactory } from '../tracking/tracker_factory';
 import { ConfigurationTracker } from './configuration_tracker';
@@ -36,17 +36,16 @@ const environmentLocation: string | undefined = process.env.SHARPANGLES;
 const defaultConfigName = 'sharpangles.config.json';
 
 export interface ConfigurationTrackerFactoryOptions {
+    localConfigPath?: string;
     configName?: string;
     remoteUrl?: string;
 }
 
 export class ConfigurationTrackerFactory implements TrackerFactory {
-    constructor(public options: ConfigurationTrackerFactoryOptions, cwd?: string, trackerContext?: TrackerContext) {
-        this.cwd = cwd || process.cwd();
+    constructor(public options: ConfigurationTrackerFactoryOptions, private cwd?: string, trackerContext?: TrackerContext) {
         this.trackerContext = trackerContext || new TrackerContext();
     }
 
-    cwd: string;
     trackerContext: TrackerContext;
 
     rootTracker: ConfigurationTracker;
@@ -61,11 +60,12 @@ export class ConfigurationTrackerFactory implements TrackerFactory {
             if (prevTracker instanceof ConfigurationTracker)
                 await tracker.configureAsync(prevTracker.config); // Or if we ever add discovery trackers, add config connection instead
             if (prevTracker)
-                await new OnSuccessTrackerConnection(prevTracker, tracker).connectAsync();
+                await Connections.runOnSuccess(prevTracker, tracker, { name: 'Extend Config', description: 'Connects a base config to be extended by a derived one.' }).connectAsync();
             prevTracker = tracker;
         }
         let invoker = new ConfigurationFactoriesInvoker(this.trackerContext, this.cwd);
-        await new OnSuccessTrackerConnection(tracker, invoker, proc => (<AsyncTrackerProcess>proc).result).connectAsync();
+        trackers.push(invoker);
+        await Connections.runOnSuccess(tracker, invoker, { name: 'Submit Config', description: 'Final config output from which to build trackers.' }, (proc: AsyncTrackerProcess) => (<AsyncTrackerProcess>proc).result).connectAsync();
         this.rootTracker = <ConfigurationTracker>trackers[0];
         this.trackerContext.onTrackersCreated(this, trackers);
         return trackers;
@@ -85,12 +85,13 @@ export class ConfigurationTrackerFactory implements TrackerFactory {
     }
 
     private getDefaultSources(): ConfigurationSource[] {
-        let configs = [path.resolve(this.cwd, this.options.configName || defaultConfigName), environmentLocation, path.resolve(tempLocation, this.options.configName || defaultConfigName), path.resolve(userLocation, this.options.configName || defaultConfigName)]
+        let configName = this.options.configName || defaultConfigName;
+        let configs = [path.resolve(this.cwd || process.cwd(), this.options.localConfigPath, configName), environmentLocation, path.resolve(tempLocation, configName), path.resolve(userLocation, configName)]
             .filter(l => l)
             .map(l => <ConfigurationSource>{ loadType: 'file', loadConfig: <FileLoadConfig>{ file: l } });
         if (this.options.remoteUrl)
             configs.push(<ConfigurationSource>{ loadType: 'http', loadConfig: <HttpLoadConfig>{ url: this.options.remoteUrl } });
-        return configs;
+        return configs.reverse();
     }
 
     private async getTrackerFactoriesConfigAsync(config: ConfigurationSource): Promise<TrackerFactoriesConfig | undefined> {
