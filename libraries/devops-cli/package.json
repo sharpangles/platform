@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/sharpangles/platform/tree/master/libraries/devops-cli#readme",
   "scripts": {
+    "localcli": "node -r tsconfig-paths/register __artifacts/local/cli",
     "prebuild": "tsc && tsc -p tsconfig.build.json && cpy cli __artifacts/local",
     "build": "node -r tsconfig-paths/register ./__artifacts/local/cli build",
     "copy": "cpy package.json README.md __artifacts/release",

@@ -41,16 +41,16 @@ export interface ConfigurationTrackerFactoryOptions {
     remoteUrl?: string;
 }
 
-export class ConfigurationTrackerFactory implements TrackerFactory {
-    constructor(public options: ConfigurationTrackerFactoryOptions, private cwd?: string, trackerContext?: TrackerContext) {
-        this.trackerContext = trackerContext || new TrackerContext();
+export class ConfigurationTrackerFactory extends TrackerFactory {
+    constructor(trackerContext: TrackerContext, public options?: ConfigurationTrackerFactoryOptions, private cwd?: string) {
+        super(trackerContext);
     }
 
     trackerContext: TrackerContext;
 
     rootTracker: ConfigurationTracker;
 
-    async createTrackersAsync(tracker: Tracker): Promise<Tracker[]> {
+    protected async onCreateTrackersAsync(tracker?: Tracker): Promise<Tracker[]> {
         let trackers: Tracker[] = [];
         let configs = (await Promise.all(this.getDefaultSources().map(s => this.unrollAsync(s)))).reduce((prev, curr, ind) => prev.concat(curr), []);
         let prevTracker = tracker;
@@ -63,11 +63,12 @@ export class ConfigurationTrackerFactory implements TrackerFactory {
                 await Connections.runOnSuccess(prevTracker, tracker, { name: 'Extend Config', description: 'Connects a base config to be extended by a derived one.' }).connectAsync();
             prevTracker = tracker;
         }
+        if (!tracker)
+            throw new Error('No configurations found.');
         let invoker = new ConfigurationFactoriesInvoker(this.trackerContext, this.cwd);
         trackers.push(invoker);
         await Connections.runOnSuccess(tracker, invoker, { name: 'Submit Config', description: 'Final config output from which to build trackers.' }, (proc: AsyncTrackerProcess) => (<AsyncTrackerProcess>proc).result).connectAsync();
         this.rootTracker = <ConfigurationTracker>trackers[0];
-        this.trackerContext.onTrackersCreated(this, trackers);
         return trackers;
     }
 
@@ -85,11 +86,11 @@ export class ConfigurationTrackerFactory implements TrackerFactory {
     }
 
     private getDefaultSources(): ConfigurationSource[] {
-        let configName = this.options.configName || defaultConfigName;
-        let configs = [path.resolve(this.cwd || process.cwd(), this.options.localConfigPath, configName), environmentLocation, path.resolve(tempLocation, configName), path.resolve(userLocation, configName)]
+        let configName = this.options && this.options.configName || defaultConfigName;
+        let configs = [path.resolve(this.cwd || process.cwd(), this.options && this.options.localConfigPath, configName), environmentLocation, path.resolve(tempLocation, configName), path.resolve(userLocation, configName)]
             .filter(l => l)
             .map(l => <ConfigurationSource>{ loadType: 'file', loadConfig: <FileLoadConfig>{ file: l } });
-        if (this.options.remoteUrl)
+        if (this.options && this.options.remoteUrl)
             configs.push(<ConfigurationSource>{ loadType: 'http', loadConfig: <HttpLoadConfig>{ url: this.options.remoteUrl } });
         return configs.reverse();
     }

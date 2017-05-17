@@ -1,2 +1,2 @@
 export { CLI } from './src/cli';
-export { TrackerFactory } from './src/tracker_factory';
+export { ContextFactory } from './src/context_factory';

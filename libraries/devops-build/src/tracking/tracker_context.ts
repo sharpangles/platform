@@ -2,8 +2,12 @@ import { Tracker } from './tracker';
 import { TrackerFactory } from './tracker_factory';
 
 export class TrackerContext {
-    onTrackersCreated(factory: TrackerFactory, trackers: Tracker[]) {
-        for (let tracker of trackers)
+    factories: TrackerFactory[] = [];
+
+    onTrackersCreated(factory: TrackerFactory) {
+        console.log(`--created ${factory.constructor.name}`);
+        this.factories.push(factory);
+        for (let tracker of factory.trackers)
             this.enableLogging(tracker);
     }
 
@@ -14,5 +18,14 @@ export class TrackerContext {
         tracker.failed.subscribe(proc => console.log(`Failed: ${tracker.description.name} - ${typeof proc.error === 'string' ? proc.error : proc.error instanceof Error ? proc.error.message : JSON.stringify(proc.error)}`));
         tracker.cancelling.subscribe(proc => console.log(`Cancelling: ${tracker.description.name}`));
         tracker.cancelled.subscribe(proc => console.log(`Cancelled: ${tracker.description.name}`));
+    }
+
+    /** Disposes factories in series in reverse order. */
+    async disposeAsync() {
+        for (let factory of this.factories.reverse()) {
+            console.log(`--disposing ${factory.constructor.name}`);
+            await factory.disposeAsync();
+            console.log(`--disposed ${factory.constructor.name}`);
+        }
     }
 }

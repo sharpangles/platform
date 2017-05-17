@@ -1,3 +1,4 @@
+import { TrackerFactory } from '../tracking/tracker_factory';
 import { AsyncTrackerProcess } from '../tracking/processes/async_tracker_process';
 import { MutexTracker } from '../tracking/trackers/mutex_tracker';
 import { TrackerContext } from '../tracking/tracker_context';
@@ -18,19 +19,22 @@ export class ConfigurationFactoriesInvoker extends MutexTracker<AsyncTrackerProc
         return AsyncTrackerProcess.create(() => this.createFactoriesAsync(<{ [key: string]: any }>state.factories));
     }
 
+    factories: TrackerFactory[] = [];
+
     private async createFactoriesAsync(factories: { [key: string]: any }) {
         for (let factoryName of Object.keys(factories)) {
             let factory = this.getFactory(factoryName, factories[factoryName]);
-            let trackers = await factory.createTrackersAsync(this);
-            this.trackerContext.onTrackersCreated(factory, trackers);
-            factory.start();
+            this.factories.push(factory);
+            await factory.createTrackersAsync(this);
         }
+        for (let factory of this.factories)
+            factory.start();
     }
 
-    private getFactory(type: string, options: any) {
+    private getFactory(type: string, options: any): TrackerFactory {
         switch (type) {
             case 'typescript':
-                return new TypescriptTrackerFactory(options, this.cwd);
+                return new TypescriptTrackerFactory(this.trackerContext, options, this.cwd);
             default:
                 throw new Error('Unknown factory type');
         }

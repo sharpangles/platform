@@ -32,9 +32,13 @@ export abstract class Tracker<TProcess extends TrackerProcess<TProgress, TError>
     abstract removeTarget(connection: Connection): void;
 
     async disposeAsync(): Promise<void> {
-        await Promise.all(Array.from(this.targetConnections).map(t => t.breakAsync()));
+        for (let tc of Array.from(this.targetConnections))
+            await tc.breakAsync();
+        // await Promise.all(Array.from(this.targetConnections).map(t => t.breakAsync()));
         await this.onDisposeAsync();
-        await Promise.all(Array.from(this.sourceConnections).map(t => t.breakAsync()));
+        for (let tc of Array.from(this.sourceConnections))
+            await tc.breakAsync();
+        // await Promise.all(Array.from(this.sourceConnections).map(t => t.breakAsync()));
     }
 
     /**
@@ -42,7 +46,9 @@ export abstract class Tracker<TProcess extends TrackerProcess<TProgress, TError>
      * The base implementation cancels all active processes.
      */
     protected async onDisposeAsync() {
-        await Promise.all(Array.from(this.activeProcesses).map(p => p.cancelAsync()));
+        for (let tc of Array.from(this.activeProcesses))
+            await tc.cancelAsync();
+        // await Promise.all(Array.from(this.activeProcesses).map(p => p.cancelAsync()));
     }
 
     async configureAsync(config: TConfig) {

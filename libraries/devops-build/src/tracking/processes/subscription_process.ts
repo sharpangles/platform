@@ -11,9 +11,16 @@ export abstract class SubscriptionProcess<TProgress = any, TError = any> extends
 
     private subscription: Subscription;
 
+    protected async onCancelAsync(): Promise<boolean> {
+        this.dispose();
+        return await super.onCancelAsync();
+    }
+
     dispose() {
-        if (this.subscription)
+        if (this.subscription) {
             this.subscription.unsubscribe();
+            delete this.subscription;
+        }
     }
 
     static create<TProgress = any, TError = any>(observableFactory: () => Observable<TProgress>): SubscriptionProcess<TProgress, TError> {

@@ -23,7 +23,7 @@
       "jasmine"
     ],
     "paths": {
-      "@sharpangles/devops-build": ["../devops-build/__artifacts/release"]
+      "@sharpangles/devops-build": ["../devops-build/__artifacts/local"]
     }
   },
   "include": [

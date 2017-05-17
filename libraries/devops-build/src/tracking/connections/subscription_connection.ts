@@ -23,7 +23,7 @@ export abstract class SubscriptionConnection extends Connection {
     async breakAsync(): Promise<void> {
         if (this.subscription)
             this.subscription.unsubscribe();
-        this.source.removeSource(this);
+        this.target.removeSource(this);
         this.source.removeTarget(this);
     }
 }

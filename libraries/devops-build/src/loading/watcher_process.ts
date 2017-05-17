@@ -15,7 +15,6 @@ export class WatcherProcess extends SubscriptionProcess<string[], Error> {
         super();
     }
 
-
     protected createObservable(): Observable<string[]> {
         this.watcher = chokidar.watch(this.patterns, { cwd: this.cwd });
         let obs = Observable.fromEvent<string>(this.watcher, 'change');
@@ -25,9 +24,16 @@ export class WatcherProcess extends SubscriptionProcess<string[], Error> {
 
     public watcher: chokidar.FSWatcher;
 
+    protected async onCancelAsync(): Promise<boolean> {
+        this.dispose();
+        return true;
+    }
+
     dispose() {
-        if (this.watcher)
-            this.watcher.close();
         super.dispose();
+        if (this.watcher) {
+            this.watcher.close();
+            delete this.watcher;
+        }
     }
 }

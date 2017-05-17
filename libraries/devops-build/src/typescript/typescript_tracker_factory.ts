@@ -1,12 +1,13 @@
 import { LoadProcess } from '../loading/load_process';
 import { WatcherConfig, WatcherTracker } from '../loading/watcher_tracker';
-import { OverridingTracker } from '../tracking/trackers/overriding_tracker';
+import { Connections } from '../tracking/connections/connections';
 import { Tracker } from '../tracking/tracker';
+import { TrackerContext } from '../tracking/tracker_context';
 import { TrackerFactory } from '../tracking/tracker_factory';
+import { OverridingTracker } from '../tracking/trackers/overriding_tracker';
 import { TypescriptConfig, TypescriptTracker } from '../typescript/typescript_tracker';
 import { TsConfigLoadSource } from './tsconfig_load_source';
 import { ParsedCommandLine, parseJsonConfigFileContent, sys } from 'typescript';
-import { Connections } from '../tracking/connections/connections';
 
 export interface TypescriptTrackerFactoryOptions {
     tsConfig?: string | { [key: string]: any };
@@ -15,8 +16,9 @@ export interface TypescriptTrackerFactoryOptions {
     incremental?: boolean;
 }
 
-export class TypescriptTrackerFactory implements TrackerFactory {
-    constructor(public options: TypescriptTrackerFactoryOptions, private cwd?: string) {
+export class TypescriptTrackerFactory extends TrackerFactory {
+    constructor(trackerContext: TrackerContext, public options: TypescriptTrackerFactoryOptions, private cwd?: string) {
+        super(trackerContext);
     }
 
     tsConfigWatcherTracker?: WatcherTracker;
@@ -28,7 +30,7 @@ export class TypescriptTrackerFactory implements TrackerFactory {
      * Creates up to four trackers, wiring up the impact of any configuration changes or watch progressions.
      * (Optional tsconfig watcher) => ( Optional ParsedCommandLine loader) => (Optional ts files watcher) => Typescript (incremental) compiler
      */
-    async createTrackersAsync(tracker?: Tracker): Promise<Tracker[]> {
+    protected async onCreateTrackersAsync(tracker?: Tracker): Promise<Tracker[]> {
         this.typescriptTracker = new TypescriptTracker(this.cwd);
         if (this.options.incremental) {
             this.typescriptWatcherTracker = new WatcherTracker({ name: 'TS files watcher', description: 'Watches for changes to ts files per the provided tsconfig or inline configuration.' });
