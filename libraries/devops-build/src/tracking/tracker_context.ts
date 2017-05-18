@@ -1,11 +1,16 @@
+import { FactoryConfig, TrackerFactoryLoader } from './tracker_factory_loader';
 import { Tracker } from './tracker';
 import { TrackerFactory } from './tracker_factory';
 
 export class TrackerContext {
+    constructor(public trackerFactoryLoader: TrackerFactoryLoader) {
+        trackerFactoryLoader.trackerContext = this;
+    }
+
     factories: TrackerFactory[] = [];
 
     onTrackersCreated(factory: TrackerFactory) {
-        console.log(`--created ${factory.constructor.name}`);
+        // console.log(`--created ${factory.constructor.name}`);
         this.factories.push(factory);
         for (let tracker of factory.trackers)
             this.enableLogging(tracker);
@@ -20,12 +25,25 @@ export class TrackerContext {
         tracker.cancelled.subscribe(proc => console.log(`Cancelled: ${tracker.description.name}`));
     }
 
+    async createFactoriesAsync(factoriesOrConfigs: (TrackerFactory | FactoryConfig)[]) {
+        for (let factoryOrConfig of factoriesOrConfigs) {
+            let factory = factoryOrConfig instanceof TrackerFactory ? factoryOrConfig : await this.trackerFactoryLoader.findAsync(factoryOrConfig);
+            if (!factory)
+                throw new Error(`Factory was not found.`);
+            this.factories.push(factory);
+        }
+        for (let factory of this.factories)
+            await factory.createTrackersAsync();
+        for (let factory of this.factories)
+            factory.start();
+    }
+
     /** Disposes factories in series in reverse order. */
     async disposeAsync() {
         for (let factory of this.factories.reverse()) {
-            console.log(`--disposing ${factory.constructor.name}`);
+            // console.log(`--disposing ${factory.constructor.name}`);
             await factory.disposeAsync();
-            console.log(`--disposed ${factory.constructor.name}`);
+            // console.log(`--disposed ${factory.constructor.name}`);
         }
     }
 }

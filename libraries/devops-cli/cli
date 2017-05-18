@@ -3,4 +3,3 @@
 process.title = '@sharpangles/cli';
 let CLI = require('./src/cli').CLI;
 new CLI();
-

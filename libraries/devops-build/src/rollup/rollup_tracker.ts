@@ -1,28 +1,23 @@
-// import { Observable } from 'rxjs/Observable';
-// import { Tracker } from '../tracking/tracker';
-// import { RollupCompiler } from './rollup_compiler';
+import { RollupCompiler, RollupConfig } from './rollup_compiler';
+import { OverridingTracker } from '../tracking/trackers/overriding_tracker';
+import { AsyncTrackerProcess } from '../tracking/processes/async_tracker_process';
 
-// /**
-//  * There is also rollup-watch, but we want control over the trigger.
-//  */
-// export class RollupTracker extends Tracker<any, boolean> {
-//     constructor(observable: Observable<any>, public rollupCompiler: RollupCompiler, public buildEs: boolean = true, public buildUmd: boolean = true) {
-//         super(observable);
-//     }
+export class RollupTracker extends OverridingTracker<AsyncTrackerProcess, RollupConfig> {
+    constructor(private cwd?: string) {
+        super({
+            name: 'Rollup Compiler',
+            description: 'Rolls up existing es6 build output to a single file.'
+        });
+    }
 
-//     protected async onRunAsync(source: any): Promise<boolean | undefined> {
-//         try {
-//             let promises: Promise<any>[] = [];
-//             if (this.buildEs)
-//                 promises.push(this.rollupCompiler.buildEsAsync());
-//             if (this.buildUmd)
-//                 promises.push(this.rollupCompiler.buildUmdAsync());
-//             await Promise.all(promises);
-//             return true;
-//         }
-//         catch (ex) {
-//             console.log(ex);
-//             return;
-//         }
-//     }
-// }
+    async configureAsync(config: RollupConfig) {
+        this.compiler = new RollupCompiler(config, this.cwd);
+        this.runProcess();
+    }
+
+    protected createProcess(state?: string[]): AsyncTrackerProcess | undefined {
+        return AsyncTrackerProcess.create(() => this.compiler.rollupAsync());
+    }
+
+    compiler: RollupCompiler;
+}

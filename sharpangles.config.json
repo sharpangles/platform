@@ -1,7 +1,10 @@
 {
-  "factories": {
-    "typescript": {
-      "incremental": true
+  "factories": [
+    {
+      "type": "@sharpangles/typescript",
+      "config": {
+        "incremental": true
+      }
     }
-  }
+  ]
 }

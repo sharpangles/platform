@@ -26,6 +26,7 @@ export { SubjectTracker } from './src/tracking/trackers/subject_tracker';
 export { Connection } from './src/tracking/connection';
 export { Description } from './src/tracking/description';
 export { TrackerContext } from './src/tracking/tracker_context';
+export { TrackerFactoryLoader, DefaultTrackerFactoryLoader } from './src/tracking/tracker_factory_loader';
 export { TrackerFactory } from './src/tracking/tracker_factory';
 export { TrackerProcess } from './src/tracking/tracker_process';
 export { Tracker } from './src/tracking/tracker';

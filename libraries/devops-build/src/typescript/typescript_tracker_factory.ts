@@ -1,3 +1,5 @@
+import { FactoryConfig } from '../tracking/tracker_factory_loader';
+import { TerminalTrackerContext } from '../tracking/contexts/terminal_tracker_context';
 import { LoadProcess } from '../loading/load_process';
 import { WatcherConfig, WatcherTracker } from '../loading/watcher_tracker';
 import { Connections } from '../tracking/connections/connections';
@@ -13,12 +15,16 @@ export interface TypescriptTrackerFactoryOptions {
     tsConfig?: string | { [key: string]: any };
     watchConfig?: boolean;
     tsConfigIdleTime?: number;
+
+    /** Explicitly set the typescript compiler to incremental or default.  If undefined, it is based on whether the tracker context is terminal. */
     incremental?: boolean;
 }
 
-export class TypescriptTrackerFactory extends TrackerFactory {
-    constructor(trackerContext: TrackerContext, public options: TypescriptTrackerFactoryOptions, private cwd?: string) {
-        super(trackerContext);
+export class TypescriptTrackerFactory extends TrackerFactory<TypescriptTrackerFactoryOptions> {
+    static readonly factoryName = '@sharpangles/typescript';
+
+    constructor(trackerContext: TrackerContext, config: FactoryConfig<TypescriptTrackerFactoryOptions>, private cwd?: string) {
+        super(trackerContext, config);
     }
 
     tsConfigWatcherTracker?: WatcherTracker;
@@ -30,28 +36,30 @@ export class TypescriptTrackerFactory extends TrackerFactory {
      * Creates up to four trackers, wiring up the impact of any configuration changes or watch progressions.
      * (Optional tsconfig watcher) => ( Optional ParsedCommandLine loader) => (Optional ts files watcher) => Typescript (incremental) compiler
      */
-    protected async onCreateTrackersAsync(tracker?: Tracker): Promise<Tracker[]> {
+    protected async onCreateTrackersAsync(): Promise<Tracker[]> {
         this.typescriptTracker = new TypescriptTracker(this.cwd);
-        if (this.options.incremental) {
+        let config = this.config.config || <TypescriptTrackerFactoryOptions>{};
+        let incremental = config.incremental || config.incremental !== false && !(this.trackerContext instanceof TerminalTrackerContext);
+        if (incremental) {
             this.typescriptWatcherTracker = new WatcherTracker({ name: 'TS files watcher', description: 'Watches for changes to ts files per the provided tsconfig or inline configuration.' });
             await Connections.runOnProgress(this.typescriptWatcherTracker, this.typescriptTracker, { name: 'TS change trigger', description: 'Builds typescript due to .ts changes.' }, result => result.progress).connectAsync();
         }
-        if (!this.options.tsConfig || typeof this.options.tsConfig === 'string') {
-            let file = this.options.tsConfig || 'tsconfig.json';
+        if (!config || !config.tsConfig || typeof config.tsConfig === 'string') {
+            let file = <string>config.tsConfig || 'tsconfig.json';
             this.tsConfigLoader = new OverridingTracker<LoadProcess<ParsedCommandLine>>({ name: 'TSConfig loader', description: 'Reads the TSConfig file.' }, () => new LoadProcess(new TsConfigLoadSource(file)));
-            await Connections.configOnSuccess<LoadProcess<ParsedCommandLine>, TypescriptConfig>(this.tsConfigLoader, this.typescriptTracker, { name: 'TSConfig trigger', description: 'Builds typescript due to a change in configuration.' }, load => <TypescriptConfig>{ config: load.result, incremental: this.options.incremental }).connectAsync();
+            await Connections.configOnSuccess<LoadProcess<ParsedCommandLine>, TypescriptConfig>(this.tsConfigLoader, this.typescriptTracker, { name: 'TSConfig trigger', description: 'Builds typescript due to a change in configuration.' }, load => <TypescriptConfig>{ config: load.result, incremental: incremental }).connectAsync();
             if (this.typescriptWatcherTracker)
-                await Connections.runOnSuccess<LoadProcess<ParsedCommandLine>, WatcherConfig>(this.tsConfigLoader, this.typescriptWatcherTracker, { name: 'TS files watcher config', description: 'Resets the .ts files watcher due to a config change' }, load => <WatcherConfig>{ cwd: this.cwd, patterns: load.result.fileNames, idleTime: this.options.tsConfigIdleTime }).connectAsync();
-            if (this.options.watchConfig) {
+                await Connections.runOnSuccess<LoadProcess<ParsedCommandLine>, WatcherConfig>(this.tsConfigLoader, this.typescriptWatcherTracker, { name: 'TS files watcher config', description: 'Resets the .ts files watcher due to a config change' }, load => <WatcherConfig>{ cwd: this.cwd, patterns: load.result.fileNames, idleTime: config && config.tsConfigIdleTime }).connectAsync();
+            if (config && config.watchConfig) {
                 this.tsConfigWatcherTracker = new WatcherTracker({ name: 'TSConfig watcher', description: 'Watches for TSConfig changes.' });
-                await this.tsConfigWatcherTracker.configureAsync(<WatcherConfig>{ cwd: this.cwd, patterns: [file], idleTime: this.options.tsConfigIdleTime });
+                await this.tsConfigWatcherTracker.configureAsync(<WatcherConfig>{ cwd: this.cwd, patterns: [file], idleTime: config.tsConfigIdleTime });
                 await Connections.runOnProgress(this.tsConfigWatcherTracker, this.tsConfigLoader, { name: 'TSConfig watcher config', description: 'Reloads TSConfig when it changes.' }).connectAsync();
             }
         }
         else {
-            await this.typescriptTracker.configureAsync(<TypescriptConfig>{ config: parseJsonConfigFileContent(this.options.tsConfig, sys, this.cwd || process.cwd()), incremental: this.options.incremental });
+            await this.typescriptTracker.configureAsync(<TypescriptConfig>{ config: parseJsonConfigFileContent(config.tsConfig, sys, this.cwd || process.cwd()), incremental: incremental });
             if (this.typescriptWatcherTracker)
-                await this.typescriptWatcherTracker.configureAsync(<WatcherConfig>{ cwd: this.cwd, patterns: this.options.tsConfig.fileNames, idleTime: this.options.tsConfigIdleTime });
+                await this.typescriptWatcherTracker.configureAsync(<WatcherConfig>{ cwd: this.cwd, patterns: config.tsConfig.fileNames, idleTime: config.tsConfigIdleTime });
         }
         return (<Tracker[]>[this.tsConfigWatcherTracker, this.tsConfigLoader, this.typescriptWatcherTracker, this.typescriptTracker]).filter(t => t);
     }

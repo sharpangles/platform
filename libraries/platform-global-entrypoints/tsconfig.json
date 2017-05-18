@@ -4,9 +4,9 @@
     "noImplicitThis": true,
     "noUnusedLocals": true,
     "noEmitOnError": false,
+    "noImplicitAny": true,
     "strictNullChecks": true,
     "baseUrl": ".",
-    "rootDir": ".",
     "module": "commonjs",
     "outDir": "./__artifacts/local",
     "declaration": true,
@@ -14,21 +14,22 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "moduleResolution": "node",
+    "rootDir": ".",
     "lib": ["es2015", "dom"],
     "target": "es2015",
     "skipLibCheck": true,
     "importHelpers": true,
-    "inlineSourceMap": true,
     "types": [
       "node",
       "jasmine",
-      "glob"
+      "systemjs"
     ]
+  },
+  "paths": {
+    "@sharpangles/platform-global": ["../platform-global/__artifacts/local"]
   },
   "include": [
     "./index.ts",
-    "./build.ts",
-    "./bin/**/*.ts",
     "./src/**/*.ts",
     "./spec/**/*.ts"
     ]

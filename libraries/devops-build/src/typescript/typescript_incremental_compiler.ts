@@ -56,9 +56,9 @@ export class TypescriptIncrementalCompiler extends TypescriptCompiler {
                 if (promises.has(outputFile.name))
                     continue; // i.e. outFile, only need to write once.
                 this.ensureDir(outputFile.name);
-                new Promise<void>((resolve, reject) => fs.writeFile(outputFile.name, outputFile.text, 'utf8', err => err ? reject(err) : resolve()));
+                promises.set(outputFile.name, new Promise<void>((resolve, reject) => fs.writeFile(outputFile.name, outputFile.text, 'utf8', err => err ? reject(err) : resolve())));
             }
-            await Promise.all(promises);
+            await Promise.all(Array.from(promises.values()));
         }
     }
 

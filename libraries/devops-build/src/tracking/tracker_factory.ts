@@ -1,20 +1,25 @@
+import { FactoryConfig } from './tracker_factory_loader';
 import { TrackerContext } from './tracker_context';
 import { Tracker } from './tracker';
 
-export abstract class TrackerFactory {
-    constructor(protected trackerContext: TrackerContext) {
+/**
+ * Builds and starts trackers in the tracker context.
+ */
+export abstract class TrackerFactory<TConfig = any> {
+    constructor(protected trackerContext: TrackerContext, public config: FactoryConfig<TConfig>) {
     }
 
-    async createTrackersAsync(tracker?: Tracker) {
-        this.trackers = await this.onCreateTrackersAsync(tracker);
+    async createTrackersAsync() {
+        this.trackers = await this.onCreateTrackersAsync();
         this.trackerContext.onTrackersCreated(this);
         return this.trackers;
     }
 
     trackers: Tracker[];
 
-    protected abstract onCreateTrackersAsync(tracker?: Tracker): Promise<Tracker[]>;
+    protected abstract onCreateTrackersAsync(): Promise<Tracker[]>;
 
+    /** Called after all present factories have had their trackers created. */
     abstract start(): void;
 
     async disposeAsync() {
