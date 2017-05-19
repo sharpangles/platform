@@ -37,9 +37,9 @@ export class DefaultTrackerFactoryLoader extends TrackerFactoryLoader {
     protected async onFindAsync(factoryConfig: FactoryConfig): Promise<TrackerFactory | undefined> {
         switch (factoryConfig.type) {
             case TypescriptTrackerFactory.factoryName:
-                return new TypescriptTrackerFactory(this.trackerContext, factoryConfig, this.cwd);
+                return new TypescriptTrackerFactory(this.trackerContext, factoryConfig.config, this.cwd);
             case ConfigurationTrackerFactory.factoryName:
-                return new ConfigurationTrackerFactory(this.trackerContext, factoryConfig, this.cwd);
+                return new ConfigurationTrackerFactory(this.trackerContext, factoryConfig.config, this.cwd);
             default:
                 throw new Error('Unknown factory type');
         }

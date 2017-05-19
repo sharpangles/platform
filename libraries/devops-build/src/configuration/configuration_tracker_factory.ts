@@ -45,7 +45,7 @@ export interface ConfigurationTrackerFactoryOptions {
 export class ConfigurationTrackerFactory extends TrackerFactory<ConfigurationTrackerFactoryOptions> {
     static readonly factoryName = '@sharpangles/tracker-config';
 
-    constructor(trackerContext: TrackerContext, config: FactoryConfig<ConfigurationTrackerFactoryOptions>, private cwd?: string, public explicitConfig?: TrackerFactoriesConfig) {
+    constructor(trackerContext: TrackerContext, config: ConfigurationTrackerFactoryOptions, private cwd?: string, public explicitConfig?: TrackerFactoriesConfig) {
         super(trackerContext, config);
     }
 
@@ -78,7 +78,7 @@ export class ConfigurationTrackerFactory extends TrackerFactory<ConfigurationTra
         return trackers;
     }
 
-    start() {
+    protected onStart() {
         this.rootTracker.runProcess();
     }
 
@@ -92,12 +92,12 @@ export class ConfigurationTrackerFactory extends TrackerFactory<ConfigurationTra
     }
 
     private getDefaultSources(): ConfigurationSource[] {
-        let configName = this.config.config && this.config.config.configName || defaultConfigName;
-        let configs = [path.resolve(this.cwd || process.cwd(), this.config.config && this.config.config.localConfigPath, configName), environmentLocation, path.resolve(tempLocation, configName), path.resolve(userLocation, configName)]
+        let configName = this.config && this.config.configName || defaultConfigName;
+        let configs = [path.resolve(this.cwd || process.cwd(), this.config && this.config.localConfigPath, configName), environmentLocation, path.resolve(tempLocation, configName), path.resolve(userLocation, configName)]
             .filter(l => l)
             .map(l => <ConfigurationSource>{ loadType: 'file', loadConfig: <FileLoadConfig>{ file: l } });
-        if (this.config.config && this.config.config.remoteUrl)
-            configs.push(<ConfigurationSource>{ loadType: 'http', loadConfig: <HttpLoadConfig>{ url: this.config.config.remoteUrl } });
+        if (this.config && this.config.remoteUrl)
+            configs.push(<ConfigurationSource>{ loadType: 'http', loadConfig: <HttpLoadConfig>{ url: this.config.remoteUrl } });
         return configs.reverse();
     }
 

@@ -13,8 +13,7 @@ export class ContextFactory {
         let factory = <ConfigurationTrackerFactory | undefined>await trackerContext.trackerFactoryLoader.findAsync(<FactoryConfig<ConfigurationTrackerFactoryOptions>>{ type: seedTrackerName, config: { localConfigPath: this.findConfigPath() } });
         if (!factory)
             throw new Error(`${seedTrackerName} is a fundamental factory type and must be present in the factory loader.`);
-        await factory.createTrackersAsync();
-        factory.start();
+        await trackerContext.createFactoriesAsync([factory]);
     }
 
     protected getSeedTrackerName() {

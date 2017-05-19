@@ -7,8 +7,8 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch Program",
-            "program": "${workspaceRoot}/libraries/devops-build/build.js",
+            "name": "Debug devops-build",
+            "program": "${workspaceRoot}/libraries/devops-build/__artifacts/local/build.js",
             "cwd": "${workspaceRoot}/libraries/devops-build",
             "outFiles": [],
             "protocol": "inspector",

@@ -1,4 +1,3 @@
-import { FactoryConfig } from './tracker_factory_loader';
 import { TrackerContext } from './tracker_context';
 import { Tracker } from './tracker';
 
@@ -6,26 +5,46 @@ import { Tracker } from './tracker';
  * Builds and starts trackers in the tracker context.
  */
 export abstract class TrackerFactory<TConfig = any> {
-    constructor(protected trackerContext: TrackerContext, public config: FactoryConfig<TConfig>) {
+    constructor(protected trackerContext: TrackerContext, public config: TConfig) {
     }
 
-    async createTrackersAsync() {
+    async createAsync() {
+        if (this.childFactories)
+            throw new Error('Trackers already created.');
+        this.childFactories = await this.onCreateChildFactoriesAsync();
+        for (let f of this.childFactories)
+            await f.createAsync();
         this.trackers = await this.onCreateTrackersAsync();
         this.trackerContext.onTrackersCreated(this);
         return this.trackers;
     }
 
     trackers: Tracker[];
+    childFactories: TrackerFactory[];
 
-    protected abstract onCreateTrackersAsync(): Promise<Tracker[]>;
+    /** Creates any child factories.  Any created factories can safely have their createAsync method called either in here or by the base.  It only happens once. */
+    protected async onCreateChildFactoriesAsync(): Promise<TrackerFactory[]> {
+        return [];
+    }
+
+    protected async onCreateTrackersAsync(): Promise<Tracker[]> {
+        return [];
+    }
 
     /** Called after all present factories have had their trackers created. */
-    abstract start(): void;
+    start(): void {
+        for (let childFactory of this.childFactories)
+            childFactory.start();
+        this.onStart();
+    }
+
+    protected onStart(): void {
+    }
 
     async disposeAsync() {
         for (let t of this.trackers)
             await t.disposeAsync();
-
-        // await Promise.all(this.trackers.map(t => t.disposeAsync()));
+        for (let f of this.childFactories)
+            await f.disposeAsync();
     }
 }

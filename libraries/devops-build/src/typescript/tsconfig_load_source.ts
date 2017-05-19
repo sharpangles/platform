@@ -3,7 +3,7 @@ import { ParsedCommandLine, sys, parseJsonConfigFileContent, parseConfigFileText
 import { WrappedLoadSource } from '../loading/wrapped_load_source';
 import * as path from 'path';
 
-export class TsConfigLoadSource extends WrappedLoadSource<string, ParsedCommandLine> {
+export class TSConfigLoadSource extends WrappedLoadSource<string, ParsedCommandLine> {
     constructor(public file: string = 'tsconfig.json') {
         super(new FileLoadSource(file));
     }

@@ -11,7 +11,7 @@ export class TrackerContext {
 
     onTrackersCreated(factory: TrackerFactory) {
         // console.log(`--created ${factory.constructor.name}`);
-        this.factories.push(factory);
+        // this.factories.push(factory);
         for (let tracker of factory.trackers)
             this.enableLogging(tracker);
     }
@@ -25,16 +25,19 @@ export class TrackerContext {
         tracker.cancelled.subscribe(proc => console.log(`Cancelled: ${tracker.description.name}`));
     }
 
+    /** Creates and starts factories.  Typically called from trackers to add new factories. */
     async createFactoriesAsync(factoriesOrConfigs: (TrackerFactory | FactoryConfig)[]) {
+        let factories: TrackerFactory[] = [];
         for (let factoryOrConfig of factoriesOrConfigs) {
             let factory = factoryOrConfig instanceof TrackerFactory ? factoryOrConfig : await this.trackerFactoryLoader.findAsync(factoryOrConfig);
             if (!factory)
                 throw new Error(`Factory was not found.`);
             this.factories.push(factory);
+            factories.push(factory);
         }
-        for (let factory of this.factories)
-            await factory.createTrackersAsync();
-        for (let factory of this.factories)
+        for (let factory of factories)
+            await factory.createAsync();
+        for (let factory of factories)
             factory.start();
     }
 

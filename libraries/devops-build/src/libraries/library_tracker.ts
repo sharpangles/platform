@@ -1,47 +1,38 @@
-// import { TypescriptIncrementalCompiler } from '../typescript/typescript_incremental_compiler';
-// import { WatchChange } from './watcher';
-// import { Observable } from 'rxjs/Observable';
-// import { RollupCompiler } from '../rollup/rollup_compiler';
-// import { RollupTracker } from '../rollup/rollup_tracker';
-// import { TypescriptTracker } from '../typescript/typescript_tracker';
-// import * as path from 'path';
-// import { Tracker } from './tracker';
+// import { Tracker } from '../tracking/tracker';
+// import { Description } from '../tracking/description';
+// import { WatcherProcess } from './watcher_process';
+// import { OverridingTracker } from '../tracking/trackers/overriding_tracker';
 
 // export interface LibraryConfig {
+//     cwd?: string;
+//     patterns: string[];
+
+//     /** Idle time required between changes to trigger a progress event. */
+//     idleTime?: number;
 // }
 
-// export class LibraryTracker extends Tracker<any, boolean> {
-//     constructor(observable?: Observable<any>, name?: string, cwd?: string, watch?: boolean) {
-//         super(observable);
-//         this.cwd = cwd || process.cwd();
-//         this.name = name || require(path.resolve(this.cwd, './package.json')).name;
-//         if (watch) {
-//             // Trigger both in parallel from both the watch built by the local tracker and the library trigger.
-//             this.localTypescriptTracker = this.attach(changed => TypescriptTracker.createIncremental(this.cwd, undefined, changed.map(() => <WatchChange>{ init: true })));
-//             this.buildTypescriptTracker = this.attach(changed => TypescriptTracker.createDefault(this.cwd, 'tsconfig.build.json', Observable.merge(changed, (<TypescriptIncrementalCompiler>this.localTypescriptTracker.compiler).watcher.changed).map(() => <WatchChange>{ init: true })));
-//         }
-//         else {
-//             this.localTypescriptTracker = this.attach(changed => TypescriptTracker.createDefault(this.cwd, undefined, changed.map(() => <WatchChange>{ init: true })));
-//             this.buildTypescriptTracker = this.attach(changed => TypescriptTracker.createDefault(this.cwd, 'tsconfig.build.json', changed.map(() => <WatchChange>{ init: true })));
-//         }
-//         this.rollupTracker = this.buildTypescriptTracker.attach(changed => new RollupTracker(changed, new RollupCompiler(this.name)));
+// /**
+//  * A process that starts, progresses, and the completes.
+//  * Completion can be due to success, failure, or cancellation.
+//  */
+// export class LibraryTracker extends Tracker {
+//     constructor(relativePath: string, cwd?: string) {
+//         super({
+//             name: 'Library tracker',
+//             description: 'Discovers and creates tracker factories based on discovered files in a folder.'
+//         });
 //     }
 
-//     protected async onRunAsync(source: any): Promise<boolean | undefined> {
-//         return true;
+//     private config: WatcherConfig;
+
+//     async configureAsync(config: WatcherConfig) {
+//         this.config = config;
 //     }
 
-//     private cwd: string;
-//     name: string;
-
-//     localTypescriptTracker: TypescriptTracker;
-//     buildTypescriptTracker: TypescriptTracker;
-//     rollupTracker: RollupTracker;
-
-//     dispose() {
-//         this.rollupTracker.dispose();
-//         this.localTypescriptTracker.dispose();
-//         this.buildTypescriptTracker.dispose();
-//         super.dispose();
+//     protected createProcess(state?: WatcherConfig): WatcherProcess | undefined {
+//         return new WatcherProcess(
+//             state && state.patterns || this.config && this.config.patterns,
+//             state && state.cwd || this.config && this.config.cwd,
+//             state && state.idleTime || this.config && this.config.idleTime);
 //     }
 // }

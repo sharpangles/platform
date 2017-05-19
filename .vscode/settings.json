@@ -15,5 +15,9 @@
   "typescriptHero.resolver.ignorePatterns": [
     "__artifacts",
     "index.ts"
-  ]
+  ],
+  "files.exclude": {
+    "**/node_modules": true,
+    "**/__artifacts": true
+  }
 }

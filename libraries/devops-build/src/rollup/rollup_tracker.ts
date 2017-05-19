@@ -11,7 +11,7 @@ export class RollupTracker extends OverridingTracker<AsyncTrackerProcess, Rollup
     }
 
     async configureAsync(config: RollupConfig) {
-        this.compiler = new RollupCompiler(config, this.cwd);
+        this.compiler = new RollupCompiler(config, undefined, this.cwd);
         this.runProcess();
     }
 
