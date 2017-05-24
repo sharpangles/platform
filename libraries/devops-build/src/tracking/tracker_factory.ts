@@ -8,6 +8,9 @@ export abstract class TrackerFactory<TConfig = any> {
     constructor(protected trackerContext: TrackerContext, public config: TConfig) {
     }
 
+    /** An optional key by which to differentiate this factory from others of the same type.  If undefined, its key is its type name. */
+    get key(): string | undefined { return undefined; }
+
     async createAsync() {
         if (this.childFactories)
             throw new Error('Trackers already created.');

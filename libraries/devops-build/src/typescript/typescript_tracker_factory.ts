@@ -25,6 +25,8 @@ export class TypescriptTrackerFactory extends TrackerFactory<TypescriptTrackerFa
         super(trackerContext, config);
     }
 
+    get key(): string | undefined { return typeof this.config.tsConfig === 'string' ? this.config.tsConfig : undefined; }
+
     tsConfigTrackerFactory?: TSConfigTrackerFactory;
     typescriptWatcherTracker?: WatcherTracker;
     typescriptTracker: TypescriptTracker;

@@ -9,6 +9,18 @@ export class TrackerContext {
 
     factories: TrackerFactory[] = [];
 
+    private keyedTrackers = new Map<any, Tracker>();
+
+    addKeyedTracker(key: any, tracker: Tracker) {
+        if (this.keyedTrackers.has(key))
+            throw new Error('That tracker is keyed and already exists.');
+        this.keyedTrackers.set(key, tracker);
+    }
+
+    findTracker(key: any) {
+        return this.keyedTrackers.get(key);
+    }
+
     onTrackersCreated(factory: TrackerFactory) {
         // console.log(`--created ${factory.constructor.name}`);
         // this.factories.push(factory);
