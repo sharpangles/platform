@@ -1,0 +1,50 @@
+{
+  "version": "1.0.0-alpha.0",
+  "name": "@sharpangles/ops",
+  "description": "Global build bootstraps",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sharpangles/platform.git"
+  },
+  "keywords": [
+    "Angular",
+    "Enterprise",
+    "Bootstrap"
+  ],
+  "author": "Eric Nilsen",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sharpangles/platform/issues"
+  },
+  "homepage": "https://github.com/sharpangles/platform/tree/master/modules/bootstrap#readme",
+  "scripts": {
+    "watch": "tsc && node __artifacts/local/build.js watch",
+    "build": "tsc && node __artifacts/local/build.js",
+    "copy": "cpy package.json README.md __artifacts/release",
+    "postbuild": "npm run copy",
+    "clean": "rimraf -rf \"__artifacts\""
+  },
+  "dependencies": {
+    "proper-lockfile": "^2.0.1",
+    "deep-extend": "^0.4.1"
+  },
+  "devDependencies": {
+    "karma": "^1.7.0",
+    "karma-chrome-launcher": "^2.1.1",
+    "karma-cli": "^1.0.1",
+    "karma-jasmine": "^1.1.0",
+    "karma-jasmine-html-reporter": "^0.2.2",
+    "cpy-cli": "^1.0.1",
+    "jasmine": "^2.6.0",
+    "nyc": "^10.3.2",
+    "rimraf": "^2.6.1",
+    "concurrently": "^3.4.0",
+    "closure-compiler-cli": "1.0.2",
+    "google-closure-compiler": "^20170409.0.0",
+    "google-closure-library": "^20170409.0.0",
+    "concat-with-sourcemaps": "^1.0.4"
+  },
+  "types": "index.d.ts",
+  "main": "bundles/devops-build.umd.js",
+  "module": "bundles/devops-build.es.js"
+}
