@@ -12,6 +12,7 @@ export interface TaskCompletion<TResult> {
 
 export class Task<TResult = any> extends Stateful {
     constructor(protected executionTransition: Transition<Task, TResult>,
+                protected startingTransition: Transition<Task>,
                 protected cancellationTransition?: Transition<Task>,
                 protected pauseTransition?: Transition<Task>,
                 protected resumeTransition?: Transition<Task>) {
@@ -26,6 +27,7 @@ export class Task<TResult = any> extends Stateful {
     get paused() { return !this.pauseTransition ? this.neverSubject : this.pauseTransition.transitioned; }
     get resuming() { return !this.resumeTransition ? this.neverSubject : this.resumeTransition.transitioning; }
     get resumed() { return !this.resumeTransition ? this.neverSubject : this.resumeTransition.transitioned; }
+    get starting() { return this.executionTransition.transitioning; }
     get starting() { return this.executionTransition.transitioning; }
     get ended() {
         return <Observable<TaskCompletion<TResult>>>Observable.merge([

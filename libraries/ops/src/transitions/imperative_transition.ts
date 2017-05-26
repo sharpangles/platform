@@ -1,53 +1,31 @@
-import { Transition } from './transition';
-import { Observable } from 'rxjs/Observable';
-import { Subject } from 'rxjs/Subject';
+import { SubjectTransition } from './subject_transition';
 
-export abstract class ImperativeTransition<TSource, TState = any | undefined> implements Transition<TSource, TState> {
-    private transitioningSubject = new Subject<{ source: TSource, transition: Transition<TSource, TState> }>();
-    private transitionedSubject = new Subject<{ source: TSource, transition: Transition<TSource, TState>, state?: TState }>();
-
-    get transitioning(): Observable<{ source: TSource, transition: Transition<TSource, TState> }> { return this.transitioningSubject; }
-    get transitioned(): Observable<{ source: TSource, transition: Transition<TSource, TState>, state?: TState }> { return this.transitionedSubject; }
-
-    get inTransition(): boolean { return !!this.promise; }
-
+export class ImperativeTransition<TSource, TState = any | undefined> extends SubjectTransition<TSource, TState> {
     transition(source: TSource) {
         this.promise = this.createTransitionPromise(source);
     }
 
     promise?: Promise<{ source: TSource, state: TState }>;
-    lastState?: TState;
 
     async createTransitionPromise(source: TSource): Promise<{ source: TSource, state?: TState }> {
-        if (this.promise)
-            throw new Error('Already transitioning.');
-        this.transitioningSubject.next({ source: source, transition: this });
+        this.setTransitioning(source);
         let state: TState | undefined;
         try {
             this.lastState = await this.onTransitioningAsync(source);
         }
         catch (err) {
-            this.transitionedSubject.error(err);
+            this.fail(err);
             throw err;
         }
         finally {
             delete this.promise;
         }
-        this.transitionedSubject.next({ source: source, transition: this, state: state });
+        this.setTransitioned(source, state);
         return { source: source, state: state };
     }
 
     protected async onTransitioningAsync(source: TSource): Promise<TState | undefined> {
         return;
-    }
-
-    dispose() {
-        this.transitioningSubject.complete();
-        if (this.inTransition) {
-            this.transitionedSubject.error('Transition disposed');
-            return;
-        }
-        this.transitionedSubject.complete();
     }
 }
 

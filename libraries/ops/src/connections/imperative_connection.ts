@@ -12,10 +12,11 @@ export class ImperativeConnection<TInput, TOutput> extends Connection<TInput, TO
 
 
     async connectAsync() {
-        return await this.runTransitionAsync(<ImperativeTransition<any>>this.connectTransition);
+        await this.runTransitionAsync(<ImperativeTransition<any>>this.connectTransition);
     }
 
     async disconnectAsync() {
-        return await this.runTransitionAsync(<ImperativeTransition<any>>this.disconnectTransition);
+        await this.runTransitionAsync(<ImperativeTransition<any>>this.disconnectTransition);
+        this.dispose();
     }
 }
