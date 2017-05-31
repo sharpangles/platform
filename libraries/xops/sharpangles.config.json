@@ -1,0 +1,7 @@
+{
+  "factories": [
+    {
+      "type": "@sharpangles/typescript"
+    }
+  ]
+}

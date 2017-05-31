@@ -1,13 +1,13 @@
-import { Transitive } from './transitive';
+import { Transition } from './transition';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 
-export abstract class SubjectTransition<TSource, TState = any | undefined> implements Transitive<TSource, TState> {
-    private transitioningSubject = new Subject<{ source: TSource, transition: Transitive<TSource, TState> }>();
-    private transitionedSubject = new Subject<{ source: TSource, transition: Transitive<TSource, TState>, state?: TState }>();
+export abstract class SubjectTransition<TSource, TState = any | undefined> implements Transition<TSource, TState> {
+    private transitioningSubject = new Subject<{ source: TSource, transition: Transition<TSource, TState> }>();
+    private transitionedSubject = new Subject<{ source: TSource, transition: Transition<TSource, TState>, state?: TState }>();
 
-    get transitioning(): Observable<{ source: TSource, transition: Transitive<TSource, TState> }> { return this.transitioningSubject; }
-    get transitioned(): Observable<{ source: TSource, transition: Transitive<TSource, TState>, state?: TState }> { return this.transitionedSubject; }
+    get transitioning(): Observable<{ source: TSource, transition: Transition<TSource, TState> }> { return this.transitioningSubject; }
+    get transitioned(): Observable<{ source: TSource, transition: Transition<TSource, TState>, state?: TState }> { return this.transitionedSubject; }
 
     inTransition: boolean;
     lastState?: TState;

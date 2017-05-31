@@ -1,14 +1,13 @@
 import { SubjectTransition } from './subject_transition';
 
-export class ImperativeTransition<TSource = any, TState = any | undefined> extends SubjectTransition<TSource, TState> {
-    transitionAsync(source: TSource) {
+export class ImperativeTransition<TSource, TState = any | undefined> extends SubjectTransition<TSource, TState> {
+    transition(source: TSource) {
         this.promise = this.createTransitionPromise(source);
-        return this.promise;
     }
 
     promise?: Promise<{ source: TSource, state: TState }>;
 
-    protected async createTransitionPromise(source: TSource): Promise<{ source: TSource, state?: TState }> {
+    async createTransitionPromise(source: TSource): Promise<{ source: TSource, state?: TState }> {
         this.setTransitioning(source);
         let state: TState | undefined;
         try {
@@ -27,5 +26,15 @@ export class ImperativeTransition<TSource = any, TState = any | undefined> exten
 
     protected async onTransitioningAsync(source: TSource): Promise<TState | undefined> {
         return;
+    }
+}
+
+export class ExplicitTransition<TSource, TState = any | undefined> extends ImperativeTransition<TSource, TState> {
+    constructor(private transitioningAsync: (source: TSource) => Promise<TState | undefined>) {
+        super();
+    }
+
+    protected async onTransitioningAsync(source: TSource): Promise<TState | undefined> {
+        return this.transitioningAsync(source);
     }
 }

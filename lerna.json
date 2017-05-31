@@ -1,8 +1,8 @@
 {
-  "lerna": "2.0.0-rc.4",
+  "lerna": "2.0.0-rc.5",
   "packages": [
     "libraries/*"
   ],
   "version": "1.0.0-alpha.0",
-  "npmClient": "yarn"
+  "npmClient": "npm"
 }

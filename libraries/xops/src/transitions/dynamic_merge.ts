@@ -12,13 +12,12 @@ export class DynamicMerge<TKey, T> {
         this.subscriptions.set(key, observable.subscribe(this.subject));
     }
 
-    delete(key: TKey): boolean {
+    delete(key: TKey) {
         let sub = this.subscriptions.get(key);
         if (!sub)
-            return false;
+            throw new Error('Key not found.');
         this.subscriptions.delete(key);
         sub.unsubscribe();
-        return true;
     }
 
     get observable(): Observable<T> { return this.subject; }

@@ -1,18 +1,26 @@
-import { ImperativeTransition, Transition } from './transition';
+import { Transitive } from './transitive';
 import { DynamicMerge } from './dynamic_merge';
 import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/toPromise';
 
-/** Something transitionable between multiple states. */
-export class Stateful<TState = any> implements Transition<Stateful<TState>, TState> {
-    currentTransition?: Transition<Stateful<TState>, TState>;
+/** A state machine transitionable between multiple states. */
+export class Stateful<TState = any> implements Transitive<Stateful<TState>, TState> {
+    currentTransition?: Transitive<Stateful<TState>, TState>;
 
-    transition(transition: Transition<Stateful<TState>, TState>) {
+    transition(transition: Transitive<Stateful<TState>, TState>) {
         if (this.currentTransition)
             this.onExistingTransition(this.currentTransition, transition);
         this.setTransition(transition);
     }
 
-    protected onExistingTransition(prevTransition: Transition<Stateful<TState>, TState>, newTransition: Transition<Stateful<TState>, TState>) {
+    transitionAsync(transition: Transitive<Stateful<TState>, TState>) {
+        let promise = transition.transitioned.toPromise();
+        this.transition(transition);
+        return promise;
+    }
+
+    /** The default implementation is that of a state machine, allowing only one transition at a time and removing the previous one. */
+    protected onExistingTransition(prevTransition: Transitive<Stateful<TState>, TState>, newTransition: Transitive<Stateful<TState>, TState>) {
         if (prevTransition.inTransition)
             throw new Error('Already transitioning');
         if (prevTransition === newTransition)
@@ -20,29 +28,22 @@ export class Stateful<TState = any> implements Transition<Stateful<TState>, TSta
         this.deleteTransition(prevTransition);
     }
 
-    protected async runTransitionAsync(transition: ImperativeTransition<Stateful<TState>, TState>) {
-        this.setTransition(transition);
-        let promise = transition.transitioned.toPromise();
-        transition.transition(this);
-        await promise;
-    }
-
-    protected setTransition(transition: Transition<Stateful<TState>, TState>) {
+    protected setTransition(transition: Transitive<Stateful<TState>, TState>) {
         this.transitioningMerge.set(transition, transition.transitioning);
         this.transitionedMerge.set(transition, transition.transitioned);
         this.currentTransition = transition;
     }
 
-    protected deleteTransition(transition: Transition<Stateful<TState>, TState>) {
+    protected deleteTransition(transition: Transitive<Stateful<TState>, TState>) {
         this.transitioningMerge.delete(transition);
         this.transitionedMerge.delete(transition);
     }
 
-    private transitioningMerge = new DynamicMerge<Transition<Stateful<TState>, TState>, { source: Stateful<TState>, transition: Transition<Stateful<TState>, TState> }>();
-    private transitionedMerge = new DynamicMerge<Transition<Stateful<TState>, TState>, { source: Stateful<TState>, transition: Transition<Stateful<TState>, TState>, state?: TState }>();
+    private transitioningMerge = new DynamicMerge<Transitive<Stateful<TState>, TState>, { source: Stateful<TState>, transition: Transitive<Stateful<TState>, TState> }>();
+    private transitionedMerge = new DynamicMerge<Transitive<Stateful<TState>, TState>, { source: Stateful<TState>, transition: Transitive<Stateful<TState>, TState>, state?: TState }>();
 
-    get transitioning(): Observable<{ source: Stateful<TState>, transition: Transition<Stateful<TState>, TState> }> { return this.transitioningMerge.observable; }
-    get transitioned(): Observable<{ source: Stateful<TState>, transition: Transition<Stateful<TState>, TState>, state?: TState }> { return this.transitionedMerge.observable; }
+    get transitioning(): Observable<{ source: Stateful<TState>, transition: Transitive<Stateful<TState>, TState> }> { return this.transitioningMerge.observable; }
+    get transitioned(): Observable<{ source: Stateful<TState>, transition: Transitive<Stateful<TState>, TState>, state?: TState }> { return this.transitionedMerge.observable; }
     get inTransition(): boolean { return !this.currentTransition || this.currentTransition.inTransition; }
     get state(): TState | undefined { return this.currentTransition && this.currentTransition.lastState; }
 

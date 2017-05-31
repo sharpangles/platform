@@ -1,35 +1,49 @@
 # @sharpangles/ops
-Operational management of systems.  Initially targeting devops and build environments.  Other potential future systems include IT infrastructure, interconnected IoT devices, or even manufacturing.
+Operational management of systems.  Initially targeting devops and build environments.  Other potential future systems include a running application, IT infrastructure, interconnected IoT devices, or even manufacturing.
+___
 
 
+## What It Does
+This enables modeling a system, whether its a programming environment or a kitchen, to enable understanding and interacting with its state.
+It works by building up networks of ```trackers``` in a hierarchy of ```systems```.  Trackers expose ```interfaces``` where ```connections``` can be made.
+Think of it as a dynamic ```observable``` network that lives in between two layers of design: individual state-modifying activities underneath, and a dynamic control flow designer above.
+The operations model of trackers, connectors, interfaces, are all designed to change over time.  Each change exposes imperative extensibility, as well as declarative observables for changes.
+
+## The Declarative Sandwich
+When talking about declarative vs imperative, one often thinks of observables vs promises.  While there is some truth to this, observables are not entirely declarative.
+In more complex systems, the architecture is often a set of alternating layers of imperative and declarative programming.
+Even observables are built on top of an imperative layer or sorts.  For example, whether an observable is hot or cold deals with a point of execution.
+RXJS operators themselves, particularly custom ones, frequently perform imperative work.
+So now we have somewhat of an imperative layer below a declarative one.  However, something had to define how that network of observables was constructed.
+Something has to assign meaning to events flowing through the network.  In fact, frequently we add state information to the event being passed so we can track individual actions.
+Now we have another imperative layer on top.  There is always an imperative layer on top.  It may live in configuration via json, factories, or a DSL, but it exists to define the control flow of the system.
+
+The point is that there is no 'declarative vs imperative' war.  It's just that strong achitectures treat them like oil and water, strictly separated.
+This library attempts to do this, living mostly in the declarative middle.
+The configuration and buildup of the network via factories would serve as the top imperative layer, where control flow is ultimately created.
+The operations model (connectors, connections, trackers, interfaces, etc...) exposes most of its customizable actions as an imperative async/await surface.
 
 
 ## Key concepts
 
-### TrackerProcess
-A one-time process that starts, progresses, and then completes either by success, failure, or cancellation.
-Base implementations:
-- AsyncTrackerProcess: Wraps a promise
-- CancelPollingProcess: Allows for a cancellation check at each progress event
-- SubscriptionProcess: Maps an observable subscription
-
 ### Tracker
-An aggregator of processes that track a particular concept in an environment.
-Each tracker is responsible for creating and executing processes of a particular type.
-Several base tracker implementations are provided:
-- SubjectTracker: Aggregates events from all running process observables through the tracker observables.
-- MutexTracker: Waits for any existing process to complete before starting a new one
-- OverridingTracker: Cancels the previous process to start a new one
+Models an idea, behavior, or object in a system.  Contains ```interfaces```.
+
+### System
+A ```tracker``` that has child trackers.  Encapsulates a lifetime, exposing a dependency injection scope.
+
+### Interface
+Exposes events via ```connectors``` that can trigger, notify, or otherwise expose details about an activity on the ```tracker```.
+This is main point at which work on ```trackers``` is performed.
+
+#### Connector
+Exposes a point of interaction for an ```interface```.
 
 #### Connection
-Connects events from a source tracker to effects on a target.
-This allows two trackers to be connected without knowing about each other, while still allowing each tracker an opportunity to manage the connection.
+Connects two ```connectors``` together.
 
-#### TrackerFactory
-Creates 
+#### Arranger
+Manipulates the system by creating and removing ```connections``` and ```trackers```.
 
-#### TrackerFactoryLoader
-Constructs factories from names and configuration.  This potentially connect the system to public and private repositories.
-
-#### TrackerContext
-Manages the graph of factories and trackers for the process.
+#### ArrangerSource
+Loads ```arrangers``` based on a string identifier and json configuration.
