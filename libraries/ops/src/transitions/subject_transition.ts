@@ -10,7 +10,6 @@ export abstract class SubjectTransition<TSource, TState = any | undefined> imple
     get transitioned(): Observable<{ source: TSource, transition: Transitive<TSource, TState>, state?: TState }> { return this.transitionedSubject; }
 
     inTransition: boolean;
-    lastState?: TState;
 
     protected setTransitioning(source: TSource) {
         if (this.inTransition)
@@ -28,7 +27,6 @@ export abstract class SubjectTransition<TSource, TState = any | undefined> imple
     protected setTransitioned(source: TSource, state?: TState) {
         this.transitionedSubject.next({ source: source, transition: this, state: state });
         this.inTransition = false;
-        this.lastState = state;
     }
 
     dispose() {

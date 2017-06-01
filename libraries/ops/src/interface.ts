@@ -1,10 +1,11 @@
+import { Tracker } from './tracker';
 import { Placement, PlacementChange, Surface } from './placement/placement';
 import { Connector, InputConnector, OutputConnector } from './connector';
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
 
 export class Interface {
-    constructor(public surface: Surface<Connector>) {
+    constructor(public tracker: Tracker, public surface: Surface<Connector>) {
     }
 
     async insertInputConnector(connector: InputConnector, placement?: Placement) {

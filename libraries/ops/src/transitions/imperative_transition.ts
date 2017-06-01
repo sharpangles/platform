@@ -8,11 +8,11 @@ export class ImperativeTransition<TSource = any, TState = any | undefined> exten
 
     promise?: Promise<{ source: TSource, state: TState }>;
 
-    protected async createTransitionPromise(source: TSource): Promise<{ source: TSource, state?: TState }> {
+    protected async createTransitionPromise(source: TSource): Promise<{ source: TSource, state: TState }> {
         this.setTransitioning(source);
-        let state: TState | undefined;
+        let state: TState;
         try {
-            this.lastState = await this.onTransitioningAsync(source);
+            state = await this.onTransitioningAsync(source);
         }
         catch (err) {
             this.fail(err);
@@ -25,7 +25,7 @@ export class ImperativeTransition<TSource = any, TState = any | undefined> exten
         return { source: source, state: state };
     }
 
-    protected async onTransitioningAsync(source: TSource): Promise<TState | undefined> {
-        return;
+    protected async onTransitioningAsync(source: TSource): Promise<TState> {
+        return <any>undefined;
     }
 }

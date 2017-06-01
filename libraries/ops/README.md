@@ -10,8 +10,8 @@ Think of it as a dynamic ```observable``` network that lives in between two laye
 The operations model of trackers, connectors, interfaces, are all designed to change over time.  Each change exposes imperative extensibility, as well as declarative observables for changes.
 
 ## The Declarative Sandwich
-When talking about declarative vs imperative, one often thinks of observables vs promises.  While there is some truth to this, observables are not entirely declarative.
 In more complex systems, the architecture is often a set of alternating layers of imperative and declarative programming.
+When talking about declarative vs imperative, one often thinks of observables vs promises.  While there is some truth to this, observables are not entirely declarative.
 Even observables are built on top of an imperative layer or sorts.  For example, whether an observable is hot or cold deals with a point of execution.
 RXJS operators themselves, particularly custom ones, frequently perform imperative work.
 So now we have somewhat of an imperative layer below a declarative one.  However, something had to define how that network of observables was constructed.
@@ -21,7 +21,9 @@ Now we have another imperative layer on top.  There is always an imperative laye
 The point is that there is no 'declarative vs imperative' war.  It's just that strong achitectures treat them like oil and water, strictly separated.
 This library attempts to do this, living mostly in the declarative middle.
 The configuration and buildup of the network via factories would serve as the top imperative layer, where control flow is ultimately created.
-The operations model (connectors, connections, trackers, interfaces, etc...) exposes most of its customizable actions as an imperative async/await surface.
+The operations model (connectors, connections, trackers, interfaces, etc...) exposes most of its customizable actions as an imperative async/await surface, while mapping those executions to observable transitions.
+Container objects (trackers, systems, interfaces) expose synchronous points of extensibility to add components.
+Connection objects (connectors, connections) provide async extension points
 
 
 ## Key concepts
@@ -47,3 +49,8 @@ Manipulates the system by creating and removing ```connections``` and ```tracker
 
 #### ArrangerSource
 Loads ```arrangers``` based on a string identifier and json configuration.
+
+
+
+
+stuff about how transitions separate the work from the skeleton...

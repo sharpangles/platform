@@ -1,56 +1,48 @@
-import { ExplicitTransition } from './transitions/explicit_transition';
-import { Stateful } from './transitions/stateful';
-import { Connectable } from './connectable';
+import { Connector, InputConnector } from './connector';
+import { MappedTransition } from './transitions/mapped_transition';
+import { Transitive } from './transitions/transitive';
+import { Observable } from 'rxjs/Observable';
+import { Connectable, ConnectableResult } from './connectable';
+import 'rxjs/add/operator/toPromise';
 
-/** A connectable sourced from only one other connectable. */
-export class ConnectionConnectable<T> extends Connectable<T> {
-    constructor(public connection: Connection<T>) {
-        super();
-    }
-
-    connectable?: Connectable<T>;
-
-    protected async onConnectAsync(connectable: Connectable<T>): Promise<boolean> {
-        await this.deleteConnectableAsync();
-        await connectable.connectAsync(connectable);
-        this.connectable = connectable;
-        return true;
-    }
-
-    protected async onDisconnectAsync(connectable: Connectable): Promise<boolean> {
-        if (connectable !== this.connectable)
-            return false;
-        await this.deleteConnectableAsync();
-        return true;
-    }
-
-    private async deleteConnectableAsync() {
-        if (this.connectable) {
-            let existing = this.connectable;
-            delete this.connectable;
-            await existing.disconnectAsync(this);
-        }
-    }
+export interface ConnectionResult extends ConnectableResult {
+    isSource: boolean;
 }
 
-/** An aggregated Stateful of both an input and output connectable. */
-export class Connection<T> extends Stateful<boolean> {
-    source = new ConnectionConnectable<T>(this);
-    target = new ConnectionConnectable<T>(this);
-
-    async connectSourceAsync(connectable: Connectable): Promise<boolean> {
-        return !!(await this.transitionAsync(new ExplicitTransition<Connectable, boolean>(s => this.source.connectAsync(connectable)))).state;
+/**
+ * Can operate like a bus with multiple inputs and outputs.
+ */
+export class Connection<TSource = any, TSourceEvent = any, TTargetEvent = any> extends Connector<TSource, TTargetEvent> {
+    constructor() {
+        super();
+        this.observable = this.createObservable(this.sourceConnector.observable);
     }
 
-    async disconnectSourceAsync(connectable: Connectable): Promise<boolean> {
-        return !!(await this.transitionAsync(new ExplicitTransition<Connectable, boolean>(async s => this.source.connectable && await this.source.disconnectAsync(this.source.connectable)))).state;
+    sourceConnector = new InputConnector<TSource, TSourceEvent>();
+    observable: Observable<TTargetEvent>;
+
+    /** The base implementation assumes TSourceEvent can be cast as TTargetEvent. */
+    protected createObservable(observable: Observable<TSourceEvent>): Observable<TTargetEvent> {
+        return <Observable<TTargetEvent>><Observable<any>>observable;
     }
 
-    async connectTargetAsync(connectable: Connectable): Promise<boolean> {
-        return !!(await this.transitionAsync(new ExplicitTransition<Connectable, boolean>(s => this.target.connectAsync(connectable)))).state;
+    connectSource(sourceConnectable: Connectable<TSource, TSourceEvent>, connectTransition: Transitive<TSource, boolean>) {
+        this.sourceConnector.connect(sourceConnectable, connectTransition);
+        sourceConnectable.connect(this.sourceConnector, connectTransition);
+        this.transition(new MappedTransition<TSource, boolean, ConnectionResult>(connectTransition, (source, trans, state) => <ConnectionResult>{ source: source, success: !!state, connect: true, observable: sourceConnectable.observable, isSource: true, connectable: sourceConnectable }));
     }
 
-    async disconnectTargetAsync(connectable: Connectable): Promise<boolean> {
-        return !!(await this.transitionAsync(new ExplicitTransition<Connectable, boolean>(async s => this.target.connectable && await this.target.disconnectAsync(this.target.connectable)))).state;
+    disconnectSource(sourceConnectable: Connectable<TSource, TSourceEvent>, disconnectTransition: Transitive<TSource, boolean>) {
+        this.sourceConnector.disconnect(sourceConnectable, disconnectTransition);
+        sourceConnectable.disconnect(this.sourceConnector, disconnectTransition);
+        this.transition(new MappedTransition<TSource, boolean, ConnectionResult>(disconnectTransition, (source, trans, state) => <ConnectionResult>{ source: source, success: !!state, connect: false, isSource: true, connectable: sourceConnectable }));
+    }
+
+    connect(connectable: Connectable<TSource, TTargetEvent>, connectTransition: Transitive<TSource, boolean>) {
+        this.transition(new MappedTransition<TSource, boolean, ConnectableResult<TSource, TTargetEvent>>(connectTransition, (source, trans, state) => <ConnectableResult<TSource, TTargetEvent>>{ source: source, success: !!state, connect: true, connectable: connectable }));
+    }
+
+    disconnect(connectable: Connectable<TSource, TTargetEvent>, disconnectTransition: Transitive<TSource, boolean>) {
+        this.transition(new MappedTransition<TSource, boolean, ConnectableResult<TSource, TTargetEvent>>(disconnectTransition, (source, trans, state) => <ConnectableResult<TSource, TTargetEvent>>{ source: source, success: !!state, connect: false, connectable: connectable }));
     }
 }
