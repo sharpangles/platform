@@ -1,40 +1,28 @@
-import { Stateful } from './transitions/stateful';
 import { Surface } from './placement/placement';
+import { MappedTransition } from './transitions/mapped_transition';
+import { Transitive } from './transitions/transitive';
+import { System } from './system';
+import { StateMachine } from './transitions/state_machine';
 import { Interface } from './interface';
 
-export class Tracker extends Stateful<boolean> {
-    constructor(public interfaces: Surface<Tracker>) {
+export interface TrackerResult {
+    success: boolean;
+    added: boolean;
+    iface?: Interface;
+}
+
+export class Tracker extends StateMachine<TrackerResult> {
+    constructor(public interfaces: Surface<Interface>, public system?: System) {
         super();
     }
 
-    async addInterfaceAsync(connectable: Connectable) {
-        return !!(await this.transitionAsync(new ExplicitTransition<Connectable, boolean>(s => this.onConnectAsync(connectable)))).state;
+    addInterface(iface: Interface, addTransition: Transitive<boolean>) {
+        this.interfaces.place(iface);
+        this.transition(new MappedTransition<boolean, TrackerResult>(addTransition, result => <TrackerResult>{ success: !!result, added: true, iface: iface }));
     }
 
-    async removeInterfaceAsync(connectable: Connectable) {
-        return !!(await this.transitionAsync(new ExplicitTransition<Connectable, boolean>(s => this.onDisconnectAsync(connectable)))).state;
+    removeInterface(iface: Interface, removeTransition: Transitive<boolean>) {
+        removeTransition.transitioned.take(1).toPromise().then(() => this.interfaces.remove(iface));
+        this.transition(new MappedTransition<boolean, TrackerResult>(removeTransition, result => <TrackerResult>{ success: !!result, added: false, iface: iface }));
     }
-
-    protected async onAddInterfaceAsync(interface: Interface): Promise<boolean> {
-        return true;
-    }
-
-    protected async onRemoveInterfaceAsync(interface: Interface): Promise<boolean> {
-        return true;
-    }
-
-    async addOutputConnector(connector: OutputConnector, placement?: Placement) {
-        let changes = this.surface.place(connector, placement);
-        this.connectorsChangedSubject.next(changes);
-    }
-
-    async removeOutputConnector(connector: OutputConnector) {
-        let changes = this.surface.remove(connector);
-        this.connectorsChangedSubject.next(changes);
-    }
-
-    private connectorsChangedSubject = new Subject<PlacementChange<Connector>[]>();
-
-    /** Support for handling a new connector coming into existence. */
-    get connectorsChanged(): Observable<PlacementChange<Connector>[]> { return this.connectorsChangedSubject; }
 }

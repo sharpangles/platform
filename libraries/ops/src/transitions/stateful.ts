@@ -1,31 +1,39 @@
+import { CancellationTokenSource } from '@sharpangles/lang';
 import { Transitive } from './transitive';
 import { DynamicMerge } from './dynamic_merge';
 import { Observable } from 'rxjs/Observable';
 
 /** Aggregates transitions. */
-export class Stateful<TSource, TState = any> implements Transitive<TSource, TState> {
-    transition(transition: Transitive<TSource, TState>) {
+export class Stateful<TResult> implements Transitive<TResult> {
+    transition(transition: Transitive<TResult>) {
         this.setTransition(transition);
     }
 
-    protected setTransition(transition: Transitive<TSource, TState>) {
+    protected setTransition(transition: Transitive<TResult>) {
         this.transitioningMerge.set(transition, transition.transitioning);
         this.transitionedMerge.set(transition, transition.transitioned);
     }
 
-    protected deleteTransition(transition: Transitive<TSource, TState>) {
+    protected deleteTransition(transition: Transitive<TResult>) {
         this.transitioningMerge.delete(transition);
         this.transitionedMerge.delete(transition);
     }
 
-    private transitioningMerge = new DynamicMerge<Transitive<TSource, TState>, { source: TSource, transition: Transitive<TSource, TState> }>();
-    private transitionedMerge = new DynamicMerge<Transitive<TSource, TState>, { source: TSource, transition: Transitive<TSource, TState>, state: TState }>();
+    private transitioningMerge = new DynamicMerge<Transitive<TResult>, void>();
+    private transitionedMerge = new DynamicMerge<Transitive<TResult>, TResult>();
 
-    get transitioning(): Observable<{ source: TSource, transition: Transitive<TSource, TState> }> { return this.transitioningMerge.observable; }
-    get transitioned(): Observable<{ source: TSource, transition: Transitive<TSource, TState>, state: TState }> { return this.transitionedMerge.observable; }
+    get transitioning(): Observable<void> { return this.transitioningMerge.observable; }
+    get transitioned(): Observable<TResult> { return this.transitionedMerge.observable; }
     get inTransition(): boolean { return !!Array.from(this.transitioningMerge.subscriptions.keys()).find(t => t.inTransition); }
 
+    private cancellationTokenSource = new CancellationTokenSource();
+
+    protected registerDisposal(disposal: () => void) {
+        this.cancellationTokenSource.token.register(disposal);
+    }
+
     dispose() {
+        this.cancellationTokenSource.cancel();
         this.transitioningMerge.dispose();
         this.transitionedMerge.dispose();
     }

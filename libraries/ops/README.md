@@ -14,8 +14,8 @@ In more complex systems, the architecture is often a set of alternating layers o
 When talking about declarative vs imperative, one often thinks of observables vs promises.  While there is some truth to this, observables are not entirely declarative.
 Even observables are built on top of an imperative layer or sorts.  For example, whether an observable is hot or cold deals with a point of execution.
 RXJS operators themselves, particularly custom ones, frequently perform imperative work.
-So now we have somewhat of an imperative layer below a declarative one.  However, something had to define how that network of observables was constructed.
-Something has to assign meaning to events flowing through the network.  In fact, frequently we add state information to the event being passed so we can track individual actions.
+So now we have somewhat of an imperative layer below a declarative one.  However, something had to define how that network of observables was constructed.  Something has to assign meaning to events flowing through the network.
+In fact, frequently we add state information to the event being passed so we can track individual actions (although this is often an anti-pattern, a sign of forcing imperative into declarative).
 Now we have another imperative layer on top.  There is always an imperative layer on top.  It may live in configuration via json, factories, or a DSL, but it exists to define the control flow of the system.
 
 The point is that there is no 'declarative vs imperative' war.  It's just that strong achitectures treat them like oil and water, strictly separated.

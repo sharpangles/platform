@@ -1,35 +1,29 @@
+import { Surface } from './placement/placement';
+import { MappedTransition } from './transitions/mapped_transition';
+import { Transitive } from './transitions/transitive';
+import { StateMachine } from './transitions/state_machine';
 import { Tracker } from './tracker';
-import { Placement, PlacementChange, Surface } from './placement/placement';
-import { Connector, InputConnector, OutputConnector } from './connector';
-import { Subject } from 'rxjs/Subject';
-import { Observable } from 'rxjs/Observable';
+// import { Placement, PlacementChange, Surface } from './placement/placement';
+import { Connector } from './connector';
 
-export class Interface {
-    constructor(public tracker: Tracker, public surface: Surface<Connector>) {
+export interface InterfaceResult {
+    success: boolean;
+    added: boolean;
+    connector?: Connector;
+}
+
+export class Interface extends StateMachine<InterfaceResult> {
+    constructor(public tracker: Tracker, public connectors: Surface<Connector>) {
+        super();
     }
 
-    async insertInputConnector(connector: InputConnector, placement?: Placement) {
-        let changes = this.surface.place(connector, placement);
-        this.connectorsChangedSubject.next(changes);
+    addConnector(connector: Connector, addTransition: Transitive<boolean>) {
+        this.connectors.place(connector);
+        this.transition(new MappedTransition<boolean, InterfaceResult>(addTransition, result => <InterfaceResult>{ success: !!result, added: true, connector: connector }));
     }
 
-    async removeInputConnector(connector: InputConnector) {
-        let changes = this.surface.remove(connector);
-        this.connectorsChangedSubject.next(changes);
+    removeConnector(connector: Connector, removeTransition: Transitive<boolean>) {
+        removeTransition.transitioned.take(1).toPromise().then(() => this.connectors.remove(connector));
+        this.transition(new MappedTransition<boolean, InterfaceResult>(removeTransition, result => <InterfaceResult>{ success: !!result, added: false, connector: connector }));
     }
-
-    async addOutputConnector(connector: OutputConnector, placement?: Placement) {
-        let changes = this.surface.place(connector, placement);
-        this.connectorsChangedSubject.next(changes);
-    }
-
-    async removeOutputConnector(connector: OutputConnector) {
-        let changes = this.surface.remove(connector);
-        this.connectorsChangedSubject.next(changes);
-    }
-
-    private connectorsChangedSubject = new Subject<PlacementChange<Connector>[]>();
-
-    /** Support for handling a new connector coming into existence. */
-    get connectorsChanged(): Observable<PlacementChange<Connector>[]> { return this.connectorsChangedSubject; }
 }

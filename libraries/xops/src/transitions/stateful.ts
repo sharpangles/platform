@@ -22,7 +22,7 @@ export class Stateful<TState = any> implements Transition<Stateful<TState>, TSta
 
     protected async runTransitionAsync(transition: ImperativeTransition<Stateful<TState>, TState>) {
         this.setTransition(transition);
-        let promise = transition.transitioned.toPromise();
+        let promise = transition.transitioned.take(1).toPromise();
         transition.transition(this);
         await promise;
     }

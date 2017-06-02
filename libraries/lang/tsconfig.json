@@ -23,14 +23,12 @@
       "node",
       "jasmine",
       "glob"
-    ],
-    "paths": {
-      "@sharpangles/lang": ["../lang"]
-    }
+    ]
   },
   "include": [
     "./index.ts",
     "./build.ts",
+    "./bin/**/*.ts",
     "./src/**/*.ts",
     "./spec/**/*.ts"
     ]

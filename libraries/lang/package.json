@@ -1,7 +1,7 @@
 {
   "version": "1.0.0-alpha.0",
-  "name": "@sharpangles/ops",
-  "description": "Global build bootstraps",
+  "name": "@sharpangles/lang",
+  "description": "Fundamental language extensions",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/sharpangles/platform.git"
@@ -16,21 +16,13 @@
   "bugs": {
     "url": "https://github.com/sharpangles/platform/issues"
   },
-  "homepage": "https://github.com/sharpangles/platform/tree/master/modules/bootstrap#readme",
+  "homepage": "https://github.com/sharpangles/platform/tree/master/libraries/lang#readme",
   "scripts": {
     "watch": "tsc && node __artifacts/local/build.js watch",
     "build": "tsc && node __artifacts/local/build.js",
     "copy": "cpy package.json README.md __artifacts/release",
     "postbuild": "npm run copy",
     "clean": "rimraf -rf \"__artifacts\""
-  },
-  "dependencies": {
-    "proper-lockfile": "^2.0.1",
-    "deep-extend": "^0.4.1",
-    "jsonpath": "^0.2.11"
-  },
-  "peerDependencies": {
-    "@sharpangles/lang": "1.0.0-alpha.0"
   },
   "devDependencies": {
     "@types/jsonpath": "^0.1.29",

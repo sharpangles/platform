@@ -1,11 +1,11 @@
 import { ImperativeTransition } from './imperative_transition';
 
-export class ExplicitTransition<TSource, TState = any | undefined> extends ImperativeTransition<TSource, TState> {
-    constructor(private transitioningAsync: (source: TSource) => Promise<TState | undefined>) {
+export class ExplicitTransition<TResult> extends ImperativeTransition<TResult> {
+    constructor(private promiseFactory: () => Promise<TResult>) {
         super();
     }
 
-    protected async onTransitioningAsync(source: TSource): Promise<TState | undefined> {
-        return this.transitioningAsync(source);
+    protected async onTransitioningAsync(): Promise<TResult> {
+        return this.promiseFactory();
     }
 }

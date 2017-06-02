@@ -12,13 +12,13 @@ export interface ConnectionResult extends ConnectableResult {
 /**
  * Can operate like a bus with multiple inputs and outputs.
  */
-export class Connection<TSource = any, TSourceEvent = any, TTargetEvent = any> extends Connector<TSource, TTargetEvent> {
+export class Connection<TSourceEvent = any, TTargetEvent = any> extends Connector<TTargetEvent> {
     constructor() {
         super();
         this.observable = this.createObservable(this.sourceConnector.observable);
     }
 
-    sourceConnector = new InputConnector<TSource, TSourceEvent>();
+    sourceConnector = new InputConnector<TSourceEvent>(this);
     observable: Observable<TTargetEvent>;
 
     /** The base implementation assumes TSourceEvent can be cast as TTargetEvent. */
@@ -26,23 +26,23 @@ export class Connection<TSource = any, TSourceEvent = any, TTargetEvent = any> e
         return <Observable<TTargetEvent>><Observable<any>>observable;
     }
 
-    connectSource(sourceConnectable: Connectable<TSource, TSourceEvent>, connectTransition: Transitive<TSource, boolean>) {
+    connectSource(sourceConnectable: Connectable<TSourceEvent>, connectTransition: Transitive<boolean>) {
         this.sourceConnector.connect(sourceConnectable, connectTransition);
         sourceConnectable.connect(this.sourceConnector, connectTransition);
-        this.transition(new MappedTransition<TSource, boolean, ConnectionResult>(connectTransition, (source, trans, state) => <ConnectionResult>{ source: source, success: !!state, connect: true, observable: sourceConnectable.observable, isSource: true, connectable: sourceConnectable }));
+        this.transition(new MappedTransition<boolean, ConnectionResult>(connectTransition, result => <ConnectionResult>{ success: !!result, connect: true, observable: sourceConnectable.observable, isSource: true, connectable: sourceConnectable }));
     }
 
-    disconnectSource(sourceConnectable: Connectable<TSource, TSourceEvent>, disconnectTransition: Transitive<TSource, boolean>) {
+    disconnectSource(sourceConnectable: Connectable<TSourceEvent>, disconnectTransition: Transitive<boolean>) {
         this.sourceConnector.disconnect(sourceConnectable, disconnectTransition);
         sourceConnectable.disconnect(this.sourceConnector, disconnectTransition);
-        this.transition(new MappedTransition<TSource, boolean, ConnectionResult>(disconnectTransition, (source, trans, state) => <ConnectionResult>{ source: source, success: !!state, connect: false, isSource: true, connectable: sourceConnectable }));
+        this.transition(new MappedTransition<boolean, ConnectionResult>(disconnectTransition, result => <ConnectionResult>{ success: !!result, connect: false, isSource: true, connectable: sourceConnectable }));
     }
 
-    connect(connectable: Connectable<TSource, TTargetEvent>, connectTransition: Transitive<TSource, boolean>) {
-        this.transition(new MappedTransition<TSource, boolean, ConnectableResult<TSource, TTargetEvent>>(connectTransition, (source, trans, state) => <ConnectableResult<TSource, TTargetEvent>>{ source: source, success: !!state, connect: true, connectable: connectable }));
+    connect(connectable: Connectable<TTargetEvent>, connectTransition: Transitive<boolean>) {
+        this.transition(new MappedTransition<boolean, ConnectableResult<TTargetEvent>>(connectTransition, result => <ConnectableResult<TTargetEvent>>{ success: !!result, connect: true, connectable: connectable }));
     }
 
-    disconnect(connectable: Connectable<TSource, TTargetEvent>, disconnectTransition: Transitive<TSource, boolean>) {
-        this.transition(new MappedTransition<TSource, boolean, ConnectableResult<TSource, TTargetEvent>>(disconnectTransition, (source, trans, state) => <ConnectableResult<TSource, TTargetEvent>>{ source: source, success: !!state, connect: false, connectable: connectable }));
+    disconnect(connectable: Connectable<TTargetEvent>, disconnectTransition: Transitive<boolean>) {
+        this.transition(new MappedTransition<boolean, ConnectableResult<TTargetEvent>>(disconnectTransition, result => <ConnectableResult<TTargetEvent>>{ success: !!result, connect: false, connectable: connectable }));
     }
 }

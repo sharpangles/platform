@@ -1,18 +1,19 @@
+import { CancellationToken } from '@sharpangles/lang';
 import { SubjectTransition } from './subject_transition';
 
-export class ImperativeTransition<TSource = any, TState = any | undefined> extends SubjectTransition<TSource, TState> {
-    transitionAsync(source: TSource) {
-        this.promise = this.createTransitionPromise(source);
+export class ImperativeTransition<TResult> extends SubjectTransition<TResult> {
+    transitionAsync(cancellationToken?: CancellationToken) {
+        this.promise = this.createTransitionPromise();
         return this.promise;
     }
 
-    promise?: Promise<{ source: TSource, state: TState }>;
+    promise?: Promise<TResult>;
 
-    protected async createTransitionPromise(source: TSource): Promise<{ source: TSource, state: TState }> {
-        this.setTransitioning(source);
-        let state: TState;
+    protected async createTransitionPromise(cancellationToken?: CancellationToken): Promise<TResult> {
+        this.setTransitioning();
+        let result: TResult;
         try {
-            state = await this.onTransitioningAsync(source);
+            result = await this.onTransitioningAsync();
         }
         catch (err) {
             this.fail(err);
@@ -21,11 +22,11 @@ export class ImperativeTransition<TSource = any, TState = any | undefined> exten
         finally {
             delete this.promise;
         }
-        this.setTransitioned(source, state);
-        return { source: source, state: state };
+        this.setTransitioned(result);
+        return result;
     }
 
-    protected async onTransitioningAsync(source: TSource): Promise<TState> {
+    protected async onTransitioningAsync(cancellationToken?: CancellationToken): Promise<TResult> {
         return <any>undefined;
     }
 }
