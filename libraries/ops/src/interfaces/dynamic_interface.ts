@@ -6,10 +6,10 @@ import { Interface } from '../interface';
 import { InputConnector, OutputConnector } from '../connector';
 import { Subscription } from 'rxjs/Subscription';
 
-export class StatefulInterface extends Interface {
+export class DynamicInterface extends Interface {
     cancellationTokenSource = new CancellationTokenSource();
 
-    addTransition<TResult>(transition: Transitive<TResult>, transitioningName: string, transitionedName: string) {
+    addTransition<TInput, TResult>(transition: Transitive<TInput, TResult>, transitioningName: string, transitionedName: string) {
         let input = new InputConnector(this);
         this.addConnector(input, this.getInputAdditionTransition(input, transition));
         let output = new OutputConnector<TResult>(transition.transitioned, this);

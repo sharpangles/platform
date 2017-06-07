@@ -1,4 +1,4 @@
-import { Surface } from './placement/placement';
+import { Surface } from './placement/surface';
 import { MappedTransition } from './transitions/mapped_transition';
 import { Transitive } from './transitions/transitive';
 import { StateMachine } from './transitions/state_machine';

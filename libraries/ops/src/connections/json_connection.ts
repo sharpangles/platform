@@ -12,6 +12,6 @@ export class JsonConnection extends Connection {
     path: string;
 
     protected createObservable(observable: Observable<any>) {
-        return this.source.observable.map(source => jsonpath.value(source, this.path));
+        return observable.map(source => jsonpath.value(source, this.path));
     }
 }

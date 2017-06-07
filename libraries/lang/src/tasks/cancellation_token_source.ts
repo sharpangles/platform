@@ -15,10 +15,13 @@ export class CancellationTokenSource {
             registration();
     }
 
-    static createLinkedTokenSource(...tokens: CancellationToken[]): CancellationTokenSource {
+    static createLinkedTokenSource(...tokens: (CancellationToken | undefined)[]): CancellationTokenSource {
+        tokens = tokens.filter(t => t);
+        if (tokens.length === 1)
+            return (<any>tokens[0]).cancellationTokenSource;
         let cancellationTokenSource = new CancellationTokenSource();
         let cancelled = false;
-        for (let token of tokens) {
+        for (let token of <CancellationToken[]>tokens) {
             token.register(() => {
                 if (cancelled)
                     return;

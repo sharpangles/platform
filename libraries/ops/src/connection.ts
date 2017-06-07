@@ -1,48 +1,66 @@
-import { Connector, InputConnector } from './connector';
-import { MappedTransition } from './transitions/mapped_transition';
-import { Transitive } from './transitions/transitive';
-import { Observable } from 'rxjs/Observable';
-import { Connectable, ConnectableResult } from './connectable';
-import 'rxjs/add/operator/toPromise';
+import { CancellationToken, CancellationTokenSource, NestedValidation, Disposable } from '@sharpangles/lang';
+import { Connectable, ConnectionResult } from './connectable';
 
-export interface ConnectionResult extends ConnectableResult {
-    isSource: boolean;
-}
-
-/**
- * Can operate like a bus with multiple inputs and outputs.
- */
-export class Connection<TSourceEvent = any, TTargetEvent = any> extends Connector<TTargetEvent> {
-    constructor() {
-        super();
-        this.observable = this.createObservable(this.sourceConnector.observable);
+/** Synchronizes the connection transaction between itself and other connectables. */
+@Disposable()
+export abstract class Connection implements Disposable {
+    constructor(connectables: Iterable<Connectable>) {
+        this.connectableSet = new Set<Connectable>(connectables);
     }
 
-    sourceConnector = new InputConnector<TSourceEvent>(this);
-    observable: Observable<TTargetEvent>;
+    changing?: boolean;
+    isConnected?: boolean;
+    connectableSet: Set<Connectable>;
 
-    /** The base implementation assumes TSourceEvent can be cast as TTargetEvent. */
-    protected createObservable(observable: Observable<TSourceEvent>): Observable<TTargetEvent> {
-        return <Observable<TTargetEvent>><Observable<any>>observable;
+    private cancellationTokenSource = new CancellationTokenSource();
+
+    protected commitConnection() {
     }
 
-    connectSource(sourceConnectable: Connectable<TSourceEvent>, connectTransition: Transitive<boolean>) {
-        this.sourceConnector.connect(sourceConnectable, connectTransition);
-        sourceConnectable.connect(this.sourceConnector, connectTransition);
-        this.transition(new MappedTransition<boolean, ConnectionResult>(connectTransition, result => <ConnectionResult>{ success: !!result, connect: true, observable: sourceConnectable.observable, isSource: true, connectable: sourceConnectable }));
+    protected commitDisconnection() {
     }
 
-    disconnectSource(sourceConnectable: Connectable<TSourceEvent>, disconnectTransition: Transitive<boolean>) {
-        this.sourceConnector.disconnect(sourceConnectable, disconnectTransition);
-        sourceConnectable.disconnect(this.sourceConnector, disconnectTransition);
-        this.transition(new MappedTransition<boolean, ConnectionResult>(disconnectTransition, result => <ConnectionResult>{ success: !!result, connect: false, isSource: true, connectable: sourceConnectable }));
+    async connectAsync(cancellationToken?: CancellationToken): Promise<ConnectionResult> {
+        if (this.isConnected)
+            throw new Error('Already connected.');
+        if (this.changing)
+            throw new Error('Already connecting.');
+        return this.changeAsync(cancellationToken);
     }
 
-    connect(connectable: Connectable<TTargetEvent>, connectTransition: Transitive<boolean>) {
-        this.transition(new MappedTransition<boolean, ConnectableResult<TTargetEvent>>(connectTransition, result => <ConnectableResult<TTargetEvent>>{ success: !!result, connect: true, connectable: connectable }));
+    async disconnectAsync(cancellationToken?: CancellationToken): Promise<ConnectionResult> {
+        if (!this.isConnected)
+            throw new Error('Already disconnected.');
+        if (this.changing)
+            throw new Error('Already disconnecting.');
+        return this.changeAsync(cancellationToken);
     }
 
-    disconnect(connectable: Connectable<TTargetEvent>, disconnectTransition: Transitive<boolean>) {
-        this.transition(new MappedTransition<boolean, ConnectableResult<TTargetEvent>>(disconnectTransition, result => <ConnectableResult<TTargetEvent>>{ success: !!result, connect: false, connectable: connectable }));
+    private async changeAsync(cancellationToken?: CancellationToken): Promise<ConnectionResult> {
+        this.changing = true;
+        let isConnected = this.isConnected;
+        cancellationToken = CancellationTokenSource.createLinkedTokenSource(this.cancellationTokenSource.token, cancellationToken).token;
+        let connectionResults = await Promise.all(Array.from(this.connectableSet.keys()).map(c => isConnected ? c.disconnectAsync(this, cancellationToken) : c.connectAsync(this, cancellationToken)));
+        let result = <ConnectionResult>{ validation: new NestedValidation(undefined, connectionResults.map(r => r.validation)) };
+        if (!result.validation.isValid)
+            return result;
+        result.commit = () => {
+            if (this.isConnected !== isConnected)
+                throw new Error('Invalid state');
+            for (let result of connectionResults)
+                result.commit && (<Function>result.commit)();
+            isConnected ? this.commitDisconnection() : this.commitConnection();
+            this.isConnected = !isConnected;
+            this.changing = false;
+        };
+        result.rollback = () => {
+            this.changing = false;
+        };
+        return result;
+    }
+
+    dispose() {
+        if (this.changing)
+            this.cancellationTokenSource.cancel();
     }
 }

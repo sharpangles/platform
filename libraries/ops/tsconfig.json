@@ -6,7 +6,6 @@
     "noEmitOnError": false,
     "strictNullChecks": true,
     "baseUrl": ".",
-    "rootDir": ".",
     "module": "commonjs",
     "outDir": "./__artifacts/local",
     "declaration": true,

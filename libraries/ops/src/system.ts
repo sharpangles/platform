@@ -1,8 +1,8 @@
 import { Interface } from './interface';
+import { Surface } from './placement/surface';
 import { Connection } from './connection';
 import { MappedTransition } from './transitions/mapped_transition';
 import { Transitive } from './transitions/transitive';
-import { Surface } from './placement/placement';
 import { Tracker, TrackerResult } from './tracker';
 
 export interface SystemResult extends TrackerResult {

@@ -1,63 +1,39 @@
 import { Connection } from './connection';
+import { Multiplexer } from './multiplexer';
+import { Disposable, CancellationToken, Validation } from '@sharpangles/lang';
 import { Interface } from './interface';
-import { Transitive } from './transitions/transitive';
-import { DynamicMerge } from './transitions/dynamic_merge';
-import { Connectable } from './connectable';
+import { Connectable, ConnectionResult } from './connectable';
 import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/never';
 
-export abstract class Connector<TEvent = any> extends Connectable<TEvent> {
-    constructor(public parent?: Interface | Connection) {
+export interface Connector<T = any> extends Connectable<T> {
+    connections: IterableIterator<Connection>;
+}
+
+export class InputConnector<T = any> extends Multiplexer<T> implements Connector<T> {
+    constructor(public iface: Interface) {
         super();
-        this.dynamicMerge = new DynamicMerge<Connectable<TEvent>, TEvent>();
-        let neverObservable = Observable.never();
-        this.dynamicMerge.set(this, neverObservable);
+    }
+}
+
+@Disposable()
+export class OutputConnector<TEvent = any> implements Connector<TEvent>, Disposable {
+    constructor(public iface: Interface) {
     }
 
-    protected dynamicMerge: DynamicMerge<Connectable<TEvent>, TEvent>;
-    protected connections = new Map<Connectable<TEvent>, () => void>();
+    private connectionSet = new Set<Connectable>();
+    get connections(): IterableIterator<Connectable> { return this.connectionSet.keys(); }
 
-    connect(connectable: Connectable<TEvent>, connectTransition: Transitive<boolean>) {
-        if (this.connections.has(connectable))
-            throw new Error('Connectable already attached.');
-        let transitioningSubscription = connectable.transitioning.subscribe(() => this.dynamicMerge.delete(connectable)); // If it reenters transitioning, ensure its deleted
-        let transitionedSubscription = connectable.transitioned.subscribe(() => this.dynamicMerge.set(connectable, connectable.observable)); // Only add after fully connected
-        let disposal = () => {
-            this.dynamicMerge.delete(connectable);
-            transitioningSubscription.unsubscribe();
-            transitionedSubscription.unsubscribe();
-        };
-        this.connections.set(connectable, disposal);
-        super.connect(connectable, connectTransition);
+    async connectAsync(connectable: Connectable, cancellationToken?: CancellationToken): Promise<ConnectionResult> {
+        return <ConnectionResult>{ validation: <Validation>{ isValid: true }, commit: () => { this.connectionSet.delete(connectable); } };
     }
 
-    disconnect(connectable: Connectable<TEvent>, disconnectTransition: Transitive<boolean>) {
-        let disposal = this.connections.get(connectable);
-        if (!disposal)
-            throw new Error('Connectable not attached.');
-        disposal();
-        super.disconnect(connectable, disconnectTransition);
+    async disconnectAsync(connectable: Connectable, cancellationToken?: CancellationToken): Promise<ConnectionResult> {
+        if (!this.connectionSet.has(connectable))
+            return <ConnectionResult>{ validation: <Validation>{ isValid: false } };
+        return <ConnectionResult>{ validation: <Validation>{ isValid: true }, commit: () => { this.connectionSet.delete(connectable); } };
     }
 
     dispose() {
-        for (let disposal of this.connections.values())
-            disposal();
-        this.connections.clear();
-        this.dynamicMerge.dispose();
-        super.dispose();
-    }
-}
-
-export class InputConnector<TEvent = any> extends Connector<TEvent> {
-    constructor(parent?: Interface | Connection) {
-        super(parent);
-    }
-
-    get observable(): Observable<TEvent> { return this.dynamicMerge.observable; }
-}
-
-export class OutputConnector<TEvent = any> extends Connector<TEvent> {
-    constructor(public observable: Observable<TEvent>, parent: Interface | Connection) {
-        super(parent);
+        this.input.dispose();
     }
 }
