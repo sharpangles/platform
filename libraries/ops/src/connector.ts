@@ -1,12 +1,11 @@
-import { Connection } from './connection';
+import { Splitter } from './splitter';
 import { Multiplexer } from './multiplexer';
-import { Disposable, CancellationToken, Validation } from '@sharpangles/lang';
 import { Interface } from './interface';
-import { Connectable, ConnectionResult } from './connectable';
+import { Connectable } from './connectable';
 import { Observable } from 'rxjs/Observable';
 
 export interface Connector<T = any> extends Connectable<T> {
-    connections: IterableIterator<Connection>;
+    iface: Interface;
 }
 
 export class InputConnector<T = any> extends Multiplexer<T> implements Connector<T> {
@@ -15,25 +14,8 @@ export class InputConnector<T = any> extends Multiplexer<T> implements Connector
     }
 }
 
-@Disposable()
-export class OutputConnector<TEvent = any> implements Connector<TEvent>, Disposable {
-    constructor(public iface: Interface) {
-    }
-
-    private connectionSet = new Set<Connectable>();
-    get connections(): IterableIterator<Connectable> { return this.connectionSet.keys(); }
-
-    async connectAsync(connectable: Connectable, cancellationToken?: CancellationToken): Promise<ConnectionResult> {
-        return <ConnectionResult>{ validation: <Validation>{ isValid: true }, commit: () => { this.connectionSet.delete(connectable); } };
-    }
-
-    async disconnectAsync(connectable: Connectable, cancellationToken?: CancellationToken): Promise<ConnectionResult> {
-        if (!this.connectionSet.has(connectable))
-            return <ConnectionResult>{ validation: <Validation>{ isValid: false } };
-        return <ConnectionResult>{ validation: <Validation>{ isValid: true }, commit: () => { this.connectionSet.delete(connectable); } };
-    }
-
-    dispose() {
-        this.input.dispose();
+export class OutputConnector<T = any> extends Splitter<T> implements Connector<T> {
+    constructor(public iface: Interface, observable: Observable<T>) {
+        super(observable);
     }
 }

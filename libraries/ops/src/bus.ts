@@ -1,69 +1,55 @@
-import { DynamicMerge } from './transitions/dynamic_merge';
-import { Connectable } from './connectable';
+import { NestedValidation, CancellationToken, MessageValidation } from '@sharpangles/lang';
+import { Removable } from './operational';
+import { Multiplexer } from './multiplexer';
+import { Splitter } from './splitter';
+import { ConnectionResult } from './connectable';
 import { Observable } from 'rxjs/Observable';
+import { Subject } from 'rxjs/Subject';
 
 /**
- * Models an imperative and potentially transactional process of joining two connectables.
+ * Dynamically connects inputs of one type through outputs of another.
  */
-export abstract class Bus<TSourceEvent = any, TTargetEvent = any> {
-    protected dynamicMerge = new DynamicMerge<Connectable, TSourceEvent>();
-    protected connections = new Map<Connectable, boolean>();
+export class Bus<TSource = any, TTarget = any> implements Removable {
+    constructor() {
+        this.output = new Multiplexer<TSource>();
+        this.input = new Splitter<TTarget>(this.createObservable(this.output.observable));
+    }
 
-    get observable(): Observable<TTargetEvent> { return }
+    output: Multiplexer<TSource>;
+    input: Splitter<TTarget>;
 
-    inputConnectable: Connectable;
-    outputConnectable: Connectable;
+    private removedSubject = new Subject<void>();
+    get removed(): Observable<void> { return this.removedSubject; }
 
+    /** The default implementation simply returns the source as the target. */
+    protected createObservable(input: Observable<TSource>): Observable<TTarget> {
+        return <any>input;
+    }
 
-
-
-    protected async createConnectPromise(connectable: Connectable, input: ConnectableInput): Promise<ConnectableResult> {
-        this.connections.set(connectable, false);
-        if (this.connections.has(connectable))
-            throw new Error('Connectable already attached.');
-        let result = await super.createConnectPromise(connectable, input);
-        this.dynamicMerge.set(connectable, connectable.observable);
-        this.connections.set(connectable, true);
+    async removeAsync(cancellationToken?: CancellationToken): Promise<ConnectionResult> {
+        let results = await Promise.all([this.output.removeAsync(cancellationToken), this.input.removeAsync(cancellationToken)]);
+        let result = <ConnectionResult>{ validation: new NestedValidation(undefined, [results[0].validation, results[1].validation]) };
+        let rollback = () => {
+            results[0].rollback && (<Function>results[0].rollback)();
+            results[1].rollback && (<Function>results[1].rollback)();
+            this.removedSubject.error(new MessageValidation('Connection was rolled back.'));
+        };
+        if (!result.validation.isValid) {
+            rollback();
+            return result;
+        }
+        result.commit = () => {
+            results[0].commit && (<Function>results[0].commit)();
+            results[1].commit && (<Function>results[1].commit)();
+            this.removedSubject.next();
+            this.removedSubject.complete();
+        };
+        result.rollback = rollback;
         return result;
     }
 
-    protected async createDisonnectPromise(connectable: Connectable, input: ConnectableInput): Promise<ConnectableResult> {
-        let wasConnected = this.connections.get(connectable);
-        if (!disposal)
-            throw new Error('Connectable not attached.');
-        let result = await super.createDisonnectPromise(connectable, input);
-        this.dynamicMerge.set(connectable, connectable.observable);
-        this.connections.set(connectable, true);
-        return result;
+    dispose() {
+        this.output.dispose();
+        this.input.dispose();
     }
-
-    async disconnectAsync(connectable: Connectable): Promise<void> {
-        let disposal = this.connections.get(connectable);
-        if (!disposal)
-            throw new Error('Connectable not attached.');
-
-        if (this.connections.has(connectable))
-            throw new Error('Connectable already attached.');
-        this.connections.set(connectable, false);
-        if (!await super.connectAsync(connectable))
-            return false;
-        this.dynamicMerge.set(connectable, connectable.observable);
-        this.connections.set(connectable, true);
-        return true;
-    }
-
-
-
-
-    // async connectInputAsync(input: InputConnector<TSourceEvent>, cancellationToken?: CancellationToken): Promise<ConnectionResult> {
-    // }
-
-    // async connectOutputAsync(output: OutputConnector<TTargetEvent>, cancellationToken?: CancellationToken): Promise<ConnectionResult> {
-    // }
-
-    // async disconnectInputAsync(input: InputConnector<TSourceEvent>, cancellationToken?: CancellationToken): Promise<ConnectionResult> {
-    // }
-
-    // async disconnectOutputAsync(output: OutputConnector<TTargetEvent>, cancellationToken?: CancellationToken): Promise<ConnectionResult> {
-    // }
 }

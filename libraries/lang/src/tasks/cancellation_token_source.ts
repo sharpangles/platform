@@ -4,13 +4,13 @@ export class CancellationTokenSource {
     token = new CancellationToken(this);
 
     /** @internal */
-    isCancelled = false;
+    isCancellationRequested = false;
 
     /** @internal */
     registrations: (() => void)[];
 
     cancel() {
-        this.isCancelled = true;
+        this.isCancellationRequested = true;
         for (let registration of this.registrations)
             registration();
     }

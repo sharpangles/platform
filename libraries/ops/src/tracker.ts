@@ -1,28 +1,12 @@
 import { Surface } from './placement/surface';
-import { MappedTransition } from './transitions/mapped_transition';
-import { Transitive } from './transitions/transitive';
-import { System } from './system';
-import { StateMachine } from './transitions/state_machine';
+import { Operational, Removable } from './operational';
 import { Interface } from './interface';
+import { System } from './system';
 
-export interface TrackerResult {
-    success: boolean;
-    added: boolean;
-    iface?: Interface;
-}
-
-export class Tracker extends StateMachine<TrackerResult> {
+export class Tracker extends Operational {
     constructor(public interfaces: Surface<Interface>, public system?: System) {
         super();
     }
 
-    addInterface(iface: Interface, addTransition: Transitive<boolean>) {
-        this.interfaces.place(iface);
-        this.transition(new MappedTransition<boolean, TrackerResult>(addTransition, result => <TrackerResult>{ success: !!result, added: true, iface: iface }));
-    }
-
-    removeInterface(iface: Interface, removeTransition: Transitive<boolean>) {
-        removeTransition.transitioned.take(1).toPromise().then(() => this.interfaces.remove(iface));
-        this.transition(new MappedTransition<boolean, TrackerResult>(removeTransition, result => <TrackerResult>{ success: !!result, added: false, iface: iface }));
-    }
+    get children(): Iterable<Removable> { return this.interfaces; }
 }

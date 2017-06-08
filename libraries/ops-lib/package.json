@@ -1,7 +1,7 @@
 {
   "version": "1.0.0-alpha.0",
-  "name": "@sharpangles/ops",
-  "description": "Operational management of systems",
+  "name": "@sharpangles/ops-lib",
+  "description": "GUI for @sharpangles/ops",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/sharpangles/platform.git"
@@ -16,7 +16,7 @@
   "bugs": {
     "url": "https://github.com/sharpangles/platform/issues"
   },
-  "homepage": "https://github.com/sharpangles/platform/tree/master/modules/ops#readme",
+  "homepage": "https://github.com/sharpangles/platform/tree/master/modules/ops-lib#readme",
   "scripts": {
     "watch": "tsc && node __artifacts/local/build.js watch",
     "build": "tsc && node __artifacts/local/build.js",
@@ -30,7 +30,8 @@
     "jsonpath": "^0.2.11"
   },
   "peerDependencies": {
-    "@sharpangles/lang": "1.0.0-alpha.0"
+    "@sharpangles/lang": "1.0.0-alpha.0",
+    "@sharpangles/ops": "1.0.0-alpha.0"
   },
   "devDependencies": {
     "@types/jsonpath": "^0.1.29",
@@ -50,6 +51,6 @@
     "concat-with-sourcemaps": "^1.0.4"
   },
   "types": "index.d.ts",
-  "main": "bundles/ops.umd.js",
-  "module": "bundles/ops.es.js"
+  "main": "bundles/ops-lib.umd.js",
+  "module": "bundles/ops-lib.es.js"
 }
