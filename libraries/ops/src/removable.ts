@@ -1,20 +1,22 @@
 import { ConnectionResult } from './connectable';
-import { MessageValidation, NestedValidation, CancellationToken, Disposable } from '@sharpangles/lang';
+import { MessageValidation, NestedValidation, CancellationToken, CancellationTokenSource, Disposable } from '@sharpangles/lang';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 
 export interface Removable extends Disposable {
     removeAsync(cancellationToken?: CancellationToken): Promise<ConnectionResult>;
+    removed: Observable<void>;
 }
 
 @Disposable()
-export abstract class Operational implements Removable {
+export abstract class Remover implements Removable {
     private removedSubject = new Subject<void>();
     get removed(): Observable<void> { return this.removedSubject; }
 
     abstract get children(): Iterable<Removable>;
 
     async removeAsync(cancellationToken?: CancellationToken): Promise<ConnectionResult> {
+        cancellationToken = CancellationTokenSource.createLinkedTokenSource(this.cancellationTokenSource.token, cancellationToken).token;
         let removalResults = await Promise.all(Array.from(this.children).map(o => o.removeAsync(cancellationToken)));
         if (removalResults.find(r => !r.validation.isValid)) {
            this.rollbackRemoval(removalResults);
@@ -41,11 +43,32 @@ export abstract class Operational implements Removable {
     protected commitRemoval(removalResults: ConnectionResult[]) {
         for (let result of removalResults)
             result.commit && result.commit();
+        this.runRemovals();
         this.removedSubject.next();
         this.removedSubject.complete();
     }
 
+    registerRemoval(registration: () => void) {
+        if (!this.removals)
+            this.removals = [];
+        this.removals.push(registration);
+    }
+
+    private runRemovals() {
+        if (this.removals) {
+            for (let removal of this.removals)
+                removal();
+            delete this.removals;
+        }
+    }
+
+    private removals?: (() => void)[];
+
+    protected cancellationTokenSource = new CancellationTokenSource();
+
     dispose() {
+        this.runRemovals();
+        this.cancellationTokenSource.cancel();
         for (let child of this.children)
             child.dispose();
     }

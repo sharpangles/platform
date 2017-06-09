@@ -1,23 +1,24 @@
-import { Operational, Removable } from './operational';
+import { Remover } from './removable';
+import { Removable } from './removable';
 import { Connection } from './connection';
 import { Connectable, ConnectionResult } from './connectable';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
-import { Subscription } from 'rxjs/Subscription';
-import { CancellationToken, Validation, MessageValidation, DynamicMerge } from '@sharpangles/lang';
+import { CancellationToken, CancellationTokenSource, Validation, MessageValidation, DynamicMerge } from '@sharpangles/lang';
 import 'rxjs/add/observable/merge';
 
 /**
  * A connectable whose observable is the result of dynamic multiplexed inputs.
  */
-export class Multiplexer<T> extends Operational implements Connectable<T> {
+export class Multiplexer<T> extends Remover implements Connectable<T> {
     constructor() {
         super();
-        this.subscription = this.dynamicMerge.observable.subscribe(this.observableSubject);
+        let subscription = this.dynamicMerge.observable.subscribe(this.observableSubject);
+        this.registerRemoval(() => subscription.unsubscribe());
+        this.registerRemoval(() => this.dynamicMerge.dispose());
     }
 
     private dynamicMerge = new DynamicMerge<Connection, T>();
-    private subscription: Subscription;
 
     private observableSubject = new Subject<T>(); // Pass observable through a subject so we can break the connection immediately on removal
     get observable(): Observable<T> { return this.observableSubject; }
@@ -32,6 +33,7 @@ export class Multiplexer<T> extends Operational implements Connectable<T> {
 
     /** Connects an inbound connection. */
     async connectAsync(connection: Connection, cancellationToken?: CancellationToken): Promise<ConnectionResult> {
+        cancellationToken = CancellationTokenSource.createLinkedTokenSource(this.cancellationTokenSource.token, cancellationToken).token;
         return <ConnectionResult>{
             validation: <Validation>{ isValid: true },
             commit: () => {
@@ -46,6 +48,7 @@ export class Multiplexer<T> extends Operational implements Connectable<T> {
 
     /** Connects an inbound connection. */
     async disconnectAsync(connection: Connection, cancellationToken?: CancellationToken): Promise<ConnectionResult> {
+        cancellationToken = CancellationTokenSource.createLinkedTokenSource(this.cancellationTokenSource.token, cancellationToken).token;
         return <ConnectionResult>{
             validation: <Validation>{ isValid: true },
             commit: () => {
@@ -62,17 +65,5 @@ export class Multiplexer<T> extends Operational implements Connectable<T> {
         super.commitRemoval(removalResults);
         this.connectedSubject.complete();
         this.disconnectedSubject.complete();
-        if (this.subscription) {
-            this.subscription.unsubscribe();
-            delete this.subscription;
-        }
-    }
-
-    dispose() {
-        if (this.subscription) {
-            this.subscription.unsubscribe();
-            delete this.subscription;
-        }
-        this.dynamicMerge.dispose();
     }
 }

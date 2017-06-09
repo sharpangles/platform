@@ -1,18 +1,31 @@
-import { Interface } from './interface';
-import { Surface } from './placement/surface';
-import { Removable } from './operational';
+import { Bus } from './bus';
 import { Tracker } from './tracker';
 
+// @todo Need DI containers here.  Systems are a lifetime scope but I cant find any JS DI packages support lifetime (scope/dispose).
+// Its a todo item in inversify, but still doesn't add dispose from what I see yet.
 export class System extends Tracker {
-    constructor(public trackers: Surface<Tracker>, public interfaces: Surface<Interface>, public system?: System) {
-        super(interfaces, system);
+    constructor(public system?: System) {
+        super(system);
     }
 
-    get children(): Iterable<Removable> { return this._children(); }
-    private *_children(): Iterable<Removable> {
-        for (let child of super.children)
-            yield child;
-        for (let tracker of this.trackers)
-            yield <any>tracker;
+    get trackers(): Iterable<Tracker> { return this._trackers(); }
+    private *_trackers() {
+        for (let tracker of this.children)
+            if (tracker instanceof Tracker)
+                yield tracker;
+    }
+
+    get systems(): Iterable<Tracker> { return this._systems(); }
+    private *_systems() {
+        for (let system of this.children)
+            if (system instanceof System)
+                yield system;
+    }
+
+    get busses(): Iterable<Bus> { return this._busses(); }
+    private *_busses() {
+        for (let bus of this.children)
+            if (bus instanceof Bus)
+                yield bus;
     }
 }

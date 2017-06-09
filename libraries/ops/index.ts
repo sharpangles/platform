@@ -4,7 +4,7 @@ export { Surface } from './src/placement/surface';
 export { Tracker } from './src/tracker';
 export { System } from './src/system';
 export { Splitter } from './src/splitter';
-export { Operational } from './src/operational';
+export { RemovableBase } from './src/operational';
 export { Multiplexer } from './src/multiplexer';
 export { Interface } from './src/interface';
 export { Connector, InputConnector, OutputConnector } from './src/connector';

@@ -1,12 +1,17 @@
-import { Surface } from './placement/surface';
-import { Operational, Removable } from './operational';
+import { Removable } from './removable';
 import { Interface } from './interface';
+import { Container } from './container';
 import { System } from './system';
 
-export class Tracker extends Operational {
-    constructor(public interfaces: Surface<Interface>, public system?: System) {
+export class Tracker extends Container<Removable> {
+    constructor(public system?: System) {
         super();
     }
 
-    get children(): Iterable<Removable> { return this.interfaces; }
+    get interfaces(): Iterable<Interface> { return this._interfaces(); }
+    private *_interfaces() {
+        for (let iface of this.children)
+            if (iface instanceof Interface)
+                yield iface;
+    }
 }
