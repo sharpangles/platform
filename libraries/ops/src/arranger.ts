@@ -7,6 +7,20 @@ import { ConnectionResult, createCompositeConnectionResult } from './connectable
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 
+
+
+// TODO:
+// - Query ability by type and path restrictions (allowing descendents, ancestors, path reversals, etc...)
+// - Interfaces no longer offer anything with transactional behavior.  Get rid of them.
+// - Register arrangers on removers.  Arrangers never destroy stuff, they unregister themselves.  If the last arranger is removed, then the piece is destroyed.
+// - What do we name 'removers'?  Its the base class for all the stuff that we actually see and interact with.  'Connection' is just the glue.
+
+
+
+
+
+
+
 /**
  * An item added to a tracker as an interface, capable of manipulating the system graph.
  */
