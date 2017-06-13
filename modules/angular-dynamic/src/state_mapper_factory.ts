@@ -86,7 +86,7 @@ export class StateMapperFactory {
                     if (stateValue !== undefined)
                         component[pair[0]] = stateValue;
                 }
-                let stateChanged: StateChange = {};
+                let stateChanged: StateChange = { state: state };
                 if (controlProp)
                     stateChanged.control = component[controlProp];
                 return stateChanged;

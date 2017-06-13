@@ -10,7 +10,7 @@ Unfortunately, it touches alot more than just the module loading process.
 
 ## What works:
 ### [@sharpangles/angular-dynamic](https://github.com/sharpangles/platform/tree/master/modules/angular-dynamic)
-Dynamic component loading for Angular.  Enables dynamic state and loading capabilities through a set of directives not achievable simply through the use of SystemJS
+Dynamic component loading for Angular.  Enables dynamic state and loading capabilities through a set of directives not achievable simply through the use of SystemJsNgModuleLoader.
 
 ## What is in progress:
 

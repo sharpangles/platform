@@ -15,7 +15,7 @@ export function getState(injector: Injector, component: WidgetCustomizingStatePr
 }
 export function setState(injector: Injector, component: any, state: IWidgetState): StateChange {
     (<WidgetCustomizingStateProjection>component).someValue = state ? state.someValue.toUpperCase() : null;
-    return {};
+    return { state: state };
 }
 
 @Component({
@@ -56,7 +56,7 @@ export class WidgetUsingInheritance extends StateMapper {
     }
     setState(state: IWidgetState): StateChange {
         this.someValue = state ? state.someValue.toUpperCase() : null;
-        return {};
+        return { state: state };
     }
 
     someValue: any;

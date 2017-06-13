@@ -1,7 +1,8 @@
 import { AbstractControl } from '@angular/forms';
 
-export interface StateChange {
+export interface StateChange<TState = any> {
     control?: AbstractControl;
+    state: TState;
 }
 
 /**
