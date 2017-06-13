@@ -1,7 +1,7 @@
 export { CommonJsNgModuleLoader, CommonJsNgModuleLoaderConfig } from './src/common_js_ng_module_factory_loader';
 export { ComponentTypeLoader, TypeReferenceUrlResolver, TYPE_REFERENCE_URL_RESOLVER } from './src/component_type_loader';
 export { StateChange, TypeReference } from './src/interfaces';
-export { ControlDecorator, StateDecorator, StatefulDecorator } from './src/metadata';
+export { ControlDecorator, StateDecorator, StatefulDecorator, Control, State, Stateful } from './src/metadata';
 export { StateMapperFactory } from './src/state_mapper_factory';
 export { StateMapper } from './src/state_mapper';
 export { StatefulModule } from './src/stateful_module';
