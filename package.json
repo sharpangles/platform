@@ -1,12 +1,12 @@
 {
    "name": "@sharpangles/platform",
-   "version": "1.0.0-alpha.0",
+   "version": "1.0.0-alpha.1",
    "description": "monorepo for sharpangles development",
    "scripts": {
       "bootstrap": "lerna bootstrap",
       "build": "lerna run build",
       "test": "lerna run test",
-      "clean": "git clean -xdf && yarn && yarn run bootstrap"
+      "clean": "git clean -xdf && npm run bootstrap"
    },
    "keywords": [
       "Angular",
@@ -27,21 +27,21 @@
       "@angular/platform-browser-dynamic": "^4.0.0",
       "@angular/platform-server": "4.0.0",
       "@angular/router": "^4.0.0",
-      "@types/jasmine": "^2.5.43",
-      "@types/node": "^7.0.5",
+      "@types/jasmine": "^2.5.52",
+      "@types/node": "^7.0.31",
       "core-js": "^2.4.1",
       "cpy-cli": "^1.0.1",
-      "jasmine": "^2.5.3",
-      "lerna": "^2.0.0-rc.1",
-      "nyc": "^10.2.0",
-      "rimraf": "^2.5.4",
-      "rollup": "^0.41.4",
-      "rxjs": "^5.1.0",
-      "ts-node": "^2.1.0",
-      "tslib": "1.6.0",
-      "tslint": "^4.4.2",
-      "typescript": "^2.3.0",
-      "uglifyjs": "^2.4.10",
-      "zone.js": "^0.8.4"
+      "jasmine": "^2.6.0",
+      "lerna": "^2.0.0-rc.5",
+      "nyc": "^11.0.2",
+      "rimraf": "^2.6.1",
+      "rollup": "^0.43.0",
+      "rxjs": "^5.4.0",
+      "ts-node": "^3.0.6",
+      "tslib": "1.7.1",
+      "tslint": "^5.4.3",
+      "typescript": "^2.3.4",
+      "uglify-js": "^3.0.15",
+      "zone.js": "^0.8.12"
    }
 }

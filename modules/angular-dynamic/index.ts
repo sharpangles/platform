@@ -8,3 +8,4 @@ export { StatefulModule } from './src/stateful_module';
 export { SaStateOutlet } from './src/directives/sa_state_outlet';
 export { SaLazyComponentOutlet } from './src/directives/sa_lazy_component_outlet';
 export { SaFormControl } from './src/directives/sa_form_control';
+export { AngularReflector } from './src/angular_reflector';

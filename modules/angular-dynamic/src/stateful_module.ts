@@ -5,6 +5,7 @@ import { SaFormControl } from './directives/sa_form_control';
 import { SaLazyComponentOutlet } from './directives/sa_lazy_component_outlet';
 import { ComponentTypeLoader } from './component_type_loader';
 import { StateMapperFactory } from './state_mapper_factory';
+import { AngularReflector } from './angular_reflector';
 
 @NgModule({
   declarations: [SaStateOutlet, SaLazyComponentOutlet, SaFormControl],
@@ -17,7 +18,8 @@ export class StatefulModule {
       ngModule: StatefulModule,
       providers: [
         ComponentTypeLoader,
-        StateMapperFactory
+        StateMapperFactory,
+        AngularReflector
       ]
     };
   }

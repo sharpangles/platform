@@ -1,11 +1,12 @@
-import { Type, Injectable, Input, Injector, ɵReflector as Reflector } from '@angular/core';
+import { Type, Injectable, Input, Injector } from '@angular/core';
 import { Stateful } from './metadata';
 import { StateChange } from './interfaces';
 import { StateMapper } from './state_mapper';
+import { AngularReflector } from './angular_reflector';
 
 @Injectable()
 export class StateMapperFactory {
-    constructor(private reflector: Reflector) {
+    constructor(private reflector: AngularReflector) {
     }
 
     private statefulsByType: Map<Type<any>, Stateful> = new Map<Type<any>, Stateful>();
@@ -22,7 +23,7 @@ export class StateMapperFactory {
     }
 
     private load(typeOrFunc: Type<any>): Stateful {
-        let stateful: Stateful = this.reflector.annotations(typeOrFunc).find(a => a.getState || a.setState);
+        let stateful: Stateful = new AngularReflector().annotations(typeOrFunc).find(a => a.getState || a.setState);
         if (stateful)
             return stateful;
         stateful = this.createDefault(typeOrFunc);
@@ -41,7 +42,7 @@ export class StateMapperFactory {
     protected createDefault(typeOrFunc: Type<any>) {
         let statePairs: [string, string][] = [];
         let inputPairs: [string, string][] = [];
-        let propertyMetadata = this.reflector.propMetadata(typeOrFunc);
+        let propertyMetadata = new AngularReflector().propMetadata(typeOrFunc);
         let controlProp: string;
 
         this.stringMap(propertyMetadata, (metadata: any[], propName: string) => {
