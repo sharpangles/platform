@@ -1,4 +1,6 @@
 export { CommonJsNgModuleLoader, CommonJsNgModuleLoaderConfig } from './src/common_js_ng_module_factory_loader';
+export { ExistingNgModuleLoader } from './src/existing_ng_module_factory_loader';
+export { ExplicitNgModuleLoader } from './src/explicit_ng_module_factory_loader';
 export { ComponentTypeLoader, TypeReferenceUrlResolver, TYPE_REFERENCE_URL_RESOLVER } from './src/component_type_loader';
 export { StateChange, TypeReference } from './src/interfaces';
 export { ControlDecorator, StateDecorator, StatefulDecorator, Control, State, Stateful } from './src/metadata';

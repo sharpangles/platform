@@ -1,4 +1,4 @@
-import { Injectable, Injector, NgModuleFactory, resolveForwardRef, NgModuleFactoryLoader, NgModule, Type, InjectionToken, Optional, Inject } from '@angular/core';
+import { Injectable, Injector, NgModuleFactory, resolveForwardRef, NgModuleFactoryLoader, NgModule, Type, InjectionToken, Optional, Inject, getModuleFactory } from '@angular/core';
 import { TypeReference } from './interfaces';
 
 /**

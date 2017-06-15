@@ -1,6 +1,6 @@
 {
    "name": "@sharpangles/platform",
-   "version": "1.0.0-alpha.3",
+   "version": "1.0.0-alpha.4",
    "description": "monorepo for sharpangles development",
    "scripts": {
       "bootstrap": "lerna bootstrap",
