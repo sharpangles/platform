@@ -2,7 +2,7 @@ import { AsyncBus } from './async_bus';
 import { CancellationToken } from '@sharpangles/lang';
 
 /**
- * Dynamically connects inputs of one type through outputs of another.
+ * A bus that performs async work on events before emitting the output, waiting for each result one at a time.
  */
 export class AsyncQueueBus<TTarget = any> extends AsyncBus<TTarget> {
     constructor() {

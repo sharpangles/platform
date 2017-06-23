@@ -1,18 +1,15 @@
 import { CancellationToken, MessageValidation } from '@sharpangles/lang';
-import { SubscribingInputConnector, OutputConnector } from './connector';
-import { Interface } from './interface';
+import { OutputConnector, SubjectOutputConnector, SubscribingInputConnector } from './connector';
+import { Remover } from './removable';
 import { Tracker } from './tracker';
-import { System } from './system';
 import { ConnectionResult, createCompositeConnectionResult } from './connectable';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
-
+import 'rxjs/add/observable/fromPromise';
 
 
 // TODO:
 // - Query ability by type and path restrictions (allowing descendents, ancestors, path reversals, etc...)
-// - Interfaces no longer offer anything with transactional behavior.  Get rid of them.
-// - Register arrangers on removers.  Arrangers never destroy stuff, they unregister themselves.  If the last arranger is removed, then the piece is destroyed.
 // - What do we name 'removers'?  Its the base class for all the stuff that we actually see and interact with.  'Connection' is just the glue.
 
 
@@ -25,47 +22,69 @@ import { Subject } from 'rxjs/Subject';
  * An item added to a tracker as an interface, capable of manipulating the system graph.
  */
 export class Arranger {
-    /** Sets the arranger configuration and the interface on which it is being added. */
-    async initializeAsync(config: any, iface: Interface): Promise<void> {
+    constructor(public tracker?: Tracker) {
     }
 
-    /** Allows a tracker to answer if it is able to support a supplied configuration from its current one.  If so, update may be called. */
-    compare(config: any): boolean {
-        return false;
+    /** Sets the arranger configuration for the first time. */
+    async configAsync(config: any, cancellationToken?: CancellationToken): Promise<void> {
+        // let promise = this.onInitializeAsync(config, cancellationToken);
+        // let initializedConnector = new OutputConnector<void>(this, Observable.fromPromise(promise));
+        // let result = await this.addChildAsync(initializedConnector, cancellationToken);
+        // if (result.canCommit && result.canCommit())
+        //     result.commit && result.commit();
+        // else {
+        //     result.rollback && result.rollback();
+        //     throw new Error(`Unable to add 'initialized' connector.`);
+        // }
+        // await promise;
     }
 
-    /** Updates the arranger to handle the provided configuration.  Called only if its compare call returned true for the same config. */
-    async updateAsync(config: any, cancellationToken?: CancellationToken): Promise<ConnectionResult> {
-        throw new Error('update not supported.');
-    }
+    protected registeredRemovals = new Set<Remover>();
 
-    private initializedSubject = new Subject<void>();
-    get initialized(): Observable<void> { return this.initializedSubject; }
-    private updatedSubject = new Subject<void>();
-    get updated(): Observable<void> { return this.updatedSubject; }
+    protected getRemovals(cancellationToken?: CancellationToken): Promise<ConnectionResult>[] {
+        return super.getRemovals(cancellationToken).concat(Array.from(this.registeredRemovals).map(r => r.unregisterArrangerAsync(this, cancellationToken)));
+    }
 
     dispose() {
     }
 }
 
 /** An arranger that adds trackers of arrangers */
-export class ArrangerArranger {
-    constructor(public system: System) {
+export class ArrangerArranger extends Arranger {
+    constructor(tracker: Tracker) {
+        super(tracker);
+    }
+
+    /** Sets the arranger configuration for the first time. */
+    async initializeAsync(config: any): Promise<void> {
+        this.registerArranger(this);
+    }
+
+    async createConfigTrackerChainAsync() {
     }
 
     async createArrangerTrackerAsync<TConfig>(arranger: Arranger, cancellationToken?: CancellationToken): Promise<ConnectionResult> {
-        let tracker = new Tracker(this.system);
-        let systemPromise = this.system.addChildAsync(tracker, cancellationToken);
+        // let systemPromise = this.system.addChildAsync(tracker, cancellationToken);
+        // tracker.registerRemoval(() => arranger.dispose());
+        // let updateConnector = new SubscribingInputConnector<TConfig>(this, c => arranger.updateAsync(c));
+        // let updateConnectorPromise = tracker.addChildAsync(updateConnector, cancellationToken);
+
+        let tracker = new Tracker(this.tracker);
+        await tracker.registerArranger(this);
         tracker.registerRemoval(() => arranger.dispose());
-        let iface = new Interface(tracker);
-        let ifacePromise = tracker.addChildAsync(iface, cancellationToken);
-        let updateConnector = new SubscribingInputConnector<TConfig>(iface, c => arranger.updateAsync(c));
-        let updateConnectorPromise = iface.addChildAsync(updateConnector, cancellationToken);
-        let initializedConnector = new OutputConnector<void>(iface, arranger.updated);
-        let initializedConnectorPromise = iface.addChildAsync(initializedConnector, cancellationToken);
-        let updatedConnector = new OutputConnector<void>(iface, arranger.updated);
-        let updatedConnectorPromise = iface.addChildAsync(updatedConnector, cancellationToken);
-        let results = await Promise.all([systemPromise, ifacePromise, updateConnectorPromise, updatedConnectorPromise, initializedConnectorPromise]);
+        let configConnector = new SubjectOutputConnector<void>(tracker);
+        let configPromise = tracker.addChildAsync(configConnector, cancellationToken);
+        let results = await Promise.all([configPromise]);
         return createCompositeConnectionResult(results, isValid => isValid ? undefined : new MessageValidation('Failed to create arranger'));
     }
+}
+
+export async function addPromiseConnectorsToTrackerAsync(tracker: Tracker, promiseFactory: () => Promise<void>, cancellationToken?: CancellationToken): Promise<ConnectionResult> {
+    // @todo Would be nice if we could create a async queue bus between in front of this input connector and wrap that up as a connector...(i.e. hide the bus internally in here)
+    let outputConnector = new SubjectOutputConnector<void>(tracker);
+    let inputConnector = new SubscribingInputConnector<void>(tracker, () => promiseFactory().then(r => outputConnector.subject.next(r)));
+    let outputConnectorPromise = tracker.addChildAsync(outputConnector, cancellationToken);
+    let inputConnectorPromise = tracker.addChildAsync(inputConnector, cancellationToken);
+    let results = await Promise.all([outputConnectorPromise, inputConnectorPromise]);
+    return createCompositeConnectionResult(results, isValid => isValid ? undefined : new MessageValidation('Failed to create promise connectors'));
 }

@@ -5,7 +5,7 @@ import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 
 /**
- * Dynamically connects inputs of one type through outputs of another.
+ * A bus that performs async work on events before emitting the output.
  */
 export class AsyncBus<TTarget = any> extends Bus<(cancellationToken: CancellationToken) => Promise<TTarget>, TTarget> {
     constructor() {
