@@ -3,10 +3,9 @@
   "version": "1.0.0-alpha.4",
   "description": "monorepo for sharpangles development",
   "scripts": {
-    "bootstrap": "lerna bootstrap",
-    "build": "lerna run build",
-    "test": "lerna run test",
-    "clean": "git clean -xdf && npm run bootstrap"
+    "build": "node ./build.js",
+    "test": "node ./build.js --test",
+    "publish": "node ./build.js --test --publish"
   },
   "keywords": [
     "Angular",
