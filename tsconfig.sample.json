@@ -1,0 +1,18 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compileOnSave": false,
+  "compilerOptions": {
+    "baseUrl": ".",
+    "outDir": "../dist/out-tsc/sample",
+    "module": "es2015",
+    "sourceMap": true,
+    "inlineSourceMap": false,
+    "inlineSources": false,
+    "paths": {
+      "@sharpangles/*": ["./modules/*"]
+    }
+  },
+  "include": [
+    "./samples/*/main.ts"
+  ]
+}

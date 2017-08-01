@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compileOnSave": true,
+  "compilerOptions": {
+    "baseUrl": ".",
+    "module": "commonjs",
+    "noEmit": true,
+    "paths": {
+      "@sharpangles/*": ["./modules/*"]
+    }
+  },
+  "exclude": [
+    "./*/unsorted",
+    "./node_modules"
+  ]
+}

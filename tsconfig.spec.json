@@ -1,0 +1,28 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compileOnSave": false,
+  "compilerOptions": {
+    "baseUrl": ".",
+    "outDir": "../dist/out-tsc/spec",
+    "module": "es2015",
+    "sourceMap": true,
+    "inlineSourceMap": false,
+    "inlineSources": false,
+    "paths": {
+      "@sharpangles/*": ["./modules/*"]
+    }
+  },
+  "files": [
+    "./test.ts"
+  ],
+  "include": [
+    "./modules/**/*.spec.ts",
+    "./modules/**/*.d.ts",
+    "./samples/**/*.spec.ts",
+    "./samples/**/*.d.ts"
+  ],
+  "exclude": [
+    "./modules/unsorted",
+    "./samples/unsorted"
+  ]
+}

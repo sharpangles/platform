@@ -1,9 +1,10 @@
 {
-  "name": "@sharpangles/angular-dynamic",
+  "name": "@sharpangles/devops-build",
   "version": "1.0.0-alpha.4",
-  "description": "Dynamic component loading for angular",
-  "main": "./bundles/angular-dynamic.umd.js",
-  "module": "./index.js",
+  "description": "Quick and dirty build system, not really maintained other than for internal use.",
+  "main": "./bundles/devops-build.umd.js",
+  "module": "./bundles/devops-build.es5.js",
+  "es2015": "./bundles/devops-build.es2015.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/sharpangles/platform.git"

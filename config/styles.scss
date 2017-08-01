@@ -1,0 +1,16 @@
+// https://stackoverflow.com/questions/17555682/height-100-or-min-height-100-for-html-and-body-elements
+// Also note, 100% height on body will break the ability to set scrollTop on an element (custom scrollbars).
+// The trade-off is that height doesn't flow.  To size children against viewport site, use vh unit.
+
+html {
+    height: 100%;
+}
+
+body {
+    margin: 10px;
+    min-height: 100%;
+}
+
+sa-app-root {
+    display: block;
+}

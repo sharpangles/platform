@@ -1,0 +1,67 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "project": {
+    "name": "typescript"
+  },
+  "apps": [
+    {
+      "name": "tests",
+      "root": "Typescript",
+      "outDir": "dist",
+      "assets": [],
+      "index": "config/index.html",
+      "main": "config/main.ts",
+      "polyfills": "config/polyfills.ts",
+      "test": "./test.ts",
+      "tsconfig": "./tsconfig.app.json",
+      "testTsconfig": "./tsconfig.spec.json",
+      "prefix": "sa",
+      "styles": [],
+      "scripts": [],
+      "environmentSource": "config/environments/environment.ts",
+      "environments": {
+        "dev": "config/environments/environment.ts",
+        "prod": "config/environments/environment.prod.ts"
+      }
+    },
+    {
+      "name": "endpoints",
+      "root": "Typescript",
+      "outDir": "Typescript/samples/endpoints/dist",
+      "assets": [],
+      "index": "config/index.html",
+      "main": "samples/endpoints/main.ts",
+      "polyfills": "config/polyfills.ts",
+      "test": "./test.ts",
+      "tsconfig": "./tsconfig.sample.json",
+      "testTsconfig": "./tsconfig.spec.json",
+      "prefix": "sa",
+      "styles": ["config/styles.scss"],
+      "scripts": [],
+      "environmentSource": "config/environments/environment.ts",
+      "environments": {
+        "dev": "config/environments/environment.ts",
+        "prod": "config/environments/environment.prod.ts"
+      }
+    }
+  ],
+  "e2e": {
+    "protractor": {
+      "config": "./Typescript/config/protractor.conf.js"
+    }
+  },
+  "lint": [
+    {
+      "project": "./Typescript/tsconfig.build.json"
+    }
+  ],
+  "test": {
+    "karma": {
+      "config": "./Typescript/karma.conf.js"
+    }
+  },
+  "defaults": {
+    "styleExt": "scss",
+    "component": {}
+  }
+}
