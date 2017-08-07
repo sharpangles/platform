@@ -1,4 +1,4 @@
-# @sharpangles/deps
+# @sharpangles/life
 
 ## Dependency Injection
 

@@ -1,5 +1,5 @@
 {
-  "name": "@sharpangles/deps",
+  "name": "@sharpangles/life",
   "version": "1.0.0-alpha.4",
   "description": "Dynamic component loading for angular",
   "main": "./bundles/angular-dynamic.umd.js",
