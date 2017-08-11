@@ -25,7 +25,7 @@ But let's look at the problems.
 - Numerous copies of state are hidden all over the application: global state, BehaviorSubject state, distinctOnChanged, inputs on components, etc...
 - State is no longer its original definition: state of all the components of the application.  The inputs on my presentation components should be the only real copy of state that I need.  If I want to know my UI state, shouldn't I ask the UI?
 - We no longer have a living system, but a sequence of snapshots.
-- We lost the ability to architect applications.  We replaced OOP principals with 'just make a lot of really small modules'.  Architecture is about decomposing complex problems into functional (NOT domain) concepts.  Once we break up these pieces by volatility, we apply them to a specific domain purpose.  That's a lot harder to do when object instances with dependency injection containers are no longer available to us to provide context to events.
+- We lost the ability to architect applications.  We replaced service oriented architecture with 'just make a lot of really small modules'.  Architecture is about decomposing complex problems into functional (NOT domain) concepts.  Once we break up these pieces by volatility, we apply them to a specific domain purpose.  That's a lot harder to do when object instances with dependency injection containers are no longer available to us to provide context to events.
 - The application is optimized for initialization, not an actual running application.
 - We lose imperative capabilities in many cases.  Ever get confused by the difference between imperative and declarative code?  We all have.  It's easy to see chains of subscriptions and assume its declarative, but that's just syntax.  Chaining '.thens' on promises is not really declarative, its an explicit imperative sequence.  Holding onto arrays of running tasks in a class?  It looks like imperative, but usually its just some internal implementation of a declarative design.  Here is the test: if you care about context or synchronization, its really imperative.  You may be using rxjs observables, but if you are wrapping event objects to attach state with context specific to the event source, or have synchronization capabilities (i.e. cancellation or transactional commit scopes) flowing along with those events, that's not really declarative anymore.
 
@@ -40,3 +40,35 @@ We need a new architectural principal, one that can bring life into our system d
 Component lifetime different from models of system lifetimes.
 
 Init and history are simpler to understand from the state-centrist approach.  But as soon as they get more complex, we go back to events anyway.  Loading a 'state' in a different context for example (A URL sent to a different user with different theme preferences or access).
+
+# Lifetime Oriented Architecture
+
+- Distributed containers of services whose finalization (commit, rollback, disposal, etc...) is coupled to the lifetime.  Its creation is either eagerly or lazily tied to the lifetime.
+- Transactional behavior is itself a lifetime.  Coordination of context, cancellation, etc... is always at a lifetime level.
+- Cross-lifetime coordination is the act of tying a transaction lifetime to multiple parent lifetiems.
+- State, event sources, imperative actions are all contained in services.  i.e. an interface.
+- Long-running process is not a service call, its the creation of a new lifetime.
+- Plumbing for distributing services across language/device/etc... is in the lifetime.
+  - Do all events/calls flow over lifetime, to remove all plumbing considerations?
+- SOA problems solved:
+  - Execution tied to a single 'machine' (event if that 'machine' is load balanced copies of the service).
+  - Decouples plumbing from services.
+    - Compartmentalized service discovery.
+    - Removes need for any imperative async work by encapsulating any context/transactional coordination from services and puting it into synchronization of lifetime across platforms.
+
+Language is insufficient, which is reason for divide between aspect abstraction in WCF and calling things synchronously vs async removing coupling between thread (cpu) and network resources.
+If lifetime was fundamental to allocation (not execution) context, we dont need await or cancellation tokens.  Do lifetime-generating operations handle generating a new lifetime on the intersection of the execution and allocation context?
+objects has allocation context (simulated by injecting lifetimeinto ctor)
+threads have execution context AND allocation context of the instance containing their source.
+A new lifetime creation needs to involve both...
+Add another lifetime dimension with an instantiation context, where distributed lifetime is fundamental.
+
+Contracts should never decide location (i.e. if they have an async signature).
+Also they do not determine if the action is cancellable.  Every action is cancellable since at the very least the lifetime might end.
+
+vs. Actor model:
+- Actors have a flat perspective of state and lifetime.  They have no concern for flowing events.
+- Lifetimes have state, but it should be assumed to be consistent.  Then services expose events and inputs like ng directives.  You never really access state, you just flow changes over services, keeping everything as a change right up to the endpoint (persistence, DOM, etc...).
+
+Presentation components are actors
+Actors have no properties, network managed by lifetime (search is visitor pattern?)
