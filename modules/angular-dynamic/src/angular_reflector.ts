@@ -1,9 +1,12 @@
-import { Type, Injectable, Input, Injector } from '@angular/core';
+import { Type, Injectable, Input, Injector, TypeDecorator } from '@angular/core';
 import { Stateful } from './metadata';
 import { StateChange } from './interfaces';
 import { StateMapper } from './state_mapper';
 
 /**
+ * Update: this is still here for ng4.  Its better in ng5, so some of this goes away eventually.  Adapted to support ng4 and 5.
+ *
+ *
  * Below is adapted from the angular reflector: https://github.com/angular/angular/blob/14fd78fd85b3dd230742eaaeab65f75226f37167/packages/core/src/reflection/reflection_capabilities.ts
  * This avoids any private references to the unexported reflector, at the cost of some duplication.
  * Although it doesn't involve a private reference, it still needs to be treated and maintained as such, since the inheritence behavior and tsickle decorator treatment is still an internal implementation.
@@ -40,9 +43,17 @@ export class AngularReflector {
             return convertTsickleDecoratorIntoMetadata((<any>typeOrFunc).decorators);
         }
 
-        // API for metadata created by invoking the decorators.
+        let ng5results: any[] | undefined;
+
+        // NG5 API for metadata created by invoking the decorators.
+        if (typeOrFunc.hasOwnProperty(ANNOTATIONS)) {
+            ng5results = (typeOrFunc as any)[ANNOTATIONS];
+        }
+
+        // NG4 API for metadata created by invoking the decorators.
         if (Reflect && (<any>Reflect).getOwnMetadata) {
-            return (<any>Reflect).getOwnMetadata('annotations', typeOrFunc);
+            const ng4Results = (<any>Reflect).getOwnMetadata('annotations', typeOrFunc);
+            return ng5results ? ng4Results ? ng5results.concat(ng4Results) : ng5results : ng4Results;
         }
         return null;
     }
@@ -80,10 +91,17 @@ export class AngularReflector {
             return propMetadata;
         }
 
+        let ng5results: any[] | undefined;
 
-        // API for metadata created by invoking the decorators.
+        // NG5 API for metadata created by invoking the decorators.
+        if (typeOrFunc.hasOwnProperty(PROP_METADATA)) {
+            ng5results = (typeOrFunc as any)[PROP_METADATA];
+        }
+
+        // NG4 API for metadata created by invoking the decorators.
         if (Reflect && (<any>Reflect).getOwnMetadata) {
-            return (<any>Reflect).getOwnMetadata('propMetadata', typeOrFunc);
+            const ng4Results = (<any>Reflect).getOwnMetadata('propMetadata', typeOrFunc);
+            return ng5results ? ng4Results ? ng5results.concat(ng4Results) : ng5results : ng4Results;
         }
         return null;
     }
@@ -124,13 +142,139 @@ function getParentCtor(ctor: Function): Type<any> {
 }
 
 function convertTsickleDecoratorIntoMetadata(decoratorInvocations: any[]): any[] {
-  if (!decoratorInvocations) {
-    return [];
-  }
-  return decoratorInvocations.map(decoratorInvocation => {
-    const decoratorType = decoratorInvocation.type;
-    const annotationCls = decoratorType.annotationCls;
-    const annotationArgs = decoratorInvocation.args ? decoratorInvocation.args : [];
-    return new annotationCls(...annotationArgs);
-  });
+    if (!decoratorInvocations) {
+        return [];
+    }
+    return decoratorInvocations.map(decoratorInvocation => {
+        const decoratorType = decoratorInvocation.type;
+        const annotationCls = decoratorType.annotationCls;
+        const annotationArgs = decoratorInvocation.args ? decoratorInvocation.args : [];
+        return new annotationCls(...annotationArgs);
+    });
+}
+
+
+
+export const ANNOTATIONS = '__annotations__';
+export const PARAMETERS = '__paramaters__';
+export const PROP_METADATA = '__prop__metadata__';
+
+/**
+ * @suppress {globalThis}
+ */
+export function makeDecorator(
+    name: string, props?: (...args: any[]) => any, parentClass?: any,
+    chainFn?: (fn: Function) => void):
+    { new(...args: any[]): any; (...args: any[]): any; (...args: any[]): (cls: any) => any; } {
+    const metaCtor = makeMetadataCtor(props);
+
+    function DecoratorFactory(objOrType: any): (cls: any) => any {
+        if (this instanceof DecoratorFactory) {
+            metaCtor.call(this, objOrType);
+            return this;
+        }
+
+        const annotationInstance = new (<any>DecoratorFactory)(objOrType);
+        const TypeDecorator: TypeDecorator = <TypeDecorator>function TypeDecorator(cls: Type<any>) {
+            // Use of Object.defineProperty is important since it creates non-enumerable property which
+            // prevents the property is copied during subclassing.
+            const annotations = cls.hasOwnProperty(ANNOTATIONS) ?
+                (cls as any)[ANNOTATIONS] :
+                Object.defineProperty(cls, ANNOTATIONS, { value: [] })[ANNOTATIONS];
+            annotations.push(annotationInstance);
+            return cls;
+        };
+        if (chainFn) chainFn(TypeDecorator);
+        return TypeDecorator;
+    }
+
+    if (parentClass) {
+        DecoratorFactory.prototype = Object.create(parentClass.prototype);
+    }
+
+    DecoratorFactory.prototype.ngMetadataName = name;
+    (<any>DecoratorFactory).annotationCls = DecoratorFactory;
+    return DecoratorFactory as any;
+}
+
+function makeMetadataCtor(props?: (...args: any[]) => any): any {
+    return function ctor(...args: any[]) {
+        if (props) {
+            const values = props(...args);
+            for (const propName in values) {
+                this[propName] = values[propName];
+            }
+        }
+    };
+}
+
+export function makeParamDecorator(
+    name: string, props?: (...args: any[]) => any, parentClass?: any): any {
+    const metaCtor = makeMetadataCtor(props);
+    function ParamDecoratorFactory(...args: any[]): any {
+        if (this instanceof ParamDecoratorFactory) {
+            metaCtor.apply(this, args);
+            return this;
+        }
+        const annotationInstance = new (<any>ParamDecoratorFactory)(...args);
+
+        (<any>ParamDecorator).annotation = annotationInstance;
+        return ParamDecorator;
+
+        function ParamDecorator(cls: any, unusedKey: any, index: number): any {
+            // Use of Object.defineProperty is important since it creates non-enumerable property which
+            // prevents the property is copied during subclassing.
+            const parameters = cls.hasOwnProperty(PARAMETERS) ?
+                (cls as any)[PARAMETERS] :
+                Object.defineProperty(cls, PARAMETERS, { value: [] })[PARAMETERS];
+
+            // there might be gaps if some in between parameters do not have annotations.
+            // we pad with nulls.
+            while (parameters.length <= index) {
+                parameters.push(null);
+            }
+
+            (parameters[index] = parameters[index] || []).push(annotationInstance);
+            return cls;
+        }
+    }
+    if (parentClass) {
+        ParamDecoratorFactory.prototype = Object.create(parentClass.prototype);
+    }
+    ParamDecoratorFactory.prototype.ngMetadataName = name;
+    (<any>ParamDecoratorFactory).annotationCls = ParamDecoratorFactory;
+    return ParamDecoratorFactory;
+}
+
+export function makePropDecorator(
+    name: string, props?: (...args: any[]) => any, parentClass?: any): any {
+    const metaCtor = makeMetadataCtor(props);
+
+    function PropDecoratorFactory(...args: any[]): any {
+        if (this instanceof PropDecoratorFactory) {
+            metaCtor.apply(this, args);
+            return this;
+        }
+
+        const decoratorInstance = new (<any>PropDecoratorFactory)(...args);
+
+        return function PropDecorator(target: any, name: string) {
+            const constructor = target.constructor;
+            // Use of Object.defineProperty is important since it creates non-enumerable property which
+            // prevents the property is copied during subclassing.
+            const meta = constructor.hasOwnProperty(PROP_METADATA) ?
+                (constructor as any)[PROP_METADATA] :
+                Object.defineProperty(constructor, PROP_METADATA, { value: {} })[PROP_METADATA];
+            meta[name] = meta.hasOwnProperty(name) && meta[name] || [];
+            meta[name].unshift(decoratorInstance);
+        };
+    }
+
+    if (parentClass) {
+        PropDecoratorFactory.prototype = Object.create(parentClass.prototype);
+    }
+
+    PropDecoratorFactory.prototype.ngMetadataName = name;
+    (<any>PropDecoratorFactory).annotationCls = PropDecoratorFactory;
+    return PropDecoratorFactory;
 }

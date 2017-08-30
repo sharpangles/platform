@@ -1,5 +1,6 @@
 import { Injectable, Injector, NgModuleFactory, resolveForwardRef, NgModuleFactoryLoader, NgModule, Type, InjectionToken, Optional, Inject, getModuleFactory } from '@angular/core';
 import { TypeReference } from './interfaces';
+import { AngularReflector } from './angular_reflector';
 
 /**
  * Implementations asyncrhonously resolve the type reference to a url.
@@ -30,7 +31,7 @@ export class ComponentTypeLoader {
         }
         let url = this.typeReferenceUrlResolver ? await this.typeReferenceUrlResolver.getUrl(typeReference) : typeReference.moduleName;
         let ngModuleFactory = await this.moduleFactoryLoader.load(<string>url);
-        let annotations = (<any>Reflect).getMetadata('annotations', ngModuleFactory.moduleType);
+        let annotations = new AngularReflector().annotations(ngModuleFactory.moduleType);
         let ngModule: NgModule = annotations ? annotations.find((m: any) => m.entryComponents || m.bootstrap) : (<any>ngModuleFactory.moduleType).decorators[0].args[0];
         if (!ngModule || (!ngModule.entryComponents && !ngModule.bootstrap)) {
             throw new Error('The type was not a module with entryComponents');

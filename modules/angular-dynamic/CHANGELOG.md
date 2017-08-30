@@ -1,3 +1,7 @@
+<a name="1.0.0-alpha.5"></a>
+# 1.0.0-alpha.5 (2017-08-30)
+Angular 5
+
 <a name="1.0.0-alpha.4"></a>
 # 1.0.0-alpha.4 (2017-06-15)
 Added more NgModuleFactoryLoaders.

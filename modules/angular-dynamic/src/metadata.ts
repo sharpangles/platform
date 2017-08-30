@@ -1,6 +1,7 @@
 import { TypeDecorator, Injector, Type } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
 import { StateChange } from './interfaces';
+import { ANNOTATIONS } from './angular_reflector';
 
 export interface StatefulDecorator extends TypeDecorator { }
 
@@ -52,9 +53,13 @@ export function Stateful(stateful: Stateful) {
     // This does not invoke all of angular annotations.  It's just enough to get StatefulMetadtaFactory to work.
     // AOT cant seem to understand makePropDecorator if copying ng metadata.Makes us use a little magic string stuff for now tokeep it simple.
     return function TypeDecorator(cls: Type<any>) {
+        // just set both for ng4 and 5.
         const annotations = (<any>Reflect).getOwnMetadata('annotations', cls) || [];
         annotations.push(stateful);
         (<any>Reflect).defineMetadata('annotations', annotations, cls);
+        if (!cls[ANNOTATIONS])
+            cls[ANNOTATIONS] = [];
+        cls[ANNOTATIONS].push(stateful);
         return cls;
     };
 }
