@@ -99,7 +99,7 @@ export class AngularReflector {
         // NG4 API for metadata created by invoking the decorators.
         if (Reflect && (<any>Reflect).getOwnMetadata) {
             const ng4Results = (<any>Reflect).getOwnMetadata('propMetadata', typeOrFunc);
-            return ng5results ? ng4Results ? ng5results.concat(ng4Results) : ng5results : ng4Results;
+            return ng5results ? ng4Results ? Object.assign({}, ng5results, ng4Results) : ng5results : ng4Results;
         }
         return null;
     }

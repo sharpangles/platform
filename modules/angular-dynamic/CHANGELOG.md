@@ -1,3 +1,7 @@
+<a name="1.0.0-alpha.8"></a>
+# 1.0.0-alpha.8 (2017-09-19)
+Bug fix when props exist in both ng4 and ng5 prop meta storage.
+
 <a name="1.0.0-alpha.7"></a>
 # 1.0.0-alpha.7 (2017-09-19)
 Minor fix, plus moved commonjs factory loader to specs for now to get rid of static analysis warnings.  Can re-add in separate library later if needed.
