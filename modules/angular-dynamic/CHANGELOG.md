@@ -1,3 +1,7 @@
+<a name="1.0.0-alpha.7"></a>
+# 1.0.0-alpha.7 (2017-09-19)
+Minor fix, plus moved commonjs factory loader to specs for now to get rid of static analysis warnings.  Can re-add in separate library later if needed.
+
 <a name="1.0.0-alpha.6"></a>
 # 1.0.0-alpha.6 (2017-09-19)
 Get stuff working with 'static' dynamic (ie. ng cli with AOT).

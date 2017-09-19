@@ -1,7 +1,7 @@
 import { SaLazyComponentOutlet } from '../src/directives/sa_lazy_component_outlet';
 import { StatefulModule } from '../src/stateful_module';
 import { TypeReference } from '../src/interfaces';
-import { CommonJsNgModuleLoader } from '../src/common_js_ng_module_factory_loader';
+import { CommonJsNgModuleLoader } from './common_js_ng_module_factory_loader';
 import { Component, ViewChild, Input, NgModuleFactoryLoader } from '@angular/core';
 import { async, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';

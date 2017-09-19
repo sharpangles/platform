@@ -33,9 +33,9 @@ export class ComponentTypeLoader {
         let ngModuleFactory = this.moduleFactoryLoader ? await this.moduleFactoryLoader.load(url) : getModuleFactory(url);
         let annotations = new AngularReflector().annotations(ngModuleFactory.moduleType);
         let component: Type<any>;
-        if (annotations) {
-            let ngModule: NgModule = annotations.find((m: any) => m.entryComponents || m.bootstrap);
-            if (!ngModule || (!ngModule.entryComponents && !ngModule.bootstrap)) {
+        let ngModule: NgModule = annotations.find((m: any) => m.entryComponents || m.bootstrap);
+        if (ngModule) {
+            if (!ngModule.entryComponents && !ngModule.bootstrap) {
                 throw new Error('The type was not a module with entryComponents');
             }
             component = this.findComponent(ngModule, typeReference.componentTypeName)!;

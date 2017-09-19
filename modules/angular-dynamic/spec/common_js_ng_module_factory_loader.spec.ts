@@ -1,5 +1,5 @@
 import { StatefulModule } from '../src/stateful_module';
-import { CommonJsNgModuleLoader } from '../src/common_js_ng_module_factory_loader';
+import { CommonJsNgModuleLoader } from './common_js_ng_module_factory_loader';
 import { NgModuleFactory } from '@angular/core';
 import { TestBed, async } from '@angular/core/testing';
 import { WidgetModule } from './widget_module';
