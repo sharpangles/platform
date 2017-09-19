@@ -1,15 +1,9 @@
 import { ComponentTypeLoader } from '../src/component_type_loader';
 import { StatefulModule } from '../src/stateful_module';
-import { TypeReference, StateChange } from '../src/interfaces';
+import { TypeReference } from '../src/interfaces';
 import { CommonJsNgModuleLoader } from '../src/common_js_ng_module_factory_loader';
-import { Control, Stateful, State } from '../src/metadata';
-import { Component, ViewChild, NgModule, Input, Injector, NgModuleFactory, NgModuleFactoryLoader } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { NgModuleFactoryLoader } from '@angular/core';
 import { async, TestBed } from '@angular/core/testing';
-import { By } from '@angular/platform-browser';
-import { Widget } from './widget_module';
-
-
 
 describe('ComponentTypeLoader', () => {
     beforeEach(() => {

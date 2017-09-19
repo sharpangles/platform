@@ -1,7 +1,4 @@
-import { Type, Injectable, Input, Injector, TypeDecorator } from '@angular/core';
-import { Stateful } from './metadata';
-import { StateChange } from './interfaces';
-import { StateMapper } from './state_mapper';
+import { Type, Injectable, TypeDecorator } from '@angular/core';
 
 /**
  * Update: this is still here for ng4.  Its better in ng5, so some of this goes away eventually.  Adapted to support ng4 and 5.
@@ -55,6 +52,7 @@ export class AngularReflector {
             const ng4Results = (<any>Reflect).getOwnMetadata('annotations', typeOrFunc);
             return ng5results ? ng4Results ? ng5results.concat(ng4Results) : ng5results : ng4Results;
         }
+
         return null;
     }
 

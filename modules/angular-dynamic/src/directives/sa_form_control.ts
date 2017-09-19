@@ -1,6 +1,5 @@
 import { Directive, Input, OnChanges, SimpleChanges, Optional, Self } from '@angular/core';
 import { FormGroup, FormArray, AbstractControl, NgControl, FormGroupName, FormArrayName } from '@angular/forms';
-import { SaStateOutlet } from './sa_state_outlet';
 
 
 /**

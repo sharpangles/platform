@@ -1,19 +1,24 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
-    "declaration": true,
     "stripInternal": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "module": "commonjs",
     "moduleResolution": "node",
     "noEmitOnError": false,
-    "outDir": "./release",
-    "rootDir": ".",
     "lib": ["es2015", "dom"],
     "target": "es5",
     "skipLibCheck": true,
     "strictNullChecks": true,
+    "noUnusedLocals": true,
+    "inlineSources": true,
+    "inlineSourceMap": true,
+    "forceConsistentCasingInFileNames": true,
+    "downlevelIteration": true,
+    "declaration": true,
+    "module": "commonjs",
+    "outDir": "./release",
+    "rootDir": ".",
     "types": [
       "node",
       "jasmine"

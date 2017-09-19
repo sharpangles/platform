@@ -1,13 +1,10 @@
 import { SaLazyComponentOutlet } from '../src/directives/sa_lazy_component_outlet';
-import { ComponentTypeLoader } from '../src/component_type_loader';
 import { StatefulModule } from '../src/stateful_module';
 import { TypeReference, StateChange } from '../src/interfaces';
 import { CommonJsNgModuleLoader } from '../src/common_js_ng_module_factory_loader';
-import { Control, Stateful, State } from '../src/metadata';
-import { Component, ViewChild, NgModule, Input, Injector, NgModuleFactory, NgModuleFactoryLoader } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { Component, ViewChild, NgModuleFactoryLoader } from '@angular/core';
+import { FormGroup } from '@angular/forms';
 import { async, TestBed } from '@angular/core/testing';
-import { By } from '@angular/platform-browser';
 
 @Component({
     selector: 'testComponent',

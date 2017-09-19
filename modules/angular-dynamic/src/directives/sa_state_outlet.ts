@@ -1,5 +1,4 @@
-import { Input, Output, Directive, OnChanges, OnDestroy, SimpleChange, EventEmitter, ComponentRef, Optional, Self, ChangeDetectorRef } from '@angular/core';
-import { SaLazyComponentOutlet } from './sa_lazy_component_outlet';
+import { Input, Output, Directive, OnChanges, SimpleChange, EventEmitter, ComponentRef } from '@angular/core';
 import { StateChange } from '../interfaces';
 import { StateMapperFactory } from '../state_mapper_factory';
 

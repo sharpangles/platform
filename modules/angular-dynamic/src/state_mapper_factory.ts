@@ -6,9 +6,6 @@ import { AngularReflector } from './angular_reflector';
 
 @Injectable()
 export class StateMapperFactory {
-    constructor(private reflector: AngularReflector) {
-    }
-
     private statefulsByType: Map<Type<any>, Stateful> = new Map<Type<any>, Stateful>();
 
     get(typeOrFunc: Type<any>) {

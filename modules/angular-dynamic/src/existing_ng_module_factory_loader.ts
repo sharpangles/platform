@@ -1,4 +1,4 @@
-import { Compiler, Injectable, Optional, NgModuleFactory, NgModuleFactoryLoader, getModuleFactory } from '@angular/core';
+import { Injectable, NgModuleFactory, NgModuleFactoryLoader, getModuleFactory } from '@angular/core';
 
 /**
  * Relies on modules that are already loaded.

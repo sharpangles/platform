@@ -1,4 +1,4 @@
-import { Injectable, Injector, NgModuleFactory, resolveForwardRef, NgModuleFactoryLoader, NgModule, Type, InjectionToken, Optional, Inject, getModuleFactory } from '@angular/core';
+import { Injectable, NgModuleFactory, NgModuleFactoryLoader, NgModule, Type, InjectionToken, Optional, Inject, getModuleFactory, resolveForwardRef, ComponentFactoryResolver } from '@angular/core';
 import { TypeReference } from './interfaces';
 import { AngularReflector } from './angular_reflector';
 
@@ -18,7 +18,7 @@ export let TYPE_REFERENCE_URL_RESOLVER: InjectionToken<TypeReferenceUrlResolver>
  */
 @Injectable()
 export class ComponentTypeLoader {
-    constructor(private moduleFactoryLoader: NgModuleFactoryLoader, @Optional() @Inject(TYPE_REFERENCE_URL_RESOLVER) private typeReferenceUrlResolver?: TypeReferenceUrlResolver) {
+    constructor(public componentFactoryResolver: ComponentFactoryResolver, @Optional() private moduleFactoryLoader?: NgModuleFactoryLoader, @Optional() @Inject(TYPE_REFERENCE_URL_RESOLVER) private typeReferenceUrlResolver?: TypeReferenceUrlResolver) {
     }
 
     /**
@@ -29,22 +29,28 @@ export class ComponentTypeLoader {
         if (!typeReference.componentTypeName) {
             throw new Error('A component name is required.');
         }
-        let url = this.typeReferenceUrlResolver ? await this.typeReferenceUrlResolver.getUrl(typeReference) : typeReference.moduleName;
-        let ngModuleFactory = await this.moduleFactoryLoader.load(<string>url);
+        let url = this.typeReferenceUrlResolver ? await this.typeReferenceUrlResolver.getUrl(typeReference) : typeReference.moduleName!;
+        let ngModuleFactory = this.moduleFactoryLoader ? await this.moduleFactoryLoader.load(url) : getModuleFactory(url);
         let annotations = new AngularReflector().annotations(ngModuleFactory.moduleType);
-        let ngModule: NgModule = annotations ? annotations.find((m: any) => m.entryComponents || m.bootstrap) : (<any>ngModuleFactory.moduleType).decorators[0].args[0];
-        if (!ngModule || (!ngModule.entryComponents && !ngModule.bootstrap)) {
-            throw new Error('The type was not a module with entryComponents');
+        let component: Type<any>;
+        if (annotations) {
+            let ngModule: NgModule = annotations.find((m: any) => m.entryComponents || m.bootstrap);
+            if (!ngModule || (!ngModule.entryComponents && !ngModule.bootstrap)) {
+                throw new Error('The type was not a module with entryComponents');
+            }
+            component = this.findComponent(ngModule, typeReference.componentTypeName)!;
         }
-        let component = this.findComponent(ngModule, typeReference.componentTypeName);
-        if (!component) {
-            throw new Error('Component is not an entryComponent on the dynamically loaded module.');
+        else {
+            // Gets things working with ng-cli AOT since we lose NgModule annotations.
+            const entry = Array.from<any>((<any>this.componentFactoryResolver)._factories.entries()).find(e => e[0].name === typeReference.componentTypeName);
+            if (!entry)
+                throw new Error('Component is not an entryComponent on the dynamically loaded module.');
+            component = entry[0];
         }
         return { module: ngModuleFactory, component: component };
     }
 
     private findComponent(ngModule: NgModule, componentTypeName: string): Type<any> | undefined {
-        let component: Type<any> | null = null;
         let flattenedEntryComponents = this.flatten<any>(<any>ngModule.entryComponents || <any>ngModule.bootstrap);
         return flattenedEntryComponents.find(entryComponent => resolveForwardRef(entryComponent).name === componentTypeName);
     }

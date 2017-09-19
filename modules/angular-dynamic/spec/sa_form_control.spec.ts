@@ -1,6 +1,6 @@
 import { Component, Input, forwardRef, ViewChild, ViewChildren, QueryList, ElementRef, Renderer2, NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormControl, FormGroup, FormArray, NG_VALUE_ACCESSOR, ControlValueAccessor, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormGroup, FormArray, NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
 import { TestBed, async } from '@angular/core/testing';
 import { StatefulModule } from '../src/stateful_module';
 

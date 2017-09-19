@@ -1,5 +1,4 @@
 import { TypeDecorator, Injector, Type } from '@angular/core';
-import { AbstractControl } from '@angular/forms';
 import { StateChange } from './interfaces';
 import { ANNOTATIONS } from './angular_reflector';
 
