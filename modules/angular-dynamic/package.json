@@ -1,6 +1,6 @@
 {
   "name": "@sharpangles/angular-dynamic",
-  "version": "1.0.0-alpha.7",
+  "version": "1.0.0-alpha.8",
   "description": "Dynamic component loading for angular",
   "main": "./bundles/angular-dynamic.umd.js",
   "module": "./index.js",
