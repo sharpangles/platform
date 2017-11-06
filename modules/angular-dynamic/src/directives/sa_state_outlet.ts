@@ -1,9 +1,9 @@
-import { Input, Output, Directive, OnChanges, SimpleChange, EventEmitter, ComponentRef } from '@angular/core';
+import { Input, Output, Directive, OnChanges, SimpleChange, EventEmitter, ComponentRef, ChangeDetectorRef } from '@angular/core';
 import { StateChange } from '../interfaces';
 import { StateMapperFactory } from '../state_mapper_factory';
 
 export abstract class SaStateOutletBase implements OnChanges {
-    constructor(private stateMapperFactory: StateMapperFactory) {
+    constructor(private stateMapperFactory: StateMapperFactory, private cdr: ChangeDetectorRef) {
     }
 
     /**
@@ -22,6 +22,7 @@ export abstract class SaStateOutletBase implements OnChanges {
         let stateful = this.stateMapperFactory.get(this.componentRef.componentType);
         let stateChange = stateful.setState(this.componentRef.injector, this.componentRef.instance, this.saStateOutlet);
         this.saStateOutletStateSet.emit(stateChange);
+        this.cdr.markForCheck();
     }
 
     getState() {
@@ -41,8 +42,8 @@ export abstract class SaStateOutletBase implements OnChanges {
     exportAs: 'saStateOutlet'
 })
 export class SaStateOutlet extends SaStateOutletBase {
-    constructor(stateMapperFactory: StateMapperFactory) {
-        super(stateMapperFactory);
+    constructor(stateMapperFactory: StateMapperFactory, cdr: ChangeDetectorRef) {
+        super(stateMapperFactory, cdr);
     }
 
     @Input() saStateOutletComponentRef?: ComponentRef<any>;

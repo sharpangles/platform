@@ -1,3 +1,7 @@
+<a name="1.0.0"></a>
+# 1.0.0 (2017-11-06)
+Move markForCheck inside directives.
+
 <a name="1.0.0-alpha.8"></a>
 # 1.0.0-alpha.8 (2017-09-19)
 Bug fix when props exist in both ng4 and ng5 prop meta storage.

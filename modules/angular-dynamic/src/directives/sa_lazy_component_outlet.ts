@@ -1,4 +1,4 @@
-import { Directive, Input, Output, OnChanges, EventEmitter, SimpleChanges, NgModuleFactory, ViewContainerRef, TemplateRef, Type, ComponentRef, EmbeddedViewRef, NgModuleRef, ComponentFactoryResolver, ReflectiveInjector, forwardRef } from '@angular/core';
+import { Directive, Input, Output, OnChanges, EventEmitter, SimpleChanges, NgModuleFactory, ViewContainerRef, TemplateRef, Type, ComponentRef, EmbeddedViewRef, NgModuleRef, ComponentFactoryResolver, ReflectiveInjector, forwardRef, ChangeDetectorRef } from '@angular/core';
 import { TypeReference } from '../interfaces';
 import { ComponentTypeLoader } from '../component_type_loader';
 
@@ -14,7 +14,7 @@ import { ComponentTypeLoader } from '../component_type_loader';
     exportAs: 'saLazyComponentOutlet'
 })
 export class SaLazyComponentOutlet implements OnChanges {
-    constructor(private viewContainer: ViewContainerRef, private componentTypeLoader: ComponentTypeLoader, private _template: TemplateRef<any>) {
+    constructor(private viewContainer: ViewContainerRef, private componentTypeLoader: ComponentTypeLoader, private _template: TemplateRef<any>, private cdr: ChangeDetectorRef) {
     }
 
     @Input() saLazyComponentOutlet: TypeReference;
@@ -58,12 +58,14 @@ export class SaLazyComponentOutlet implements OnChanges {
             this.viewContainer.remove(this.viewContainer.indexOf(this.viewRef));
             delete this.viewRef;
         }
+        this.cdr.markForCheck();
     }
 
     private _enableTemplate() {
         if (this.viewRef)
             this.viewContainer.remove(this.viewContainer.indexOf(this.viewRef));
         this.viewRef = this.viewContainer.createEmbeddedView(this.saLazyComponentOutletTemplate || this._template, this.saLazyComponentOutletContext);
+        this.cdr.markForCheck();
     }
 
     private _onComponentResolved(resolution: Promise<any>, module: NgModuleFactory<any>, component: Type<any>) {
@@ -83,5 +85,6 @@ export class SaLazyComponentOutlet implements OnChanges {
         injector = ReflectiveInjector.resolveAndCreate([{ provide: forwardRef(() => SaLazyComponentOutlet), useValue: this }], injector);
         this.componentRef = this.viewContainer.createComponent(componentFactory, this.viewContainer.length, injector, this.saLazyComponentOutletContent);
         this.componentChanged.emit(this);
+        this.cdr.markForCheck();
     }
 }
